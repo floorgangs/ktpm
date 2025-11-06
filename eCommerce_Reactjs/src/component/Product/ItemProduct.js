@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CommonUtils from '../../utils/CommonUtils';
 import './ItemProduct.scss';
+import AddToCartModal from './AddToCartModal';
 // độ phân giải ảnh có thể làm vỡ layout
 function ItemProduct(props) {
+    const [isOpenModal, setIsOpenModal] = useState(false);
+
+    const openAddToCart = (e) => {
+        // prevent parent Link navigation
+        if (e && e.preventDefault) e.preventDefault();
+        if (e && e.stopPropagation) e.stopPropagation();
+        setIsOpenModal(true);
+    }
 
     return (
         <div className={props.type}>
@@ -12,12 +21,12 @@ function ItemProduct(props) {
                     <div style={{ width: props.width, height: props.height }} className="product-img">
                         <img className="img-fluid w-100" src={props.img} alt="" />
                         <div className="p_icon">
-                            <a href="#!" role="button">
+                            <button type="button" className="icon-btn" aria-label="view">
                                 <i className="ti-eye" />
-                            </a>
-                            <a href="#!" role="button">
+                            </button>
+                            <button type="button" className="icon-btn" aria-label="add-to-cart" onClick={openAddToCart}>
                                 <i className="ti-shopping-cart" />
-                            </a>
+                            </button>
                         </div>
                     </div>
                     <div style={{ width: props.width, height: '99px' }} className="product-btm">
@@ -31,6 +40,8 @@ function ItemProduct(props) {
                     </div>
                 </Link>
             </div>
+
+            <AddToCartModal isOpen={isOpenModal} toggle={() => setIsOpenModal(false)} productId={props.id} />
         </div>
     );
 }

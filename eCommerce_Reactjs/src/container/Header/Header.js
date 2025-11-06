@@ -129,7 +129,7 @@ const Header = props => {
                                     <ul className="nav navbar-nav navbar-right right_nav pull-right">
                                         <li className="nav-item">
                                         <Link to={"/user/messenger"} className="icons">
-                                            <i class="fa-brands fa-facebook-messenger"></i>
+                                            <i className="fa-brands fa-facebook-messenger"></i>
                                             </Link>
                                             {quantityMessage>0 && 
                                              <span className="box-message-quantity">{quantityMessage}</span>

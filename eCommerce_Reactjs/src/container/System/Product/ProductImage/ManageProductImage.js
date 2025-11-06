@@ -257,8 +257,8 @@ const ManageProductImage = () => {
                         <div onClick={() => handleOpenModal()} className="float-right"><i style={{ fontSize: '35px', cursor: 'pointer', color: '#0D6EFD' }} className="fas fa-plus-square"></i></div>
                     </div>
                     <div className="card-body">
-                        <div className="table-responsive">
-                            <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
+                            <div className="table-responsive">
+                            <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing={0}>
                                 <thead>
                                     <tr>
                                         <th>STT</th>
@@ -336,8 +336,8 @@ const ManageProductImage = () => {
                         <div onClick={() => handleOpenModalSize()} className="float-right"><i style={{ fontSize: '35px', cursor: 'pointer', color: '#0D6EFD' }} className="fas fa-plus-square"></i></div>
                     </div>
                     <div className="card-body">
-                        <div className="table-responsive">
-                            <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
+                            <div className="table-responsive">
+                            <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing={0}>
                                 <thead>
                                     <tr>
                                         <th>STT</th>

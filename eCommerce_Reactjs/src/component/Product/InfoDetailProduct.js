@@ -107,18 +107,18 @@ function InfoDetailProduct(props) {
                     <h2>{CommonUtils.formatter.format(arrDetail?.discountPrice || 0)}</h2>
                     <ul className="list">
                         <li>
-                            <a className="active" href="#!">
+                            <span className="active">
                                 <span>Loại</span> : {dataProduct?.categoryData?.value || ''}
-                            </a>
+                            </span>
                         </li>
                         <li>
-                            <a href="#!">
+                            <span>
                                 <span>Trạng thái</span> : {quantity > 0 ? 'Còn hàng' : 'Hết hàng'}
-                            </a>
+                            </span>
                         </li>
                         <li>
                             <div className="box-size">
-                                <a href="#!"><span>Size</span></a>
+                                <span><span>Size</span></span>
                                 {arrDetail?.productDetailSize?.map((item, index) => (
                                     <div
                                         key={index}
@@ -131,7 +131,7 @@ function InfoDetailProduct(props) {
                             </div>
                         </li>
                         <li>
-                            <a href="#!">{quantity} sản phẩm có sẵn</a>
+                            <span>{quantity} sản phẩm có sẵn</span>
                         </li>
                     </ul>
 
@@ -174,19 +174,16 @@ function InfoDetailProduct(props) {
                     </div>
 
                     <div className="card_area">
-                        <a
+                        <button
+                            type="button"
                             className="main_btn"
-                            href="#!"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleAddShopCart();
-                            }}
+                            onClick={handleAddShopCart}
                         >
                             Thêm vào giỏ
-                        </a>
-                        <a className="icon_btn" href="#!">
+                        </button>
+                        <button type="button" className="icon_btn">
                             <i className="lnr lnr lnr-heart" />
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>

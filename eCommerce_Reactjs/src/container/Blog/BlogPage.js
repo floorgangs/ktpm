@@ -90,15 +90,15 @@ let handleOnchangeSearch = (keyword) =>{
 }
     return (
         <>
-        <section class="banner_area">
-      <div class="banner_inner d-flex align-items-center">
-        <div class="container">
-          <div class="banner_content d-md-flex justify-content-between align-items-center">
-            <div class="mb-3 mb-md-0">
+        <section className="banner_area">
+      <div className="banner_inner d-flex align-items-center">
+        <div className="container">
+          <div className="banner_content d-md-flex justify-content-between align-items-center">
+            <div className="mb-3 mb-md-0">
               <h2>Tin tức</h2>
               <p>Hãy theo dõi những bài viết để nhận được thông tin mới nhất</p>
             </div>
-            <div class="page_link">
+            <div className="page_link">
             <Link to={"/"}>Trang chủ</Link>
              <Link to={"/blog"}>Tin tức</Link>
             </div>

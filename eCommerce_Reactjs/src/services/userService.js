@@ -131,10 +131,10 @@ const UpdateProductDetailImageService = (data) => {
     return axios.put(`/api/update-product-detail-image`, data)
 }
 const DeleteProductDetailImageService = (data) => {
-    return axios.delete(`/api/delete-product-detail-image`, data)
+    return axios.delete(`/api/delete-product-detail-image`, { data: data })
 }
 const DeleteProductDetailService = (data) => {
-    return axios.delete(`/api/delete-product-detail`, data)
+    return axios.delete(`/api/delete-product-detail`, { data: data })
 }
 const createNewProductSizeService = (data) => {
     return axios.post(`/api/create-product-detail-size`, data)
@@ -146,7 +146,7 @@ const UpdateProductDetailSizeService = (data) => {
     return axios.put(`/api/update-product-detail-size`, data)
 }
 const DeleteProductDetailSizeService = (data) => {
-    return axios.delete(`/api/delete-product-detail-size`, data)
+    return axios.delete(`/api/delete-product-detail-size`, { data: data })
 }
 const getProductFeatureService = (limit) => {
     return axios.get(`/api/get-product-feature?limit=${limit}`)
@@ -168,7 +168,7 @@ const updateBannerService = (data) => {
     return axios.put(`/api/update-banner`, data)
 }
 const deleteBannerService = (data) => {
-    return axios.delete(`/api/delete-banner`, data)
+    return axios.delete(`/api/delete-banner`, { data: data })
 }
 const getDetailBannerByIdService = (id) => {
     return axios.get(`/api/get-detail-banner?id=${id}`)
@@ -184,7 +184,7 @@ const updateBlogService = (data) => {
     return axios.put(`/api/update-blog`, data)
 }
 const deleteBlogService = (data) => {
-    return axios.delete(`/api/delete-blog`, data)
+    return axios.delete(`/api/delete-blog`, { data: data })
 }
 const getDetailBlogByIdService = (id) => {
     return axios.get(`/api/get-detail-blog?id=${id}`)
@@ -206,7 +206,7 @@ const updateTypeShipService = (data) => {
     return axios.put(`/api/update-typeship`, data)
 }
 const deleteTypeShipService = (data) => {
-    return axios.delete(`/api/delete-typeship`, data)
+    return axios.delete(`/api/delete-typeship`, { data: data })
 }
 const getDetailTypeShipByIdService = (id) => {
     return axios.get(`/api/get-detail-typeship?id=${id}`)
@@ -222,7 +222,7 @@ const updateTypeVoucherService = (data) => {
     return axios.put(`/api/update-typevoucher`, data)
 }
 const deleteTypeVoucherService = (data) => {
-    return axios.delete(`/api/delete-typevoucher`, data)
+    return axios.delete(`/api/delete-typevoucher`, { data: data })
 }
 const getDetailTypeVoucherByIdService = (id) => {
     return axios.get(`/api/get-detail-typevoucher?id=${id}`)
@@ -241,7 +241,7 @@ const updateVoucherService = (data) => {
     return axios.put(`/api/update-voucher`, data)
 }
 const deleteVoucherService = (data) => {
-    return axios.delete(`/api/delete-voucher`, data)
+    return axios.delete(`/api/delete-voucher`, { data: data })
 }
 const getDetailVoucherByIdService = (id) => {
     return axios.get(`/api/get-detail-voucher?id=${id}`)
@@ -266,7 +266,7 @@ const ReplyReviewService = (data) => {
     return axios.post(`/api/reply-review`, data)
 }
 const deleteReviewService = (data) => {
-    return axios.delete(`/api/delete-review`, data)
+    return axios.delete(`/api/delete-review`, { data: data })
 }
 //========================SHOPCART===================//
 const addShopCartService = (data) => {
@@ -276,7 +276,7 @@ const getAllShopCartByUserIdService = (id) => {
     return axios.get(`/api/get-all-shopcart-by-userId?id=${id}`)
 }
 const deleteItemShopCartService = (data) => {
-    return axios.delete(`/api/delete-item-shopcart`, data)
+    return axios.delete(`/api/delete-item-shopcart`, { data: data })
 }
 //==========================ORDER====================//
 const createNewOrderService = (data) => {
@@ -320,7 +320,7 @@ const createNewAddressUserrService = (data) => {
     return axios.post(`/api/create-new-address-user`, data)
 }
 const deleteAddressUserService = (data) => {
-    return axios.delete(`/api/delete-address-user`, data)
+    return axios.delete(`/api/delete-address-user`, { data: data })
 }
 const editAddressUserService = (data) => {
     return axios.put(`/api/edit-address-user`, data)
@@ -362,7 +362,7 @@ const ReplycommentService = (data) => {
     return axios.post(`/api/reply-comment`, data)
 }
 const deletecommentService = (data) => {
-    return axios.delete(`/api/delete-comment`, data)
+    return axios.delete(`/api/delete-comment`, { data: data })
 }
 //======================STATISTIC========================//
 const getCountCardStatistic = () => {
@@ -394,7 +394,7 @@ const updateSupplierService = (data) => {
     return axios.put(`/api/update-supplier`, data)
 }
 const deleteSupplierService = (data) => {
-    return axios.delete(`/api/delete-supplier`, data)
+    return axios.delete(`/api/delete-supplier`, { data: data })
 }
 const getDetailSupplierByIdService = (id) => {
     return axios.get(`/api/get-detail-supplier?id=${id}`)
@@ -410,7 +410,7 @@ const updateReceiptService = (data) => {
     return axios.put(`/api/update-receipt`, data)
 }
 const deleteReceiptService = (data) => {
-    return axios.delete(`/api/delete-receipt`, data)
+    return axios.delete(`/api/delete-receipt`, { data: data })
 }
 const getDetailReceiptByIdService = (id) => {
     return axios.get(`/api/get-detail-receipt?id=${id}`)

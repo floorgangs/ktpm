@@ -103,7 +103,7 @@ const ManageBanner = () => {
             keyword:''
         })
        
-        if(res && res.errCode == 0){
+        if(res && res.errCode === 0){
             res.data.forEach(element => {
                 element.image = ""
             })
@@ -129,11 +129,11 @@ const ManageBanner = () => {
                     <FormSearch title={"tên băng rôn"} handleOnchange={handleOnchangeSearch} handleSearch={handleSearchBanner} />
                     </div>
                     <div className='col-8'>
-                    <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i class="fa-solid fa-file-excel"></i></button>
+                    <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i className="fa-solid fa-file-excel"></i></button>
                     </div>
                     </div>
                     <div className="table-responsive">
-                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
+                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing={0}>
                             <thead>
                                 <tr>
                                     <th>STT</th>

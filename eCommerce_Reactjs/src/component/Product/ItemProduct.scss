@@ -1,6 +1,70 @@
-.d-block{
+.single-product {
+    .product-img {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 30px;
 
-    h4{
+        .p_icon {
+            width: 90%;
+            padding: 7px 30px;
+            position: absolute;
+            bottom: -100px;
+            left: 50%;
+            -webkit-transform: translateX(-50%);
+            -moz-transform: translateX(-50%);
+            -o-transform: translateX(-50%);
+            -ms-transform: translateX(-50%);
+            transform: translateX(-50%);
+            background: rgba(113, 205, 20, 0.4);
+            -webkit-transition: all 400ms ease;
+            -moz-transition: all 400ms ease;
+            -o-transition: all 400ms ease;
+            transition: all 400ms ease;
+            text-align: center;
+
+            .icon-btn {
+                display: inline-block;
+                height: 36px;
+                line-height: 36px;
+                width: 36px;
+                text-align: center;
+                background: #fff;
+                border-radius: 30px;
+                border: none;
+                margin-right: 10px;
+                color: #2a2a2a;
+                cursor: pointer;
+                -webkit-transition: all 0.2s ease;
+                -moz-transition: all 0.2s ease;
+                -o-transition: all 0.2s ease;
+                transition: all 0.2s ease;
+
+                &:last-child {
+                    margin-right: 0px;
+                }
+
+                i {
+                    line-height: 36px;
+                    font-size: 15px;
+                }
+
+                &:hover {
+                    background: #71cd14;
+                    color: #fff;
+                }
+            }
+        }
+
+        &:hover {
+            .p_icon {
+                bottom: 0px;
+            }
+        }
+    }
+}
+
+.d-block {
+    h4 {
         display: block;
         display: -webkit-box;
         max-width: 100%;
@@ -12,5 +76,27 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: #2a2a2a;
+        transition: all 0.3s ease;
+
+        &:hover {
+            color: #71cd14;
+        }
+    }
+}
+
+.product-btm {
+    padding: 10px;
+    
+    .mt-3 {
+        span {
+            color: #71cd14;
+            font-weight: 500;
+        }
+        
+        del {
+            color: #797979;
+            margin-left: 10px;
+        }
     }
 }

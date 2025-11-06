@@ -23,11 +23,11 @@ const Turnover = (props) => {
     let handleOnclick = async () => {
 
         let res = await getStatisticOverturn({
-            oneDate: type == 'day' ? startDate : DateTime,
+            oneDate: type === 'day' ? startDate : DateTime,
             twoDate: endDate,
             type: type
         })
-        if (res && res.errCode == 0) {
+        if (res && res.errCode === 0) {
             let total = 0;
             for (let i = 0; i < res.data.length; i++) {
                 total = total + res.data[i].totalpriceProduct
@@ -43,7 +43,7 @@ const Turnover = (props) => {
                     updatedAt: moment.utc(item.updatedAt).local().format('DD/MM/YYYY HH:mm:ss'),
                     typeShip: item.typeShipData.type,
                     codeVoucher: item.voucherData.codeVoucher,
-                    paymentType: item.isPaymentOnlien == 0 ? 'Thanh toán tiền mặt' : 'Thanh toán online',
+                    paymentType: item.isPaymentOnlien === 0 ? 'Thanh toán tiền mặt' : 'Thanh toán online',
                     statusOrder: item.statusOrderData.value,
                     totalpriceProduct: item.totalpriceProduct,
 
@@ -139,11 +139,11 @@ const Turnover = (props) => {
                     <div className='row'>
 
                         <div className='col-12 mb-2'>
-                            <button style={{ float: 'right' }} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i class="fa-solid fa-file-excel"></i></button>
+                            <button style={{ float: 'right' }} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i className="fa-solid fa-file-excel"></i></button>
                         </div>
                     </div>
                     <div className="table-responsive">
-                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
+                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing={0}>
                             <thead>
                                 <tr>
                                     <th>Mã đơn</th>

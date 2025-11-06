@@ -35,9 +35,9 @@ function RightBlog(props) {
                    <FormSearch title={"tiêu đề"} handleOnchange={handleOnchangeSearch} handleSearch={handleSearchBlog} />
                 </aside>
                 
-                   <aside class="single_sidebar_widget post_category_widget">
-                   <h4 class="widget_title">Danh mục</h4>
-                   <ul class="list cat-list">
+                   <aside className="single_sidebar_widget post_category_widget">
+                   <h4 className="widget_title">Danh mục</h4>
+                   <ul className="list cat-list">
                    <ItemCategory activeLinkId={activeLinkId} handleClickCategory={handleClickCategory} data={{value:'Tất cả',code:'',countPost:'ALL'}}/>
                       {
                        dataCategory.map((item,index) =>{

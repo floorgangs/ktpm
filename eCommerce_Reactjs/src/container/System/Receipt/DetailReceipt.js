@@ -32,7 +32,7 @@ const DetailReceipt = (props) => {
     }, [])
     let loadReceiptDetail = async (id) => {
         let res = await getDetailReceiptByIdService(id)
-        if (res && res.errCode == 0) {
+        if (res && res.errCode === 0) {
             setdataReceiptDetail(res.data.receiptDetail)
         }
     }
@@ -62,7 +62,7 @@ const DetailReceipt = (props) => {
         const { name, value } = event.target;
         setInputValues({ ...inputValues, [name]: value })
         for (let i = 0; i < dataProduct.length; i++) {
-            if (dataProduct[i].id == value) {
+            if (dataProduct[i].id === value) {
 
                 setdataProductDetail(dataProduct[i].productDetail)
                 setdataProductDetailSize(dataProduct[i].productDetail[0].productDetailSize)
@@ -74,7 +74,7 @@ const DetailReceipt = (props) => {
     let handleOnChangeProductDetail = event => {
         const { name, value } = event.target;
         for (let i = 0; i < dataProductDetail.length; i++) {
-            if (dataProductDetail[i].id == value) {
+            if (dataProductDetail[i].id === value) {
 
                 setdataProductDetailSize(dataProductDetail[i].productDetailSize)
                 setproductDetailSizeId(dataProductDetail[i].productDetailSize[0].id)
@@ -178,11 +178,11 @@ const DetailReceipt = (props) => {
                     <div className='row'>
 
                         <div className='col-12'>
-                            {/* <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success mb-2" >Xuất excel <i class="fa-solid fa-file-excel"></i></button> */}
+                            {/* <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success mb-2" >Xuất excel <i className="fa-solid fa-file-excel"></i></button> */}
                         </div>
                     </div>
-                    <div className="table-responsive">
-                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
+                        <div className="table-responsive">
+                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing={0}>
                             <thead>
                                 <tr>
                                     <th>STT</th>

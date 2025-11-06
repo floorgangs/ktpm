@@ -79,7 +79,7 @@ const ManageVoucher = () => {
             offset: '',
             
         })
-        if(res && res.errCode == 0){
+        if(res && res.errCode === 0){
             res.data.forEach(item => {
                item.fromDate = moment.unix(item.fromDate / 1000).format('DD/MM/YYYY')
                item.toDate=  moment.unix(item.toDate / 1000).format('DD/MM/YYYY')
@@ -102,11 +102,11 @@ const ManageVoucher = () => {
                 <div className='row'>
                    
                     <div className='col-12 mb-2'>
-                    <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i class="fa-solid fa-file-excel"></i></button>
+                    <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i className="fa-solid fa-file-excel"></i></button>
                     </div>
                     </div>
                     <div className="table-responsive">
-                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
+                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing={0}>
                             <thead>
                                 <tr>
                                     <th>STT</th>

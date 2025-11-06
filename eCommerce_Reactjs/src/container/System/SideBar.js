@@ -134,7 +134,7 @@ const SideBar = () => {
                         }
 
                         <a className="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSupplier" aria-expanded="false" aria-controls="collapseLayouts">
-                            <div className="sb-nav-link-icon"><i class="fa-solid fa-person-military-pointing"></i></div>
+                            <div className="sb-nav-link-icon"><i className="fa-solid fa-person-military-pointing"></i></div>
                             Quản lý NCC
                             <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
                         </a>
@@ -145,7 +145,7 @@ const SideBar = () => {
                             </nav>
                         </div>
                         <a className="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseReceipt" aria-expanded="false" aria-controls="collapseLayouts">
-                            <div className="sb-nav-link-icon"><i class="fa-solid fa-file-import"></i></div>
+                            <div className="sb-nav-link-icon"><i className="fa-solid fa-file-import"></i></div>
                             Quản lý nhập hàng
                             <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
                         </a>
@@ -167,7 +167,7 @@ const SideBar = () => {
                             </nav>
                         </div>
                         <a className="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseOrder" aria-expanded="false" aria-controls="collapseLayouts">
-                            <div className="sb-nav-link-icon"><i class="fa-brands fa-facebook-messenger"></i></div>
+                            <div className="sb-nav-link-icon"><i className="fa-brands fa-facebook-messenger"></i></div>
                             Quản lý tin nhắn
                             <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
                         </a>
@@ -180,7 +180,7 @@ const SideBar = () => {
                         {user && user.roleId === "R1" &&
                             <>
                                 <a className="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseStatistic" aria-expanded="false" aria-controls="collapseLayouts">
-                                    <div className="sb-nav-link-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                                    <div className="sb-nav-link-icon"><i className="fa-solid fa-magnifying-glass-chart"></i></div>
                                     Thống kê
                                     <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
                                 </a>

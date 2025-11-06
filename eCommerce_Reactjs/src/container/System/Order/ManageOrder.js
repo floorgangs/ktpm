@@ -70,7 +70,7 @@ const ManageOrder = () => {
             offset: '',
             statusId: 'ALL'
         })
-        if (res && res.errCode == 0) {
+        if (res && res.errCode === 0) {
             await CommonUtils.exportExcel(res.data, "Danh sách đơn hàng", "ListOrder")
         }
 
@@ -85,7 +85,7 @@ const ManageOrder = () => {
                     <i className="fas fa-table me-1" />
                     Danh sách đơn đặt hàng
                 </div>
-                <select onChange={(event) => handleOnchangeStatus(event)} class="form-select col-3 ml-3 mt-3">
+                <select onChange={(event) => handleOnchangeStatus(event)} className="form-select col-3 ml-3 mt-3">
                     <option value={'ALL'} selected>Trạng thái đơn hàng</option>
                     {
                         dataStatusOrder && dataStatusOrder.length > 0 &&
@@ -100,11 +100,11 @@ const ManageOrder = () => {
                     <div className='row'>
 
                         <div className='col-12 mb-2'>
-                            <button style={{ float: 'right' }} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i class="fa-solid fa-file-excel"></i></button>
+                            <button style={{ float: 'right' }} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i className="fa-solid fa-file-excel"></i></button>
                         </div>
                     </div>
                     <div className="table-responsive">
-                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
+                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing={0}>
                             <thead>
                                 <tr>
                                     <th>Mã đơn</th>

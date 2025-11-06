@@ -13,13 +13,16 @@ export const addItemCartStart = (data) => {
                 dispatch(getItemCartStart(data.userId))
                 dispatch(addItemCartSuccess())
 
+                return res;
 
             } else {
                 dispatch(addItemCartFaild());
                 toast.error(res.errMessage)
+                return res;
             }
         } catch (error) {
             dispatch(addItemCartFaild());
+            return { errCode: 1, errMessage: 'error' };
 
         }
     }
@@ -41,14 +44,13 @@ export const getItemCartStart = (id) => {
             let res = await getAllShopCartByUserIdService(id);
             if (res && res.errCode === 0) {
                 dispatch(getItemCartSuccess(res.data))
-
             } else {
                 dispatch(getItemCartFaild());
-
             }
+            return res;
         } catch (error) {
             dispatch(getItemCartFaild());
-
+            return { errCode: 1, errMessage: 'error' };
         }
     }
 }

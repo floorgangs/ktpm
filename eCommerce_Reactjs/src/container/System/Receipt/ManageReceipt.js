@@ -65,7 +65,7 @@ const ManageReceipt = () => {
             offset: '',
            
         })
-        if(res && res.errCode == 0){
+        if(res && res.errCode === 0){
             await CommonUtils.exportExcel(res.data,"Danh sách nhập hàng","ListReceipt")
         }
        
@@ -85,11 +85,11 @@ const ManageReceipt = () => {
                     <div className='row'>
                    
                     <div className='col-12'>
-                    <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success mb-2" >Xuất excel <i class="fa-solid fa-file-excel"></i></button>
+                    <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success mb-2" >Xuất excel <i className="fa-solid fa-file-excel"></i></button>
                     </div>
                     </div>
                     <div className="table-responsive">
-                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
+                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing={0}>
                             <thead>
                                 <tr>
                                     <th>STT</th>
