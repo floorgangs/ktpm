@@ -18,10 +18,11 @@ function ReviewProduct(props) {
             await loadAllReview()
         }
         fetchAllReview()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     let openPreviewImage = (url) => {
 
-        setInputValues({ ...inputValues, ["imageReview"]: url, ["isOpen"]: true })
+        setInputValues({ ...inputValues, imageReview: url, isOpen: true })
 
 
     }
@@ -36,7 +37,7 @@ function ReviewProduct(props) {
             let count1 = res.data.filter(item => item.star === 1)
 
             await setInputValues({
-                ...inputValues, ["dataReview"]: res.data, ["countStar"]: {
+                ...inputValues, dataReview: res.data, countStar: {
                     star5: count5.length,
                     star4: count4.length,
                     star3: count3.length,
@@ -45,12 +46,12 @@ function ReviewProduct(props) {
                     average: ((count5.length * 5) + (count4.length * 4) + (count3.length * 3) + (count2.length * 2) + (count1.length * 1)) / (count5.length + count4.length + count3.length + count2.length + count1.length),
                     quantity: count5.length + count4.length + count3.length + count2.length + count1.length
                 },
-                ["content"]: '', ["image"]: '', ["imageReview"]: '', ["activeStar"]: '', ["isOpenModal"]: false
+                content: '', image: '', imageReview: '', activeStar: '', isOpenModal: false
             })
         }
     }
     let handleChooseStart = (number) => {
-        setInputValues({ ...inputValues, ["activeStar"]: number })
+        setInputValues({ ...inputValues, activeStar: number })
     }
     let handleOnChangeImage = async (event) => {
         let data = event.target.files;
@@ -61,7 +62,7 @@ function ReviewProduct(props) {
         else{
             let base64 = await CommonUtils.getBase64(file);
             let objectUrl = URL.createObjectURL(file)
-            setInputValues({ ...inputValues, ["image"]: base64, ["imageReview"]: objectUrl })
+            setInputValues({ ...inputValues, image: base64, imageReview: objectUrl })
         }
        
     }
@@ -92,11 +93,11 @@ function ReviewProduct(props) {
         }
     }
     let closeModal = () => {
-        setInputValues({ ...inputValues, ["isOpenModal"]: false, ["parentId"]: '' })
+        setInputValues({ ...inputValues, isOpenModal: false, parentId: '' })
 
     }
     let handleOpenModal = (id) => {
-        setInputValues({ ...inputValues, ["isOpenModal"]: true, ["parentId"]: id })
+        setInputValues({ ...inputValues, isOpenModal: true, parentId: id })
 
     }
     let sendDataFromReViewModal = async (content) => {
@@ -141,7 +142,7 @@ function ReviewProduct(props) {
                             <h3>{inputValues.countStar.quantity} lượt đánh giá</h3>
                             <ul className="list">
                                 <li>
-                                    <a href="#">5
+                                    <a href="/" onClick={(e) => e.preventDefault()}>5
                                         <i className="fa fa-star" />
                                         <i className="fa fa-star" />
                                         <i className="fa fa-star" />
@@ -149,7 +150,7 @@ function ReviewProduct(props) {
                                         <i className="fa fa-star" /> Có {inputValues.countStar.star5} lượt đánh giá</a>
                                 </li>
                                 <li>
-                                    <a href="#">4
+                                    <a href="/" onClick={(e) => e.preventDefault()}>4
                                         <i className="fa fa-star" />
                                         <i className="fa fa-star" />
                                         <i className="fa fa-star" />
@@ -157,20 +158,20 @@ function ReviewProduct(props) {
                                         <i className="fa fa-star" /> Có {inputValues.countStar.star4} lượt đánh giá</a>
                                 </li>
                                 <li>
-                                    <a href="#">3
+                                    <a href="/" onClick={(e) => e.preventDefault()}>3
                                         <i className="fa fa-star" />
                                         <i className="fa fa-star" />
 
                                         <i className="fa fa-star" /> Có {inputValues.countStar.star3} lượt đánh giá</a>
                                 </li>
                                 <li>
-                                    <a href="#">2
+                                    <a href="/" onClick={(e) => e.preventDefault()}>2
                                         <i className="fa fa-star" />
 
                                         <i className="fa fa-star" /> Có {inputValues.countStar.star2} lượt đánh giá</a>
                                 </li>
                                 <li>
-                                    <a href="#">1
+                                    <a href="/" onClick={(e) => e.preventDefault()}>1
 
                                         <i className="fa fa-star" /> Có {inputValues.countStar.star1} lượt đánh giá</a>
                                 </li>
@@ -225,7 +226,7 @@ function ReviewProduct(props) {
                                             <div className="media-body">
                                                 <h4>{name}</h4>
                                                 {arrStar && arrStar.length > 0 &&
-                                                    arrStar.map((item, index) => {
+                                                    arrStar.map((starItem, index) => {
 
                                                         return (
                                                             <i key={index} className="fa fa-star" />
@@ -233,7 +234,7 @@ function ReviewProduct(props) {
                                                     })
                                                 }
                                                 {inputValues.user && inputValues.user.roleId === "R1" &&
-                                                    <a style={{ cursor: 'pointer' }} onClick={() => handleOpenModal(item.id)} className="reply_btn" >Phản hồi</a>
+                                                    <a href="/" onClick={(e) => { e.preventDefault(); handleOpenModal(item.id); }} className="reply_btn" >Phản hồi</a>
                                                 }
 
                                             </div>
@@ -243,7 +244,7 @@ function ReviewProduct(props) {
                                                 {item.content}
                                             </p>
                                             {item.image &&
-                                                <img onClick={() => openPreviewImage(item.image)} className="img-cmt" src={item.image}></img>
+                                                <img onClick={() => openPreviewImage(item.image)} className="img-cmt" src={item.image} alt="review"></img>
                                             }
                                             {item.childComment && item.childComment.length > 0 &&
                                                 item.childComment.map((item, index) => {
@@ -265,7 +266,7 @@ function ReviewProduct(props) {
                                     </div>
                                 )
                             }
-
+                            return null;
                         })
                     }
 
@@ -276,7 +277,7 @@ function ReviewProduct(props) {
             {
                 inputValues.isOpen === true &&
                 <Lightbox mainSrc={inputValues.imageReview}
-                    onCloseRequest={() => setInputValues({ ...inputValues, ["isOpen"]: false, ["imageReview"]: '' })}
+                    onCloseRequest={() => setInputValues({ ...inputValues, isOpen: false, imageReview: '' })}
                 />
             }
             <ReviewModal

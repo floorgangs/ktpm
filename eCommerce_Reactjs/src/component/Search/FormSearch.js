@@ -1,8 +1,6 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { toast } from 'react-toastify';
-import { useParams } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 
 

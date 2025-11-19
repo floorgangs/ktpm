@@ -8,7 +8,6 @@ function MainShop(props) {
 
     const [dataProduct, setdataProduct] = useState([])
     const [count, setCount] = useState('')
-    const [numberPage, setnumberPage] = useState('')
     const [limitPage, setlimitPage] = useState(PAGINATION.pagerow)
     const [sortPrice, setsortPrice] = useState('')
     const [sortName, setsortName] = useState('')
@@ -20,7 +19,7 @@ function MainShop(props) {
 
       
          loadProduct(limitPage, sortName, sortPrice, offset, categoryId,keyword)
-    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     useEffect(() => {
         setcategoryId(props.categoryId)
@@ -43,7 +42,7 @@ function MainShop(props) {
             }
         }
         fetchCategory()
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.categoryId, props.brandId])
 
 
@@ -70,7 +69,6 @@ function MainShop(props) {
          loadProduct(event.target.value, sortName, sortPrice, offset, categoryId,keyword)
     }
     let handleChangePage = async (number) => {
-        setnumberPage(number.selected)
         loadProduct(limitPage, sortName, sortPrice, number.selected * limitPage, categoryId,keyword)
         setoffset(number.selected * limitPage)
         props.myRef.current.scrollIntoView()

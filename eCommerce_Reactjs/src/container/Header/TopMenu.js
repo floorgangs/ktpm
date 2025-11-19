@@ -39,7 +39,7 @@ const TopMenu = props => {
                                 </li>
                                 <li style={{ cursor: 'pointer' }}>
 
-                                    {props.user && props.user.id ? <a onClick={() => handleLogout()}>
+                                    {props.user && props.user.id ? <a href="/" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
                                         Đăng xuất
                                     </a>
                                         :

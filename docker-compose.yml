@@ -1,0 +1,79 @@
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: ecom_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ecom
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: ecomuser
+      MYSQL_PASSWORD: ecompassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - ecom_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # Backend API
+  backend:
+    build:
+      context: ./ecomAPI
+      dockerfile: Dockerfile
+    container_name: ecom_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ecom
+      DB_USER: ecomuser
+      DB_PASSWORD: ecompassword
+      JWT_SECRET: your-secret-key-change-this-in-production
+      URL_REACT: http://localhost:3000
+      AUTO_MIGRATE: "true"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - ecom_network
+    entrypoint: ["/bin/sh", "-c", "sleep 5 && npx sequelize-cli db:migrate && npm start"]
+
+  # Frontend React
+  frontend:
+    build:
+      context: ./eCommerce_Reactjs
+      dockerfile: Dockerfile
+    container_name: ecom_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_BACKEND_URL: http://localhost:8080
+      CHOKIDAR_USEPOLLING: true
+    depends_on:
+      - backend
+    networks:
+      - ecom_network
+    stdin_open: true
+    tty: true
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  ecom_network:
+    driver: bridge

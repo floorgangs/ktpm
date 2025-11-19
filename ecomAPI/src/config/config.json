@@ -9,7 +9,10 @@
     "query": {
       "raw": true
     },
-    "timezone": "+07:00"
+    "timezone": "+07:00",
+    "dialectOptions": {
+      "charset": "utf8mb4"
+    }
   },
   "test": {
     "username": "root",
@@ -19,10 +22,18 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "ecomuser",
+    "password": "ecompassword",
+    "database": "ecom",
+    "host": "mysql",
+    "dialect": "mysql",
+    "logging": true,
+    "query": {
+      "raw": true
+    },
+    "timezone": "+07:00",
+    "dialectOptions": {
+      "charset": "utf8mb4"
+    }
   }
 }

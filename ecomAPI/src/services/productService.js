@@ -163,7 +163,7 @@ let getAllProductUser = (data) => {
             if (data.categoryId && data.categoryId !== 'ALL') objectFilter.where = { categoryId: data.categoryId }
             if (data.brandId && data.brandId !== 'ALL') objectFilter.where = { ...objectFilter.where, brandId: data.brandId }
             if (data.sortName === "true") objectFilter.order = [['name', 'ASC']]
-            if (data.keyword !== '') objectFilter.where = { ...objectFilter.where, name: { [Op.substring]: data.keyword } }
+            if (data.keyword && data.keyword !== '') objectFilter.where = { ...objectFilter.where, name: { [Op.substring]: data.keyword } }
 
             let res = await db.Product.findAndCountAll(objectFilter)
             for (let i = 0; i < res.rows.length; i++) {
