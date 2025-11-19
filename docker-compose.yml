@@ -14,8 +14,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
-      - ./ecom-fixed.sql:/docker-entrypoint-initdb.d/ecom-fixed.sql
-      - ./my.cnf:/etc/mysql/conf.d/my.cnf
     networks:
       - ecom_network
     healthcheck:
@@ -24,21 +22,6 @@ services:
       retries: 10
       interval: 10s
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-
-  # Data Importer - Tự động import dữ liệu sau khi migrations hoàn tất
-  data-importer:
-    image: mysql:8.0
-    container_name: ecom_data_importer
-    depends_on:
-      backend:
-        condition: service_started
-    networks:
-      - ecom_network
-    volumes:
-      - ./import-db.sh:/import-db.sh
-      - ./ecom-fixed.sql:/docker-entrypoint-initdb.d/ecom-fixed.sql
-    entrypoint: ["/bin/bash", "/import-db.sh"]
-    restart: "no"
 
   # Backend API
   backend:
@@ -65,7 +48,9 @@ services:
         condition: service_healthy
     networks:
       - ecom_network
-    entrypoint: ["/bin/sh", "-c", "sleep 5 && npx sequelize-cli db:migrate && npm start"]
+    volumes:
+      - ./ecom-fixed.sql:/app/ecom-fixed.sql
+    entrypoint: ["/bin/sh", "-c", "sleep 5 && npx sequelize-cli db:migrate && (mysql -h$${DB_HOST} -u$${DB_USER} -p$${DB_PASSWORD} $${DB_NAME} < /app/ecom-fixed.sql || echo 'Data import skipped') && npm start"]
 
   # Frontend React
   frontend:

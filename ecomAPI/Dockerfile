@@ -1,5 +1,8 @@
 FROM node:22-alpine
 
+# Install MySQL client for data import
+RUN apk add --no-cache mysql-client
+
 # Set working directory
 WORKDIR /app
 
