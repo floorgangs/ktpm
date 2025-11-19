@@ -6,35 +6,40 @@
 - Docker Desktop đã cài đặt
 - Docker Compose v3.8 trở lên
 
-### Các bước thực hiện
+### Các bước thực hiện (CHỈ CẦN 2 LỆNH!)
 
-#### 1. Kiểm tra Docker
+#### 1. Clone repository và chạy Docker
 ```bash
-docker --version
-docker-compose --version
-```
+# Clone về
+git clone https://github.com/TranNam283/kiemthuphanmem.git
+cd kiemthuphanmem
 
-#### 2. Build và chạy containers
-```bash
-# Di chuyển về thư mục root của dự án
-cd D:\Kiemthuphanmem\kiemthuphanmem
-
-# Build và start tất cả services (lần đầu tiên)
-docker-compose up --build
-
-# Hoặc chạy ở chế độ background
+# Chạy Docker (TỰ ĐỘNG import dữ liệu)
 docker-compose up -d --build
 ```
 
-#### 3. Chờ services khởi động
+#### 2. Chờ services khởi động và tự động import dữ liệu
 - MySQL: ~30 giây
-- Backend API: ~40 giây (sau khi MySQL ready)
+- Backend API: ~40 giây (tự động chạy migrations)
+- **Data Importer: ~60-90 giây** (TỰ ĐỘNG import dữ liệu)
 - Frontend: ~60 giây
 
-#### 4. Truy cập ứng dụng
+**✓ Dữ liệu sẽ được import TỰ ĐỘNG sau khi migrations hoàn tất!**
+
+#### 3. Truy cập ứng dụng
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8080
 - **MySQL**: localhost:3307 (host machine)
+
+### Kiểm tra quá trình import dữ liệu
+
+```bash
+# Xem logs của data importer
+docker-compose logs data-importer
+
+# Kiểm tra dữ liệu đã import chưa
+docker exec ecom_mysql mysql -u ecomuser -pecompassword ecom -e "SELECT COUNT(*) as total_users FROM Users;"
+```
 
 ### Các lệnh Docker hữu ích
 
@@ -132,54 +137,52 @@ docker-compose up --build
 
 ```
 kiemthuphanmem/
-├── docker-compose.yml          # Orchestration file
+├── docker-compose.yml          # Orchestration file (4 services)
 ├── init-db.sql                 # Database initialization script
-├── ecom.sql                    # Sample data for import
-├── import-data.ps1             # Auto import script (Windows)
-├── import-data.sh              # Auto import script (Linux/Mac)
+├── ecom-fixed.sql              # Dữ liệu mẫu (TỰ ĐỘNG import)
+├── import-db.sh                # Script import tự động trong container
 ├── ecomAPI/
 │   ├── Dockerfile             # Backend image definition
-│   ├── .dockerignore          # Files to exclude
-│   └── .env.example           # Environment variables template
+│   └── src/                   # Source code
 └── eCommerce_Reactjs/
     ├── Dockerfile             # Frontend image definition
-    ├── .dockerignore          # Files to exclude
-    └── .env.example           # Environment variables template
+    └── src/                   # Source code
 ```
 
-### Import dữ liệu mẫu
+### Cách hoạt động của Auto Import
 
-Sau khi containers đã chạy và migrations hoàn tất, import dữ liệu mẫu:
+1. **MySQL khởi động** → Tạo database `ecom`
+2. **Backend khởi động** → Chạy migrations (tạo 22 tables)
+3. **Data Importer khởi động** → Tự động:
+   - Chờ backend tạo đủ tables (≥22 tables)
+   - Kiểm tra xem đã có dữ liệu chưa
+   - Nếu chưa có → Import `ecom-fixed.sql` tự động
+   - Nếu đã có → Bỏ qua (không import lại)
+4. **Frontend khởi động** → Hoàn tất!
 
-#### Windows (PowerShell):
-```powershell
-# Chạy script tự động
-.\import-data.ps1
-
-# Hoặc import thủ công
-Get-Content ecom.sql | docker-compose exec -T mysql mysql -u ecomuser -pecompassword ecom
-```
-
-#### Linux/Mac:
-```bash
-# Chạy script tự động
-chmod +x import-data.sh
-./import-data.sh
-
-# Hoặc import thủ công
-docker-compose exec -T mysql mysql -u ecomuser -pecompassword ecom < ecom.sql
-```
+**✓ KHÔNG cần chạy thêm script import nào nữa!**
 
 ### Lưu ý quan trọng
 
-1. **Lần đầu chạy**: 
-   - Database tables sẽ được tạo tự động qua migrations
-   - Để import dữ liệu mẫu, chạy script `import-data.ps1` (Windows) hoặc `import-data.sh` (Linux/Mac)
+1. **Import tự động**: 
+   - ✓ Dữ liệu tự động import lần đầu chạy
+   - ✓ Không cần chạy script import thủ công
+   - ✓ Nếu đã có dữ liệu, sẽ tự động bỏ qua
 2. **Environment variables**: Các biến môi trường đã được config sẵn trong `docker-compose.yml`
 3. **Data persistence**: Database data được lưu trong Docker volume `mysql_data`
 4. **Hot reload**: Frontend và Backend đều hỗ trợ hot reload khi code thay đổi
 5. **Network**: Các services giao tiếp với nhau qua network `ecom_network`
 6. **Auto migrations**: Backend tự động chạy migrations khi khởi động
+
+### Reset và chạy lại từ đầu
+
+```bash
+# Xóa tất cả (bao gồm database)
+docker-compose down -v
+
+# Chạy lại - dữ liệu sẽ TỰ ĐỘNG import lại
+docker-compose up -d --build
+```
 
 ### Development vs Production
 
