@@ -92,6 +92,7 @@ const Otp = (props) => {
             }
             const res = await createNewUser({
                 email: props.dataUser.email,
+                firstName: props.dataUser.firstName,
                 lastName: props.dataUser.lastName,
                 phonenumber: props.dataUser.phonenumber,
                 password: props.dataUser.password,

@@ -1,46 +1,27 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
-import { getDetailProductByIdService, getProductRecommendService } from '../../services/userService';
+import { getDetailProductByIdService } from '../../services/userService';
 import InfoDetailProduct from '../../component/Product/InfoDetailProduct';
 import ProfileProduct from '../../component/Product/ProfileProduct';
 import ReviewProduct from '../../component/Product/ReviewProduct';
 import DescriptionProduct from '../../component/Product/DescriptionProduct';
-import ProductFeature from '../../component/HomeFeature/ProductFeature';
 function DetailProductPage(props) {
     const [dataProduct, setDataProduct] = useState({})
     const [dataDetailSize, setdataDetailSize] = useState({})
     const { id } = useParams();
-    const [user, setUser] = useState({})
-    const [dataProductRecommend, setdataProductRecommend] = useState([])
     const fetchDetailProduct = useCallback(async () => {
         let res = await getDetailProductByIdService(id)
         if (res && res.errCode === 0) {
             setDataProduct(res.data)
         }
     }, [id])
-    const fetchProductFeature = useCallback(async (userId) => {
-        let res = await getProductRecommendService({
-            limit: 20,
-            userId: userId
-        })
-        if (res && res.errCode === 0) {
-            setdataProductRecommend(res.data)
-        }
-    }, [])
     useEffect(() => {
         const init = async () => {
-            const userData = JSON.parse(localStorage.getItem('userData'));
-            if (userData) {
-                setUser(userData)
-                await fetchProductFeature(userData.id)
-            }
-
             window.scrollTo(0, 0);
-
             await fetchDetailProduct()
         }
         init();
-    }, [fetchDetailProduct, fetchProductFeature])
+    }, [fetchDetailProduct])
     let sendDataFromInforDetail = (data) => {
         setdataDetailSize(data)
     }
@@ -68,7 +49,7 @@ function DetailProductPage(props) {
             <div className="product_image_area">
                 <div className="container">
 
-                    <InfoDetailProduct userId={user && user.id ? user.id : ''} dataProduct={dataProduct} sendDataFromInforDetail={sendDataFromInforDetail} > </InfoDetailProduct>
+                    <InfoDetailProduct userId={''} dataProduct={dataProduct} sendDataFromInforDetail={sendDataFromInforDetail} > </InfoDetailProduct>
 
 
                 </div>
@@ -108,10 +89,6 @@ function DetailProductPage(props) {
 
                     </div>
                 </div>
-                {user && dataProductRecommend && dataProductRecommend.length > 0 &&
-                    <ProductFeature title={"Sản phẩm bạn quan tâm"} data={dataProductRecommend}></ProductFeature>
-
-                }
             </section>
 
 

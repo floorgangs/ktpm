@@ -4,7 +4,7 @@ import MainFeature from "../../component/HomeFeature/MainFeature";
 import ProductFeature from "../../component/HomeFeature/ProductFeature";
 import NewProductFeature from "../../component/HomeFeature/NewProductFeature"
 import HomeBlog from '../../component/HomeFeature/HomeBlog';
-import { getAllBanner, getProductFeatureService, getProductNewService, getNewBlog, getProductRecommendService } from '../../services/userService';
+import { getAllBanner, getProductFeatureService, getProductNewService, getNewBlog } from '../../services/userService';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -13,7 +13,6 @@ function HomePage(props) {
     const [dataNewProductFeature, setNewProductFeature] = useState([])
     const [dataNewBlog, setdataNewBlog] = useState([])
     const [dataBanner, setdataBanner] = useState([])
-    const [dataProductRecommend, setdataProductRecommend] = useState([])
     let settings = {
         dots: false,
         Infinity: false,
@@ -26,11 +25,6 @@ function HomePage(props) {
     }
 
     useEffect(() => {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if (userData) {
-            fetchProductRecommend(userData.id)
-
-        }
         fetchBlogFeature()
         fetchDataBrand()
         fetchProductFeature()
@@ -48,15 +42,6 @@ function HomePage(props) {
         let res = await getProductFeatureService(6)
         if (res && res.errCode === 0) {
             setDataProductFeature(res.data)
-        }
-    }
-    let fetchProductRecommend = async (userId) => {
-        let res = await getProductRecommendService({
-            limit: 20,
-            userId: userId
-        })
-        if (res && res.errCode === 0) {
-            setdataProductRecommend(res.data)
         }
     }
     let fetchDataBrand = async () => {
@@ -91,9 +76,6 @@ function HomePage(props) {
 
 
             <MainFeature></MainFeature>
-            {dataProductRecommend && dataProductRecommend.length > 0 && (
-                <ProductFeature title={"Gợi ý cho bạn"} data={dataProductRecommend}></ProductFeature>
-            )}
             <ProductFeature title={"Sản phẩm đặc trưng"} data={dataProductFeature}></ProductFeature>
             <NewProductFeature title="Sản phẩm mới" description="Những sản phẩm vừa ra mắt mới lạ cuốn hút người xem" data={dataNewProductFeature}></NewProductFeature>
             <HomeBlog data={dataNewBlog} />

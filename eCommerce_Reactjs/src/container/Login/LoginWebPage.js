@@ -9,7 +9,7 @@ import { signInWithPopup, FacebookAuthProvider, GoogleAuthProvider } from 'fireb
 const LoginWebPage = () => {
 
     const [inputValues, setInputValues] = useState({
-        email: '', password: 'passwordsecrect', lastName: '', phonenumber: '', isOpen: false, dataUser: {}
+        email: '', password: 'passwordsecrect', firstName: '', lastName: '', phonenumber: '', isOpen: false, dataUser: {}
     });
     const handleOnChange = event => {
         const { name, value } = event.target;
@@ -95,6 +95,7 @@ const LoginWebPage = () => {
                 ...prev,
                 dataUser: {
                     email: prev.email,
+                    firstName: prev.firstName,
                     lastName: prev.lastName,
                     phonenumber: prev.phonenumber,
                     password: prev.password,
@@ -225,10 +226,17 @@ const LoginWebPage = () => {
                                     {/* Signup Form */}
                                     <div className="signup form-peice switched">
                                         <form className="signup-form" >
-                                            <div className="form-group">
-                                                <label htmlFor="name">Họ và tên</label>
-                                                <input type="text" name="lastName" onChange={(event) => handleOnChange(event)} id="name" className="name" />
-                                                <span className="error" />
+                                            <div style={{ display: 'flex', gap: '10px' }}>
+                                                <div className="form-group" style={{ flex: 1 }}>
+                                                    <label htmlFor="firstName">Họ</label>
+                                                    <input type="text" name="firstName" onChange={(event) => handleOnChange(event)} id="firstName" className="name" />
+                                                    <span className="error" />
+                                                </div>
+                                                <div className="form-group" style={{ flex: 1 }}>
+                                                    <label htmlFor="lastName">Tên</label>
+                                                    <input type="text" name="lastName" onChange={(event) => handleOnChange(event)} id="lastName" className="name" />
+                                                    <span className="error" />
+                                                </div>
                                             </div>
 
                                             <div className="form-group">

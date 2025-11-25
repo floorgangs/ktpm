@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getDetailAddressUserByIdService } from '../../services/userService';
-
+import AddressInput from '../../component/input/AddressInput';
 import { Modal, ModalFooter, ModalBody, Button } from 'reactstrap';
 
 const AddressUsersModal = (props) => {
@@ -104,7 +104,10 @@ const AddressUsersModal = (props) => {
                         </div>
                         <div className="col-12 form-group">
                             <label>Địa chỉ cụ thể</label>
-                            <input value={inputValues.shipAdress} name="shipAdress" onChange={(event) => handleOnChange(event)} type="text" className="form-control"
+                            <AddressInput 
+                                name="shipAdress" 
+                                value={inputValues.shipAdress} 
+                                onChange={handleOnChange}
                             />
                         </div>
                     </div>

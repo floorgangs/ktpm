@@ -67,3 +67,4 @@ docker-compose up -d
 # Đợi 40 giây
 .\import-data-simple.ps1
 ```
+http://localhost:3000

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DatePicker from '../../../component/input/DatePicker';
+import AddressInput from '../../../component/input/AddressInput';
 import moment from 'moment'
 import { getDetailUserById, UpdateUserService, handleSendVerifyEmail } from '../../../services/userService';
 import { useFetchAllcode } from '../../customize/fetch';
@@ -32,7 +33,7 @@ const Information = () => {
             isActiveEmail: data.isActiveEmail || 0,
             imageReview: ''
         }))
-        if (data.dob) {
+        if (data.dob && data.dob !== '' && data.dob !== '0') {
             setbirthday(moment.unix(+data.dob / 1000).locale('vi').format('DD/MM/YYYY'))
         } else {
             setbirthday('')
@@ -72,7 +73,11 @@ const Information = () => {
         })
         if (res && res.errCode === 0) {
             toast.success("Cập nhật người dùng thành công")
-
+            // Reload lại thông tin user để hiển thị địa chỉ mới
+            const updatedUser = await getDetailUserById(id)
+            if (updatedUser && updatedUser.errCode === 0) {
+                setStateUser(updatedUser.data)
+            }
         } else {
             toast.error(res.errMessage)
         }
@@ -133,16 +138,15 @@ const Information = () => {
                             <h4 className="text-right">Thông tin cá nhân</h4>
                         </div>
                         <div className="row mt-2">
-                            <div className="col-md-6"><label className="labels">Họ</label><input name="firstName" onChange={(event) => handleOnChange(event)} value={inputValues.firstName} type="text" className="form-control" /></div>
-                            <div className="col-md-6"><label className="labels">Tên</label><input name="lastName" onChange={(event) => handleOnChange(event)} value={inputValues.lastName} type="text" className="form-control" /></div>
+                            <div className="col-md-6"><label className="labels">Họ <span style={{color: '#dc3545'}}>*</span></label><input name="firstName" onChange={(event) => handleOnChange(event)} value={inputValues.firstName} type="text" className="form-control" placeholder="Nhập họ" /></div>
+                            <div className="col-md-6"><label className="labels">Tên <span style={{color: '#dc3545'}}>*</span></label><input name="lastName" onChange={(event) => handleOnChange(event)} value={inputValues.lastName} type="text" className="form-control" placeholder="Nhập tên" /></div>
                         </div>
                         <div className="row mt-3">
-                            <div className="col-md-12"><label className="labels">Số điện thoại</label><input name="phonenumber" onChange={(event) => handleOnChange(event)} type="text" className="form-control" value={inputValues.phonenumber} /></div>
-                            <div className="col-md-12"><label className="labels">Địa chỉ</label><input name="address" onChange={(event) => handleOnChange(event)} type="text" className="form-control" value={inputValues.address} /></div>
-
+                            <div className="col-md-12"><label className="labels">Số điện thoại <span style={{color: '#dc3545'}}>*</span></label><input name="phonenumber" onChange={(event) => handleOnChange(event)} type="text" className="form-control" value={inputValues.phonenumber} placeholder="Nhập số điện thoại" /></div>
                         </div>
                         <div className="row mt-3">
                             <div className="col-md-6"><label className="labels">Giới tính</label><select value={inputValues.genderId} name="genderId" onChange={(event) => handleOnChange(event)} id="inputState" className="form-control">
+                                <option value="">-- Chọn giới tính --</option>
                                 {dataGender && dataGender.length > 0 &&
                                     dataGender.map((item, index) => {
                                         return (
@@ -153,8 +157,18 @@ const Information = () => {
                             </select></div>
                             <div className="col-md-6"><label className="labels">Ngày sinh</label> <DatePicker className="form-control" onChange={handleOnChangeDatePicker}
                                 value={birthday}
-
+                                placeholder="Chọn ngày sinh"
                             /></div>
+                        </div>
+                        <div className="row mt-3">
+                            <div className="col-md-12">
+                                <label className="labels">Địa chỉ</label>
+                                <AddressInput 
+                                    name="address" 
+                                    value={inputValues.address} 
+                                    onChange={handleOnChange}
+                                />
+                            </div>
                         </div>
                         <div className="row mt-2">
                             <div className="col-md-3">

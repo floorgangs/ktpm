@@ -157,9 +157,7 @@ const getProductNewService = (limit) => {
 const getProductShopcartService = (data) => {
     return axios.get(`/api/get-product-shopcart?userId=${data.userId}&limit=${data.limit}`)
 }
-const getProductRecommendService = (data) => {
-    return axios.get(`/api/get-product-recommend?userId=${data.userId}&limit=${data.limit}`)
-}
+
 //===============BANNER======================//
 const createNewBannerService = (data) => {
     return axios.post(`/api/create-new-banner`, data)
@@ -447,6 +445,6 @@ export {
     createNewcommentService, getAllcommentByBlogIdService, ReplycommentService, deletecommentService, getFeatureBlog, getNewBlog, getCountCardStatistic, getCountStatusOrder,
     getStatisticByMonth, getStatisticByDay, checkPhonenumberEmail, createNewSupplierService, updateSupplierService, deleteSupplierService, getDetailSupplierByIdService,
     getAllSupplier, createNewReceiptService, getAllReceipt, getDetailReceiptByIdService, deleteReceiptService, updateReceiptService, createNewReceiptDetailService,
-    getStatisticOverturn, getStatisticProfit, getProductShopcartService, getDetailUserByEmail, getProductRecommendService,
+    getStatisticOverturn, getStatisticProfit, getProductShopcartService, getDetailUserByEmail,
     getStatisticStockProduct, getExchangeRate, paymentOrderVnpayService, confirmOrderVnpay, paymentOrderVnpaySuccessService
 }
