@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { getAllAddressUserByUserIdService, createNewAddressUserrService, deleteAddressUserService, editAddressUserService } from '../../services/userService';
+import { getAllAddressUserByUserIdService, createNewAddressUserrService, deleteAddressUserService, editAddressUserService, getDetailUserById } from '../../services/userService';
 import AddressUsersModal from '../ShopCart/AdressUserModal';
 import './AddressUser.scss';
 function AddressUser(props) {
     const { id } = props;
     const [dataAddressUser, setdataAddressUser] = useState([])
+    const [userDetail, setUserDetail] = useState(null)
     const [addressUserId, setaddressUserId] = useState('')
     const [isOpenModalAddressUser, setisOpenModalAddressUser] = useState(false)
     useEffect(() => {
@@ -15,6 +16,16 @@ function AddressUser(props) {
                 let res = await getAllAddressUserByUserIdService(userId)
                 if (res && res.errCode === 0) {
                     setdataAddressUser(res.data)
+
+                    // Nếu chưa có address trong AddressUsers, lấy thông tin user từ Users
+                    if (!res.data || res.data.length === 0) {
+                        let ud = await getDetailUserById(userId)
+                        if (ud && ud.errCode === 0) {
+                            setUserDetail(ud.data)
+                        }
+                    } else {
+                        setUserDetail(null)
+                    }
 
                 }
             }
@@ -138,6 +149,30 @@ function AddressUser(props) {
                             )
                         })
                     }
+
+                    {/* Nếu không có AddressUsers, hiển thị địa chỉ từ Users (nếu có) */}
+                    {(!dataAddressUser || dataAddressUser.length === 0) && userDetail && userDetail.address && (
+                        <div className="box-address-user">
+                            <div className='content-left'>
+                                <div className='box-label'>
+                                    <div className='label'>
+                                        <div>Họ Và Tên</div>
+                                        <div>Số Điện Thoại</div>
+                                        <div>Địa Chỉ</div>
+                                    </div>
+                                    <div className='content'>
+                                        <div>{`${userDetail.firstName || ''} ${userDetail.lastName || ''}`.trim()}</div>
+                                        <div>{userDetail.phonenumber}</div>
+                                        <div>{userDetail.address}</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div className='content-right'>
+                                <span className='text-muted' style={{fontStyle: 'italic'}}>Địa chỉ mặc định</span>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
             </div>

@@ -2,135 +2,198 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './AddressInput.scss';
 
+// AddressInput: clean implementation
+// - selects for Province / District / Ward (loaded from provinces.open-api.vn)
+// - single text input for "Số nhà, tên đường"
+// - when a `value` prop is provided (full address string), try to prefill selects
+//   by normalizing strings (strip diacritics) and matching names; fallback to
+//   placing the full string into the street input.
+
 const AddressInput = ({ value, onChange, name }) => {
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
-    
+
     const [selectedProvince, setSelectedProvince] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [selectedWard, setSelectedWard] = useState('');
-    const [streetAddress, setStreetAddress] = useState('');
-    
-    // Lưu tên để dùng khi ghép địa chỉ
+    const [street, setStreet] = useState('');
+
+    // store display names for composition
     const [provinceName, setProvinceName] = useState('');
     const [districtName, setDistrictName] = useState('');
     const [wardName, setWardName] = useState('');
 
-    // Load provinces on mount
+    const normalize = (str = '') => str.toString().normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+
     useEffect(() => {
         fetchProvinces();
     }, []);
 
-    // Parse existing address value
     useEffect(() => {
-        if (value && typeof value === 'string') {
-            const parts = value.split(', ');
-            if (parts.length >= 1) {
-                setStreetAddress(parts[0] || '');
-            }
+        // when provinces loaded and value exists, attempt to prefill
+        if (provinces.length > 0 && value && value.toString().trim() !== '') {
+            prefillFromValue(value.toString());
         }
-    }, [value]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [provinces]);
 
     const fetchProvinces = async () => {
         try {
-            const response = await axios.get('https://provinces.open-api.vn/api/p/');
-            setProvinces(response.data);
-        } catch (error) {
-            console.error('Error fetching provinces:', error);
+            const res = await axios.get('https://provinces.open-api.vn/api/p/');
+            setProvinces(res.data || []);
+        } catch (err) {
+            console.error('fetchProvinces error', err);
         }
     };
 
     const fetchDistricts = async (provinceCode) => {
         try {
-            const response = await axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
-            setDistricts(response.data.districts || []);
-            setWards([]);
-        } catch (error) {
-            console.error('Error fetching districts:', error);
+            const res = await axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+            return res.data.districts || [];
+        } catch (err) {
+            console.error('fetchDistricts error', err);
+            return [];
         }
     };
 
     const fetchWards = async (districtCode) => {
         try {
-            const response = await axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
-            setWards(response.data.wards || []);
-        } catch (error) {
-            console.error('Error fetching wards:', error);
+            const res = await axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+            return res.data.wards || [];
+        } catch (err) {
+            console.error('fetchWards error', err);
+            return [];
         }
     };
 
-    const handleProvinceChange = (e) => {
+    const composeAddress = (st, ward, district, province) => {
+        const parts = [province, district, ward, st].filter(p => p && p.toString().trim() !== '');
+        return parts.join(', ');
+    };
+
+    const emitChange = (val) => {
+        if (onChange) onChange({ target: { name: name, value: val } });
+    };
+
+    const handleProvinceChange = async (e) => {
         const code = e.target.value;
-        const pName = provinces.find(p => p.code.toString() === code)?.name || '';
-        
         setSelectedProvince(code);
-        setProvinceName(pName);
         setSelectedDistrict('');
         setSelectedWard('');
-        setDistrictName('');
-        setWardName('');
         setDistricts([]);
         setWards([]);
-        
+        const p = provinces.find(x => x.code && x.code.toString() === code);
+        setProvinceName(p ? p.name : '');
         if (code) {
-            fetchDistricts(code);
+            const ds = await fetchDistricts(code);
+            setDistricts(ds);
         }
-        
-        // Cập nhật địa chỉ đầy đủ
-        updateFullAddress(streetAddress, '', '', pName);
+        const full = composeAddress(street, '', '', p ? p.name : '');
+        emitChange(full);
     };
 
-    const handleDistrictChange = (e) => {
+    const handleDistrictChange = async (e) => {
         const code = e.target.value;
-        const dName = districts.find(d => d.code.toString() === code)?.name || '';
-        
         setSelectedDistrict(code);
-        setDistrictName(dName);
         setSelectedWard('');
-        setWardName('');
         setWards([]);
-        
+        const d = districts.find(x => x.code && x.code.toString() === code);
+        setDistrictName(d ? d.name : '');
         if (code) {
-            fetchWards(code);
+            const ws = await fetchWards(code);
+            setWards(ws);
         }
-        
-        // Cập nhật địa chỉ đầy đủ
-        updateFullAddress(streetAddress, '', dName, provinceName);
+        const full = composeAddress(street, '', d ? d.name : '', provinceName);
+        emitChange(full);
     };
 
     const handleWardChange = (e) => {
         const code = e.target.value;
-        const wName = wards.find(w => w.code.toString() === code)?.name || '';
-        
         setSelectedWard(code);
-        setWardName(wName);
-        
-        // Cập nhật địa chỉ đầy đủ
-        updateFullAddress(streetAddress, wName, districtName, provinceName);
+        const w = wards.find(x => x.code && x.code.toString() === code);
+        setWardName(w ? w.name : '');
+        const full = composeAddress(street, w ? w.name : '', districtName, provinceName);
+        emitChange(full);
     };
 
     const handleStreetChange = (e) => {
-        const street = e.target.value;
-        setStreetAddress(street);
-        
-        // Cập nhật địa chỉ đầy đủ với tên đã lưu
-        updateFullAddress(street, wardName, districtName, provinceName);
+        const v = e.target.value;
+        setStreet(v);
+        const full = composeAddress(v, wardName, districtName, provinceName);
+        emitChange(full);
     };
 
-    const updateFullAddress = (street, ward, district, province) => {
-        // Thứ tự: Tỉnh → Quận → Phường → Số nhà (từ lớn đến nhỏ)
-        const parts = [province, district, ward, street].filter(part => part && part.trim() !== '');
-        const fullAddress = parts.join(', ');
-        
-        if (onChange) {
-            onChange({
-                target: {
-                    name: name,
-                    value: fullAddress
-                }
-            });
+    // Prefill logic: try to find province/district/ward from parts of the saved value
+    const prefillFromValue = async (full) => {
+        if (!full) return;
+        const parts = full.split(',').map(p => p.trim()).filter(Boolean);
+        if (parts.length === 0) return;
+
+        // Try to match province by normalized name
+        const normParts = parts.map(p => normalize(p));
+        let matchedProvince = null;
+        for (let pr of provinces) {
+            const n = normalize(pr.name);
+            if (normParts.includes(n) || normParts.some(np => np.includes(n) || n.includes(np))) {
+                matchedProvince = pr; break;
+            }
         }
+
+        if (matchedProvince) {
+            setSelectedProvince(matchedProvince.code.toString());
+            setProvinceName(matchedProvince.name);
+            const ds = await fetchDistricts(matchedProvince.code);
+            setDistricts(ds);
+
+            // try match district
+            let matchedDistrict = null;
+            for (let d of ds) {
+                const nd = normalize(d.name);
+                if (normParts.includes(nd) || normParts.some(np => np.includes(nd) || nd.includes(np))) {
+                    matchedDistrict = d; break;
+                }
+            }
+            if (matchedDistrict) {
+                setSelectedDistrict(matchedDistrict.code.toString());
+                setDistrictName(matchedDistrict.name);
+                const ws = await fetchWards(matchedDistrict.code);
+                setWards(ws);
+
+                // try match ward
+                let matchedWard = null;
+                for (let w of ws) {
+                    const nw = normalize(w.name);
+                    if (normParts.includes(nw) || normParts.some(np => np.includes(nw) || nw.includes(np))) {
+                        matchedWard = w; break;
+                    }
+                }
+                if (matchedWard) {
+                    setSelectedWard(matchedWard.code.toString());
+                    setWardName(matchedWard.name);
+                }
+
+                // remaining parts -> street
+                const used = [matchedProvince.name, matchedDistrict.name, matchedWard && matchedWard.name].filter(Boolean).map(s => normalize(s));
+                const streetParts = parts.filter(p => !used.some(u => normalize(p).includes(u) || u.includes(normalize(p))));
+                if (streetParts.length > 0) {
+                    const st = streetParts.join(', ');
+                    setStreet(st);
+                    emitChange(composeAddress(st, matchedWard ? matchedWard.name : '', matchedDistrict.name, matchedProvince.name));
+                    return;
+                }
+            } else {
+                // province matched but not district
+                const st = parts.filter(p => normalize(p) !== normalize(matchedProvince.name)).join(', ');
+                setStreet(st);
+                emitChange(composeAddress(st, '', '', matchedProvince.name));
+                return;
+            }
+        }
+
+        // fallback: set whole string to street
+        setStreet(full);
+        emitChange(composeAddress(full, '', '', ''));
     };
 
     return (
@@ -138,73 +201,44 @@ const AddressInput = ({ value, onChange, name }) => {
             <div className="form-row">
                 <div className="form-group col-md-4">
                     <label>Tỉnh/Thành phố <span className="text-danger">*</span></label>
-                    <select
-                        className="form-control"
-                        value={selectedProvince}
-                        onChange={handleProvinceChange}
-                    >
+                    <select className="form-control" value={selectedProvince} onChange={handleProvinceChange}>
                         <option value="">-- Chọn Tỉnh/TP --</option>
-                        {provinces.map((province) => (
-                            <option key={province.code} value={province.code}>
-                                {province.name}
-                            </option>
+                        {provinces.map(p => (
+                            <option key={p.code} value={p.code}>{p.name}</option>
                         ))}
                     </select>
                 </div>
 
                 <div className="form-group col-md-4">
                     <label>Quận/Huyện <span className="text-danger">*</span></label>
-                    <select
-                        className="form-control"
-                        value={selectedDistrict}
-                        onChange={handleDistrictChange}
-                        disabled={!selectedProvince}
-                    >
+                    <select className="form-control" value={selectedDistrict} onChange={handleDistrictChange} disabled={!selectedProvince}>
                         <option value="">-- Chọn Quận/Huyện --</option>
-                        {districts.map((district) => (
-                            <option key={district.code} value={district.code}>
-                                {district.name}
-                            </option>
+                        {districts.map(d => (
+                            <option key={d.code} value={d.code}>{d.name}</option>
                         ))}
                     </select>
                 </div>
 
                 <div className="form-group col-md-4">
                     <label>Phường/Xã <span className="text-danger">*</span></label>
-                    <select
-                        className="form-control"
-                        value={selectedWard}
-                        onChange={handleWardChange}
-                        disabled={!selectedDistrict}
-                    >
+                    <select className="form-control" value={selectedWard} onChange={handleWardChange} disabled={!selectedDistrict}>
                         <option value="">-- Chọn Phường/Xã --</option>
-                        {wards.map((ward) => (
-                            <option key={ward.code} value={ward.code}>
-                                {ward.name}
-                            </option>
+                        {wards.map(w => (
+                            <option key={w.code} value={w.code}>{w.name}</option>
                         ))}
                     </select>
                 </div>
             </div>
-            
+
             <div className="form-group">
                 <label>Số nhà, tên đường <span className="text-danger">*</span></label>
-                <input
-                    type="text"
-                    className="form-control"
-                    value={streetAddress}
-                    onChange={handleStreetChange}
-                />
+                <input type="text" className="form-control" value={street} onChange={handleStreetChange} />
             </div>
-            
-            {(streetAddress || provinceName || districtName || wardName) && (
+
+            {(street || provinceName || districtName || wardName) && (
                 <div className="address-preview">
                     <label><strong>Địa chỉ đầy đủ:</strong></label>
-                    <div className="address-preview-text">
-                        {[provinceName, districtName, wardName, streetAddress]
-                            .filter(part => part && part.trim() !== '')
-                            .join(', ') || <em style={{color: '#999'}}>Chưa nhập đầy đủ thông tin</em>}
-                    </div>
+                    <div className="address-preview-text">{composeAddress(street, wardName, districtName, provinceName) || <em style={{color: '#999'}}>Chưa nhập đầy đủ thông tin</em>}</div>
                 </div>
             )}
         </div>
@@ -212,3 +246,6 @@ const AddressInput = ({ value, onChange, name }) => {
 };
 
 export default AddressInput;
+
+// ...existing code...
+        

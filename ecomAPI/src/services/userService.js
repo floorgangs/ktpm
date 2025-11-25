@@ -121,10 +121,10 @@ let deleteUser = (userId) => {
 let updateUserData = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.id || !data.genderId) {
+            if (!data.id) {
                 resolve({
                     errCode: 2,
-                    errMessage: `Missing required parameters`
+                    errMessage: `Missing required parameters: id is required`
                 })
             } else {
                 let user = await db.User.findOne({
@@ -132,15 +132,16 @@ let updateUserData = (data) => {
                     raw: false
                 })
                 if (user) {
-                    user.firstName = data.firstName
-                    user.lastName = data.lastName
-                    user.address = data.address
-                    user.roleId = data.roleId
-                    user.genderId = data.genderId
-                    user.phonenumber = data.phonenumber
-                    user.dob = data.dob
+                    // Chỉ cập nhật các trường được gửi đến (tránh ghi đè bằng undefined)
+                    if (data.firstName !== undefined) user.firstName = data.firstName;
+                    if (data.lastName !== undefined) user.lastName = data.lastName;
+                    if (data.address !== undefined) user.address = data.address;
+                    if (data.roleId !== undefined) user.roleId = data.roleId;
+                    if (data.genderId !== undefined) user.genderId = data.genderId;
+                    if (data.phonenumber !== undefined) user.phonenumber = data.phonenumber;
+                    if (data.dob !== undefined) user.dob = data.dob;
                     if (data.image) {
-                        user.image = data.image
+                        user.image = data.image;
                     }
                     await user.save();
                     resolve({
