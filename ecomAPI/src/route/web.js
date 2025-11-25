@@ -14,6 +14,7 @@ import messageController from '../controllers/messageController';
 import statisticController from '../controllers/statisticController';
 import middlewareControllers from '../middlewares/jwtVerify';
 import supplierController from '../controllers/supplierController';
+import externalController from '../controllers/externalController';
 import receiptController from '../controllers/receiptController';
 let router = express.Router();
 
@@ -172,6 +173,8 @@ let initwebRoutes = (app) => {
     router.put('/api/update-receipt', middlewareControllers.verifyTokenAdmin, receiptController.updateReceipt)
     router.delete('/api/delete-receipt', middlewareControllers.verifyTokenAdmin, receiptController.deleteReceipt)
     router.post('/api/create-new-detail-receipt', middlewareControllers.verifyTokenAdmin, receiptController.createNewReceiptDetail)
+    // External proxied endpoints (avoid CORS on client)
+    router.get('/api/get-exchange-rate', externalController.getExchangeRate)
     return app.use("/", router);
 }
 

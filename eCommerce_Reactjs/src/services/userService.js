@@ -421,7 +421,7 @@ const createNewReceiptDetailService = (data) => {
 }
 //======================THIRTY SERVICE==========================//
 const getExchangeRate = () => {
-    return axios.get(`https://tygia.com/json.php?ran=0&gold=0&bank=VIETCOM&date=now`)
+    return axios.get(`/api/get-exchange-rate`)
 }
 export {
     getAllUsers, getAllCodeService, createNewUser, DeleteUserService, getDetailUserById, UpdateUserService,
