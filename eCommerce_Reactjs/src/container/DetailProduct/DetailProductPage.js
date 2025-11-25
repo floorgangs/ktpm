@@ -25,6 +25,7 @@ function DetailProductPage(props) {
     let sendDataFromInforDetail = (data) => {
         setdataDetailSize(data)
     }
+    const userData = JSON.parse(localStorage.getItem('userData')) || null;
     return (
 
         <div>
@@ -49,7 +50,7 @@ function DetailProductPage(props) {
             <div className="product_image_area">
                 <div className="container">
 
-                    <InfoDetailProduct userId={''} dataProduct={dataProduct} sendDataFromInforDetail={sendDataFromInforDetail} > </InfoDetailProduct>
+                    <InfoDetailProduct userId={userData && userData.id ? userData.id : ''} dataProduct={dataProduct} sendDataFromInforDetail={sendDataFromInforDetail} />
 
 
                 </div>
