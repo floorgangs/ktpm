@@ -71,42 +71,32 @@ function ChatWindow(props) {
 
         <div className="ks-messages ks-messenger__messages">
         <div className="ks-header">
-          <div className="ks-description">
-            <div className="ks-name">Chat name</div>
-            <div className="ks-amount">2 members</div>
-          </div>
-          <div className="ks-controls">
-            <div className="dropdown">
-              <button className="btn btn-primary-outline ks-light ks-no-text ks-no-arrow" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span className="la la-ellipsis-h ks-icon" />
-              </button>
-              <div className="dropdown-menu dropdown-menu-right ks-simple" aria-labelledby="dropdownMenuButton">
-                <button type="button" className="dropdown-item">
-                  <span className="la la-user-plus ks-icon" />
-                  <span className="ks-text">Add members</span>
-                </button>
-                <button type="button" className="dropdown-item">
-                  <span className="la la-eye-slash ks-icon" />
-                  <span className="ks-text">Mark as unread</span>
-                </button>
-                <button type="button" className="dropdown-item">
-                  <span className="la la-bell-slash-o ks-icon" />
-                  <span className="ks-text">Mute notifications</span>
-                </button>
-                <button type="button" className="dropdown-item">
-                  <span className="la la-mail-forward ks-icon" />
-                  <span className="ks-text">Forward</span>
-                </button>
-                <button type="button" className="dropdown-item">
-                  <span className="la la-ban ks-icon" />
-                  <span className="ks-text">Spam</span>
-                </button>
-                <button type="button" className="dropdown-item">
-                  <span className="la la-trash-o ks-icon" />
-                  <span className="ks-text">Delete</span>
-                </button>
+          <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+            {userData && userData.image && (
+              <img src={userData.image} alt="Avatar" style={{width: '48px', height: '48px', borderRadius: '50%', border: '3px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', objectFit: 'cover'}} />
+            )}
+            <div className="ks-description">
+              <div className="ks-name" style={{fontSize: '16px', fontWeight: '600', color: '#202124', marginBottom: '4px'}}>
+                {userData && userData.firstName && userData.lastName 
+                  ? `${userData.firstName} ${userData.lastName}` 
+                  : 'Chat'}
+              </div>
+              <div className="ks-amount" style={{fontSize: '13px', color: '#5f6368'}}>
+                <span style={{display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#34a853', marginRight: '6px'}}></span>
+                Đang hoạt động
               </div>
             </div>
+          </div>
+          <div className="ks-controls">
+            <button className="btn btn-light" type="button" style={{borderRadius: '50%', width: '40px', height: '40px', padding: '0', border: 'none', background: '#f1f3f4', transition: 'all 0.2s ease'}} onMouseOver={(e) => e.currentTarget.style.background = '#e8eaed'} onMouseOut={(e) => e.currentTarget.style.background = '#f1f3f4'}>
+              <span className="la la-phone" style={{fontSize: '18px', color: '#5f6368'}} />
+            </button>
+            <button className="btn btn-light" type="button" style={{borderRadius: '50%', width: '40px', height: '40px', padding: '0', border: 'none', background: '#f1f3f4', marginLeft: '8px', transition: 'all 0.2s ease'}} onMouseOver={(e) => e.currentTarget.style.background = '#e8eaed'} onMouseOut={(e) => e.currentTarget.style.background = '#f1f3f4'}>
+              <span className="la la-video-camera" style={{fontSize: '18px', color: '#5f6368'}} />
+            </button>
+            <button className="btn btn-light" type="button" style={{borderRadius: '50%', width: '40px', height: '40px', padding: '0', border: 'none', background: '#f1f3f4', marginLeft: '8px', transition: 'all 0.2s ease'}} onMouseOver={(e) => e.currentTarget.style.background = '#e8eaed'} onMouseOut={(e) => e.currentTarget.style.background = '#f1f3f4'}>
+              <span className="la la-info-circle" style={{fontSize: '18px', color: '#5f6368'}} />
+            </button>
           </div>
         </div>
         <div className="ks-body ks-scrollable jspScrollable" data-auto-height data-reduce-height=".ks-footer" data-fix-height={32} style={{height: '480px', overflow: 'hidden', padding: '0px', width: '701px'}} tabIndex={0}>
@@ -122,7 +112,7 @@ function ChatWindow(props) {
                    return (
                      <li key={index} className={item.userData.id === user.id ? "ks-item ks-from" : "ks-item ks-self"}>
                        <span className="ks-avatar ks-offline">
-                         <img src={item.userData.image} width={36} height={36} className="rounded-circle" alt="User avatar" />
+                         <img src={item.userData.image} width={36} height={36} className="rounded-circle" alt="User avatar" style={{border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', objectFit: 'cover'}} />
                        </span>
                        <div className="ks-body">
                          <div className="ks-header">

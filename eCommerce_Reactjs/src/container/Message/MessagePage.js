@@ -69,8 +69,16 @@ function MessagePage(props) {
             <div className="ks-messenger">
             <MessageDisscution userId={dataUser.id} isAdmin={false} handleClickRoom={handleClickRoom} data={dataRoom}/>
             {selectedRoom ? <ChatWindow userId={dataUser.id} roomId={selectedRoom}  />
-            :<div>
-              <span className='title'>Chưa chọn phòng</span>
+            :<div className="ks-messages" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
+              <div style={{textAlign: 'center', padding: '40px'}}>
+                <div style={{fontSize: '64px', marginBottom: '20px', opacity: 0.3}}>💬</div>
+                <span className='title' style={{display: 'block', fontSize: '20px', fontWeight: '600', color: '#5f6368', marginBottom: '8px'}}>
+                  Chưa chọn phòng chat
+                </span>
+                <p style={{fontSize: '14px', color: '#80868b', margin: 0}}>
+                  Chọn một cuộc hội thoại bên trái để bắt đầu nhắn tin
+                </p>
+              </div>
             </div> 
            }
                 

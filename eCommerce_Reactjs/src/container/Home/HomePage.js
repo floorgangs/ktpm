@@ -91,7 +91,9 @@ function HomePage(props) {
 
 
             <MainFeature></MainFeature>
-            <ProductFeature title={"Gợi ý sản phẩm"} data={dataProductRecommend}></ProductFeature>
+            {dataProductRecommend && dataProductRecommend.length > 0 && (
+                <ProductFeature title={"Gợi ý cho bạn"} data={dataProductRecommend}></ProductFeature>
+            )}
             <ProductFeature title={"Sản phẩm đặc trưng"} data={dataProductFeature}></ProductFeature>
             <NewProductFeature title="Sản phẩm mới" description="Những sản phẩm vừa ra mắt mới lạ cuốn hút người xem" data={dataNewProductFeature}></NewProductFeature>
             <HomeBlog data={dataNewBlog} />
