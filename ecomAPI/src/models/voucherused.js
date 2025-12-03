@@ -1,16 +1,12 @@
 'use strict';
-const {
-    Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class VoucherUsed extends Model {
-
         static associate(models) {
-
+            VoucherUsed.belongsTo(models.Voucher, { foreignKey: 'voucherId', targetKey: 'id', as: 'voucherData' });
+            VoucherUsed.belongsTo(models.User, { foreignKey: 'userId', targetKey: 'id', as: 'userData' });
         }
     };
-    // 0 chua su dung
-    // 1 da su dung
     VoucherUsed.init({
         voucherId: DataTypes.INTEGER,
         userId: DataTypes.INTEGER,
@@ -18,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         sequelize,
         modelName: 'VoucherUsed',
-        tableName: 'Voucheruseds',
+        tableName: 'voucheruseds'
     });
     return VoucherUsed;
 };

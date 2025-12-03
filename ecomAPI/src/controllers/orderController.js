@@ -108,18 +108,8 @@ let confirmOrder = async (req, res) => {
         })
     }
 }
-let getAllOrdersByShipper = async (req, res) => {
-    try {
-        let data = await orderService.getAllOrdersByShipper(req.query);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
+// getAllOrdersByShipper removed - using GHN third-party shipping
+
 let paymentOrderVnpay = async (req, res) => {
     try {
         let data = await orderService.paymentOrderVnpay(req);
@@ -165,7 +155,6 @@ module.exports = {
     paymentOrder: paymentOrder,
     paymentOrderSuccess: paymentOrderSuccess,
     confirmOrder: confirmOrder,
-    getAllOrdersByShipper: getAllOrdersByShipper,
     paymentOrderVnpay: paymentOrderVnpay,
     confirmOrderVnpay: confirmOrderVnpay,
     paymentOrderVnpaySuccess: paymentOrderVnpaySuccess,

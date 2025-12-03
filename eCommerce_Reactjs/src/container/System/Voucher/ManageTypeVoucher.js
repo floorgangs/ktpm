@@ -1,84 +1,95 @@
-import React, { useEffect, useState } from 'react';
-import { deleteTypeVoucherService, getAllTypeVoucher } from '../../../services/userService';
+import React, { useCallback, useEffect, useState } from 'react';
+import { deleteTypeVoucherService, getAllTypeVoucherService } from '../../../services/userService';
 import { toast } from 'react-toastify';
 import { PAGINATION } from '../../../utils/constant';
 import ReactPaginate from 'react-paginate';
 import CommonUtils from '../../../utils/CommonUtils';
-import { Link } from 'react-router-dom';
-const ManageTypeShip = () => {
+import { Link } from "react-router-dom";
+import FormSearch from '../../../component/Search/FormSearch';
 
+const ManageTypeVoucher = () => {
     const [dataTypeVoucher, setdataTypeVoucher] = useState([])
     const [count, setCount] = useState('')
     const [numberPage, setnumberPage] = useState('')
-    useEffect(() => {
-        try {
-            let fetchData = async () => {
-                let arrData = await getAllTypeVoucher({
+    const [keyword, setkeyword] = useState('')
 
-                    limit: PAGINATION.pagerow,
-                    offset: 0
-
-                })
-                if (arrData && arrData.errCode === 0) {
-                    setdataTypeVoucher(arrData.data)
-                    setCount(Math.ceil(arrData.count / PAGINATION.pagerow))
-                }
-            }
-            fetchData();
-        } catch (error) {
-            console.log(error)
+    const fetchData = useCallback(async (searchKeyword) => {
+        let arrData = await getAllTypeVoucherService({
+            limit: PAGINATION.pagerow,
+            offset: 0,
+            keyword: searchKeyword
+        })
+        if (arrData && arrData.errCode === 0) {
+            setdataTypeVoucher(arrData.data)
+            setCount(Math.ceil(arrData.count / PAGINATION.pagerow))
         }
-
     }, [])
-    let handleDeleteTypeVoucher = async (id) => {
 
+    useEffect(() => {
+        fetchData(keyword);
+    }, [fetchData, keyword])
+
+    let handleDeleteTypeVoucher = async (id) => {
         let res = await deleteTypeVoucherService({
-            data: {
-                id: id
-            }
+            id: id
         })
         if (res && res.errCode === 0) {
             toast.success("Xóa loại voucher thành công")
-            let arrData = await getAllTypeVoucher({
+            let arrData = await getAllTypeVoucherService({
                 limit: PAGINATION.pagerow,
-                offset: numberPage * PAGINATION.pagerow
-
+                offset: numberPage * PAGINATION.pagerow,
+                keyword: keyword
             })
             if (arrData && arrData.errCode === 0) {
                 setdataTypeVoucher(arrData.data)
                 setCount(Math.ceil(arrData.count / PAGINATION.pagerow))
             }
-
-        } else toast.error("Xóa loại voucher thất bại")
+        } else {
+            toast.error("Xóa loại voucher thất bại")
+        }
     }
+
     let handleChangePage = async (number) => {
         setnumberPage(number.selected)
-        let arrData = await getAllTypeVoucher({
+        let arrData = await getAllTypeVoucherService({
             limit: PAGINATION.pagerow,
-            offset: number.selected * PAGINATION.pagerow
-
+            offset: number.selected * PAGINATION.pagerow,
+            keyword: keyword
         })
         if (arrData && arrData.errCode === 0) {
             setdataTypeVoucher(arrData.data)
-
         }
     }
-    let handleOnClickExport = async () => {
-        let res = await getAllTypeVoucher({
 
+    let handleSearchTypeVoucher = (value) => {
+        setkeyword(value)
+    }
+
+    let handleOnchangeSearch = (value) => {
+        if (value === '') {
+            setkeyword(value)
+        }
+    }
+
+    let handleOnClickExport = async () => {
+        let res = await getAllTypeVoucherService({
             limit: '',
             offset: '',
-
+            keyword: ''
         })
         if (res && res.errCode === 0) {
             await CommonUtils.exportExcel(res.data, "Danh sách loại voucher", "ListTypeVoucher")
         }
-
     }
+
+    // Format type voucher display
+    const formatTypeVoucher = (type) => {
+        return type === 'percent' ? 'Phần trăm (%)' : 'Tiền mặt (VNĐ)'
+    }
+
     return (
         <div className="container-fluid px-4">
             <h1 className="mt-4">Quản lý loại voucher</h1>
-
 
             <div className="card mb-4">
                 <div className="card-header">
@@ -87,9 +98,13 @@ const ManageTypeShip = () => {
                 </div>
                 <div className="card-body">
                     <div className='row'>
-
-                        <div className='col-12 mb-2'>
-                            <button style={{ float: 'right' }} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i className="fa-solid fa-file-excel"></i></button>
+                        <div className='col-4'>
+                            <FormSearch title={"tên loại voucher"} handleOnchange={handleOnchangeSearch} handleSearch={handleSearchTypeVoucher} />
+                        </div>
+                        <div className='col-8'>
+                            <button style={{ float: 'right' }} onClick={() => handleOnClickExport()} className="btn btn-success" >
+                                Xuất excel <i className="fa-solid fa-file-excel"></i>
+                            </button>
                         </div>
                     </div>
                     <div className="table-responsive">
@@ -97,35 +112,38 @@ const ManageTypeShip = () => {
                             <thead>
                                 <tr>
                                     <th>STT</th>
-                                    <th>Loại voucher</th>
+                                    <th>Loại giảm giá</th>
                                     <th>Giá trị</th>
-                                    <th>Giá trị tối thiểu</th>
-                                    <th>Giá trị tối đa</th>
+                                    <th>Giảm tối đa</th>
+                                    <th>Đơn tối thiểu</th>
+                                    <th>Mô tả</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {dataTypeVoucher && dataTypeVoucher.length > 0 &&
                                     dataTypeVoucher.map((item, index) => {
                                         return (
                                             <tr key={index}>
                                                 <td>{index + 1}</td>
-                                                <td>{item.typeVoucherData.value}</td>
-                                                <td>{item.typeVoucher === "percent" ? `${item.value}%` : CommonUtils.formatter.format(item.value)}</td>
-                                                <td>{CommonUtils.formatter.format(item.minValue)}</td>
-                                                <td>{CommonUtils.formatter.format(item.maxValue)}</td>
+                                                <td>{formatTypeVoucher(item.typeVoucher)}</td>
                                                 <td>
-                                                    <Link to={`/admin/edit-typevoucher/${item.id}`}>Edit</Link>
+                                                    {item.typeVoucher === 'percent' 
+                                                        ? `${item.value}%` 
+                                                        : CommonUtils.formatter.format(item.value)}
+                                                </td>
+                                                <td>{CommonUtils.formatter.format(item.maxValue)}</td>
+                                                <td>{CommonUtils.formatter.format(item.minValue)}</td>
+                                                <td>{item.description}</td>
+                                                <td>
+                                                    <Link to={`/admin/edit-type-voucher/${item.id}`}>Edit</Link>
                                                     &nbsp; &nbsp;
-                                                    <span onClick={() => handleDeleteTypeVoucher(item.id)} style={{ color: '#0E6DFE', cursor: 'pointer' }}   >Delete</span>
+                                                    <span onClick={() => handleDeleteTypeVoucher(item.id)} style={{ color: '#dc3545', cursor: 'pointer' }}>Delete</span>
                                                 </td>
                                             </tr>
                                         )
                                     })
                                 }
-
-
                             </tbody>
                         </table>
                     </div>
@@ -151,4 +169,5 @@ const ManageTypeShip = () => {
         </div>
     )
 }
-export default ManageTypeShip;
+
+export default ManageTypeVoucher;

@@ -4,8 +4,8 @@ import { useParams } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import CommonUtils from '../../../../utils/CommonUtils';
 import '../AddProduct.scss';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import { useFetchAllcode } from '../../../customize/fetch';
 import { CreateNewProductDetailService, } from '../../../../services/userService';
 const AddProductDetail = (props) => {
@@ -157,9 +157,7 @@ const AddProductDetail = (props) => {
                 </div>
             </div>
             {inputValues.isOpen === true &&
-                <Lightbox mainSrc={inputValues.imageReview}
-                    onCloseRequest={() => setInputValues(prev => ({ ...prev, isOpen: false }))}
-                />
+                <Lightbox open={inputValues.isOpen} close={() => setInputValues(prev => ({ ...prev, isOpen: false }))} slides={[{ src: inputValues.imageReview }]} />
             }
         </div>
     )

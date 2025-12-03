@@ -1,42 +1,61 @@
 import moment from 'moment';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import './ItemBlog.scss';
 
-function ItemBlog(props) {
-    const createdAt = props.data && props.data.createdAt ? moment(props.data.createdAt) : null;
+function ItemBlog({ data }) {
+    const authorName = useMemo(() => {
+        const first = data?.userData?.firstName || '';
+        const last = data?.userData?.lastName || '';
+        const fullName = `${first} ${last}`.trim();
+        return fullName.length ? fullName : 'Admin';
+    }, [data]);
+
+    const publishedAt = data?.createdAt ? moment(data.createdAt).format('DD MMM, YYYY') : '';
+    const commentCount = Array.isArray(data?.commentData) ? data.commentData.length : 0;
+    const viewCount = Number(data?.view) || 0;
+    const summary = data?.shortdescription || '';
+    const categoryName = data?.subjectData?.value || 'Bài viết';
+
     return (
-        <article className="blog_item">
-            <div className="blog_item_img">
-                <img
-                    style={{ height: '514px', objectFit: 'cover' }}
-                    className="card-img rounded-0"
-                    src={props.data.image}
-                    alt=""
-                />
-                <div className="blog_item_date" role="presentation">
-                    <h3>{createdAt ? createdAt.format("DD") : ''}</h3>
-                    <p>{createdAt ? createdAt.format("MMM") : ''}</p>
+        <article className="blog-card">
+            <Link to={`/detail-blog/${data.id}`} className="blog-card__image" aria-label={data.title}>
+                <img src={data.image} alt={data.title} />
+                <span className="blog-card__tag">{categoryName}</span>
+            </Link>
+            <div className="blog-card__body">
+                <div className="blog-card__meta">
+                    {publishedAt && (
+                        <span className="blog-card__meta-item">
+                            <i className="far fa-calendar" />
+                            {publishedAt}
+                        </span>
+                    )}
+                    <span className="blog-card__meta-item">
+                        <i className="far fa-user" />
+                        {authorName}
+                    </span>
                 </div>
-            </div>
-
-            <div className="blog_details">
-                <Link
-                    style={{ color: '#797979', fontSize: '18px' }}
-                    className="d-inline-block"
-                    to={`/blog-detail/${props.data.id}`}
-                >
-                    <h2>{props.data.title}</h2>
-                    <p>{props.data.shortdescription}</p>
-                    <ul className="blog-info-link">
-                        <li>
-                            <i className="ti-user" />{" "}
-                            {props.data.userData.firstName + " " + props.data.userData.lastName}
-                        </li>
-                        <li>
-                            <i className="ti-comments" /> {props.data.commentData.length} Bình luận
-                        </li>
-                    </ul>
+                <Link to={`/detail-blog/${data.id}`} className="blog-card__title">
+                    {data.title}
                 </Link>
+                <p className="blog-card__summary">{summary}</p>
+                <div className="blog-card__footer">
+                    <div className="blog-card__stats">
+                        <span>
+                            <i className="far fa-eye" />
+                            {viewCount}
+                        </span>
+                        <span>
+                            <i className="far fa-comment" />
+                            {commentCount}
+                        </span>
+                    </div>
+                    <Link to={`/detail-blog/${data.id}`} className="blog-card__readmore">
+                        Đọc thêm
+                        <i className="ti-arrow-right" />
+                    </Link>
+                </div>
             </div>
         </article>
     );

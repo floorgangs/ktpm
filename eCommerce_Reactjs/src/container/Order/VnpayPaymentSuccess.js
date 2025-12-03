@@ -77,7 +77,7 @@ function VnpayPaymentSuccess(props) {
                             <div className="col-md-12">
                     <div className="p-3 py-5">
                         <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h4 className="text-right">Thông tin thanh toán</h4>
+                            <h4 className="text-end">Thông tin thanh toán</h4>
                         </div>
                        
                        

@@ -38,12 +38,15 @@ function AddressUser(props) {
         setaddressUserId('')
         if (data.isActionUpdate === false) {
             let res = await createNewAddressUserrService({
-                shipName: data.shipName,
-                shipAdress: data.shipAdress,
-                shipEmail: data.shipEmail,
-                shipPhonenumber: data.shipPhonenumber,
+                name: data.name,
+                address: data.address,
+                email: data.email,
+                phonenumber: data.phonenumber,
                 userId: id,
-
+                // Standardized Vietnamese address (provider-agnostic)
+                provinceName: data.provinceName,
+                districtName: data.districtName,
+                wardName: data.wardName
             })
             if (res && res.errCode === 0) {
                 toast.success("Thêm địa chỉ thành công !")
@@ -57,11 +60,15 @@ function AddressUser(props) {
         } else {
             let res = await editAddressUserService({
                 id: data.id,
-                shipName: data.shipName,
-                shipAdress: data.shipAdress,
-                shipEmail: data.shipEmail,
-                shipPhonenumber: data.shipPhonenumber,
+                name: data.name,
+                address: data.address,
+                email: data.email,
+                phonenumber: data.phonenumber,
                 userId: id,
+                // Standardized Vietnamese address (provider-agnostic)
+                provinceName: data.provinceName,
+                districtName: data.districtName,
+                wardName: data.wardName
             })
             if (res && res.errCode === 0) {
                 toast.success("Cập nhật địa chỉ thành công !")
@@ -133,9 +140,9 @@ function AddressUser(props) {
                                                 <div>Địa Chỉ</div>
                                             </div>
                                             <div className='content'>
-                                                <div>{item.shipName}</div>
-                                                <div>{item.shipPhonenumber}</div>
-                                                <div>{item.shipAdress}</div>
+                                                <div>{item.name}</div>
+                                                <div>{item.phonenumber}</div>
+                                                <div>{item.address}</div>
                                             </div>
                                         </div>
 

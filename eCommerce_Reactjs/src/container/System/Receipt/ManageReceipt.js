@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 const ManageReceipt = () => {
   
     const [dataReceipt, setdataReceipt] = useState([])
-    const [count, setCount] = useState('')
+    const [count, setCount] = useState(0)
     useEffect(() => {
         try {
            
@@ -31,6 +31,9 @@ const ManageReceipt = () => {
         if (arrData && arrData.errCode === 0) {
             setdataReceipt(arrData.data)
             setCount(Math.ceil(arrData.count / PAGINATION.pagerow))
+        } else {
+            setdataReceipt([])
+            setCount(0)
         }
     }
     
@@ -46,6 +49,8 @@ const ManageReceipt = () => {
         if (arrData && arrData.errCode === 0) {
             setdataReceipt(arrData.data)
 
+        } else {
+            setdataReceipt([])
         }
     }
     
@@ -94,13 +99,19 @@ const ManageReceipt = () => {
                             <tbody>
                                 {dataReceipt && dataReceipt.length > 0 &&
                                     dataReceipt.map((item, index) => {
+                                        const supplierName = item?.supplierData?.name || '—';
+                                        const supplierPhone = item?.supplierData?.phonenumber || '—';
+                                        const userFirst = item?.userData?.firstName || '';
+                                        const userLast = item?.userData?.lastName || '';
+                                        const staffName = `${userFirst} ${userLast}`.trim() || '—';
+                                        const receiptDate = item?.createdAt ? moment.utc(item.createdAt).local().format('DD/MM/YYYY HH:mm:ss') : '—';
                                         return (
-                                            <tr key={index}>
+                                            <tr key={item?.id || index}>
                                                 <td>{index + 1}</td>
-                                                <td>{moment.utc(item.createdAt).local().format('DD/MM/YYYY HH:mm:ss')}</td>
-                                                <td>{item.supplierData.name}</td>
-                                                <td>{item.supplierData.phonenumber}</td>
-                                                <td>{item.userData.firstName +" "+item.userData.lastName}</td>
+                                                <td>{receiptDate}</td>
+                                                <td>{supplierName}</td>
+                                                <td>{supplierPhone}</td>
+                                                <td>{staffName}</td>
                                               
                                                 <td>
                                                     <Link to={`/admin/detail-receipt/${item.id}`}>view</Link>

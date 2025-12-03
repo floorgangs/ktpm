@@ -6,8 +6,8 @@ import { toast } from 'react-toastify';
 import storeVoucherLogo from '../../../../src/resources/img/storeVoucher.png'
 import ShopCartItem from '../../../component/ShopCart/ShopCartItem';
 import CommonUtils from '../../../utils/CommonUtils';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 function DetailOrder(props) {
     const { id } = useParams();
     const [DataOrder, setDataOrder] = useState({});
@@ -23,8 +23,13 @@ function DetailOrder(props) {
             const order = await getDetailOrder(id);
             if (order && order.errCode === 0) {
                 setDataOrder(order.data);
-                if (order.data && order.data.typeShipData) {
+                // Ưu tiên shippingFee từ GHN nếu có, nếu không thì dùng typeShipData.price
+                if (order.data && order.data.shippingFee && order.data.shippingFee > 0) {
+                    setpriceShip(order.data.shippingFee);
+                } else if (order.data && order.data.typeShipData && order.data.typeShipData.price) {
                     setpriceShip(order.data.typeShipData.price);
+                } else {
+                    setpriceShip(0);
                 }
             }
         } catch (error) {
@@ -127,14 +132,14 @@ function DetailOrder(props) {
                                 <>
                                     <div className="content-left">
 
-                                        <span>{DataOrder.addressUser.shipName} ({DataOrder.addressUser.shipPhonenumber})</span>
+                                        <span>{DataOrder.addressUser.name} ({DataOrder.addressUser.phonenumber})</span>
 
 
                                     </div>
                                     <div className="content-center">
                                         <span>
 
-                                            {DataOrder.addressUser.shipAdress}
+                                            {DataOrder.addressUser.address}
                                         </span>
                                     </div>
                                 </>
@@ -188,11 +193,16 @@ function DetailOrder(props) {
                                     Đơn vị vận chuyển
                                 </h6>
                                 <div>
-                                    {
-                                        DataOrder && DataOrder.typeShipData &&
-                                        <label className="form-check-label">{DataOrder.typeShipData.type} - {CommonUtils.formatter.format(DataOrder.typeShipData.price)} </label>
-                                    }
-
+                                    {DataOrder && DataOrder.shippingProvider === 'GHN' ? (
+                                        <label className="form-check-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <img src="https://file.hstatic.net/200000472237/file/giao-hang-nhanh_f0ba75003cb04ea7926e8ea128be94c2.png" alt="GHN" style={{ height: '20px' }} />
+                                            Giao Hàng Nhanh - {CommonUtils.formatter.format(priceShip)}
+                                        </label>
+                                    ) : DataOrder && DataOrder.typeShipData && DataOrder.typeShipData.price ? (
+                                        <label className="form-check-label">{DataOrder.typeShipData.type} - {CommonUtils.formatter.format(DataOrder.typeShipData.price)}</label>
+                                    ) : (
+                                        <label className="form-check-label">Phí vận chuyển: {CommonUtils.formatter.format(priceShip)}</label>
+                                    )}
                                 </div>
                             </div>
                             <div className="box-shopcart-bottom">
@@ -242,6 +252,33 @@ function DetailOrder(props) {
                         <div className='box-type-payment active'>{DataOrder.statusOrderData && DataOrder.statusOrderData.value}</div>
 
                     </div>
+                    {/* GHN Shipping Info */}
+                    {DataOrder && DataOrder.shippingProvider === 'GHN' && (
+                        <div className="content-top ghn-shipping-info" style={{ display: 'flex', gap: '10px', flexDirection: 'column', background: '#f6ffed', padding: '15px', borderRadius: '8px', marginTop: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <img src="https://file.hstatic.net/200000472237/file/giao-hang-nhanh_f0ba75003cb04ea7926e8ea128be94c2.png" alt="GHN" style={{ height: '24px' }} />
+                                <span style={{ fontWeight: '600', color: '#52c41a' }}>Giao Hàng Nhanh</span>
+                            </div>
+                            {DataOrder.shipCode && (
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <span>Mã vận đơn:</span>
+                                    <span style={{ fontWeight: '600', color: '#1890ff' }}>{DataOrder.shipCode}</span>
+                                </div>
+                            )}
+                            {DataOrder.ghnAddress && (
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <span>Địa chỉ GHN:</span>
+                                    <span>{DataOrder.ghnAddress}</span>
+                                </div>
+                            )}
+                            {DataOrder.shippingFee > 0 && (
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <span>Phí ship GHN:</span>
+                                    <span style={{ fontWeight: '600', color: '#52c41a' }}>{CommonUtils.formatter.format(DataOrder.shippingFee)}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                     <div className="content-top" style={{ display: 'flex', gap: '10px' }}>
                         <span>Hình ảnh giao hàng</span>
                         <div onClick={() => openPreviewImage(DataOrder.image)} className="box-img-preview" style={{ backgroundImage: `url(${DataOrder.image})`, width: '200px', height: '200px', borderRadius: "10px" }}></div>
@@ -252,15 +289,15 @@ function DetailOrder(props) {
                             <div className="wrap-bottom">
                                 <div className="box-flex">
                                     <div className="head">Tên khách hàng</div>
-                                    <div >{DataOrder.addressUser.shipName}</div>
+                                    <div >{DataOrder.addressUser.name}</div>
                                 </div>
                                 <div className="box-flex">
                                     <div className="head">Số điện thoại</div>
-                                    <div >{DataOrder.addressUser.shipPhonenumber}</div>
+                                    <div >{DataOrder.addressUser.phonenumber}</div>
                                 </div>
                                 <div className="box-flex">
                                     <div className="head">Địa chỉ email</div>
-                                    <div >{DataOrder.addressUser.shipEmail}</div>
+                                    <div >{DataOrder.addressUser.email}</div>
                                 </div>
 
 
@@ -317,8 +354,10 @@ function DetailOrder(props) {
 
             {
                 isOpen === true &&
-                <Lightbox mainSrc={imgPreview}
-                    onCloseRequest={() => setisOpen(false)}
+                <Lightbox 
+                    open={isOpen}
+                    close={() => setisOpen(false)}
+                    slides={[{ src: imgPreview }]}
                 />
             }
 

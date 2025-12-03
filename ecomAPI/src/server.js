@@ -42,7 +42,7 @@ const socketIo = require("socket.io")(server, {
     }
   }); 
 socketIo.on("connection", (socket) => { 
-    console.log("New client connected" + socket.id); 
+    // console.log("New client connected" + socket.id); 
   
     socket.on("sendDataClient", function(data) { 
       sendMessage(data)
@@ -53,7 +53,7 @@ socketIo.on("connection", (socket) => {
       socketIo.emit("loadRoomServer", { data });
     })
     socket.on("disconnect", () => {
-      console.log("Client disconnected"); 
+      // console.log("Client disconnected"); 
     });
   });
 let port = process.env.PORT || 8004;

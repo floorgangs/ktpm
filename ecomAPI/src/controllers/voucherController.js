@@ -1,176 +1,84 @@
 import voucherService from '../services/voucherService';
 
-//========================TYPE VOUCHER=====================//
-let createNewTypeVoucher = async (req, res) => {
+const handleServiceCall = async (servicePromise, res) => {
     try {
-        let data = await voucherService.createNewTypeVoucher(req.body);
-        return res.status(200).json(data);
+        const response = await servicePromise;
+        return res.status(200).json(response);
     } catch (error) {
-        console.log(error)
-        return res.status(200).json({
+        console.log('=== voucherController error ===');
+        console.log('Error message:', error.message);
+        console.log('Error stack:', error.stack);
+        return res.status(500).json({
             errCode: -1,
-            errMessage: 'Error from server'
-        })
+            errMessage: 'Error from server: ' + error.message
+        });
     }
-}
-let getDetailTypeVoucherById = async (req, res) => {
-    try {
-        let data = await voucherService.getDetailTypeVoucherById(req.query.id);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
+};
+
 let getAllTypeVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.getAllTypeVoucher(req.query);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
+    return handleServiceCall(voucherService.getAllTypeVoucher(req.query), res);
+};
+
+let createNewTypeVoucher = async (req, res) => {
+    return handleServiceCall(voucherService.createNewTypeVoucher(req.body), res);
+};
+
 let updateTypeVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.updateTypeVoucher(req.body);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
+    return handleServiceCall(voucherService.updateTypeVoucher(req.body), res);
+};
+
 let deleteTypeVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.deleteTypeVoucher(req.body);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
-let getSelectTypeVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.getSelectTypeVoucher();
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
-//==========================VOUCHER=====================//
-let createNewVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.createNewVoucher(req.body);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
-let getDetailVoucherById = async (req, res) => {
-    try {
-        let data = await voucherService.getDetailVoucherById(req.query.id);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
+    return handleServiceCall(voucherService.deleteTypeVoucher(req.body.id), res);
+};
+
+let getDetailVoucher = async (req, res) => {
+    return handleServiceCall(voucherService.getDetailVoucher(req.query.id), res);
+};
+
 let getAllVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.getAllVoucher(req.query);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
+    return handleServiceCall(voucherService.getAllVoucher(req.query), res);
+};
+
+let createNewVoucher = async (req, res) => {
+    return handleServiceCall(voucherService.createNewVoucher(req.body), res);
+};
 
 let updateVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.updateVoucher(req.body);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
+    return handleServiceCall(voucherService.updateVoucher(req.body), res);
+};
+
 let deleteVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.deleteVoucher(req.body);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
-let saveUserVoucher = async (req, res) => {
-    try {
-        let data = await voucherService.saveUserVoucher(req.body);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
-let getAllVoucherByUserId = async (req, res) => {
-    try {
-        let data = await voucherService.getAllVoucherByUserId(req.query);
-        return res.status(200).json(data);
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({
-            errCode: -1,
-            errMessage: 'Error from server'
-        })
-    }
-}
+    return handleServiceCall(voucherService.deleteVoucher(req.body.id), res);
+};
+
+let getVoucherStore = async (req, res) => {
+    return handleServiceCall(voucherService.getVoucherStore(req.query), res);
+};
+
+let claimVoucher = async (req, res) => {
+    return handleServiceCall(voucherService.claimVoucher(req.body), res);
+};
+
+let getVoucherWallet = async (req, res) => {
+    return handleServiceCall(voucherService.getVoucherWallet(req.query.userId), res);
+};
+
+let revokeVoucher = async (req, res) => {
+    return handleServiceCall(voucherService.revokeVoucher(req.body), res);
+};
+
 module.exports = {
-    createNewTypeVoucher: createNewTypeVoucher,
-    getDetailTypeVoucherById: getDetailTypeVoucherById,
-    getAllTypeVoucher: getAllTypeVoucher,
-    updateTypeVoucher: updateTypeVoucher,
-    deleteTypeVoucher: deleteTypeVoucher,
-    createNewVoucher: createNewVoucher,
-    getDetailVoucherById: getDetailVoucherById,
-    getAllVoucher: getAllVoucher,
-    updateVoucher: updateVoucher,
-    deleteVoucher: deleteVoucher,
-    getSelectTypeVoucher: getSelectTypeVoucher,
-    saveUserVoucher: saveUserVoucher,
-    getAllVoucherByUserId: getAllVoucherByUserId
-}
+    getAllTypeVoucher,
+    createNewTypeVoucher,
+    updateTypeVoucher,
+    deleteTypeVoucher,
+    getDetailVoucher,
+    getAllVoucher,
+    createNewVoucher,
+    updateVoucher,
+    deleteVoucher,
+    getVoucherStore,
+    claimVoucher,
+    getVoucherWallet,
+    revokeVoucher
+};

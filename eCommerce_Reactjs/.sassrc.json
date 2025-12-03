@@ -1,0 +1,3 @@
+{
+  "silenceDeprecations": ["legacy-js-api", "import", "global-builtin", "color-functions", "slash-div"]
+}

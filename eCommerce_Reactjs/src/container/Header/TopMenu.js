@@ -1,16 +1,6 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import './Header.scss';
-const TopMenu = props => {
-    let handleLogout = () => {
-        localStorage.removeItem("userData");
-        localStorage.removeItem("token");
-        window.location.href = '/login'
-
-    }
-
-
-    let name = props.user && props.user.id ? `${props.user && props.user.firstName ? props.user.firstName : ''} ${props.user.lastName}` : ''
+const TopMenu = () => {
     return (
 
 
@@ -27,31 +17,8 @@ const TopMenu = props => {
                         <div className="float-right">
                             <ul className="right_side">
                                 <li>
-                                    {props.user && props.user.id ? <NavLink exact to={`/user/detail/${props.user && props.user.id ? props.user.id : ''}`}>
-                                        {name}
-                                    </NavLink>
-                                        :
-                                        <a href="/login">
-                                            Đăng nhập
-                                        </a>
-                                    }
-
-                                </li>
-                                <li style={{ cursor: 'pointer' }}>
-
-                                    {props.user && props.user.id ? <a href="/" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
-                                        Đăng xuất
-                                    </a>
-                                        :
-                                        <a href="/login">
-                                            Đăng ký
-                                        </a>
-                                    }
-                                </li>
-                                <li>
                                     <a href="/" onClick={(event) => event.preventDefault()}>VI</a>
                                 </li>
-
                             </ul>
                         </div>
                     </div>

@@ -95,8 +95,8 @@
     padding: 15px 20px;
 
     .btn {
-      padding: 8px 20px;
-      border-radius: 4px;
+      padding: 10px 24px;
+      border-radius: 25px;
       font-size: 14px;
       font-weight: 500;
       transition: all 0.3s ease;
@@ -109,6 +109,30 @@
           background: #5da511;
           border-color: #5da511;
         }
+      }
+    }
+
+    .btn-buy-now-modal {
+      background: #71cd14;
+      border: none;
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 25px;
+
+      &:hover {
+        background: #5da511;
+      }
+    }
+
+    .btn-cancel-modal {
+      background: #6c757d;
+      border: none;
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 25px;
+
+      &:hover {
+        background: #5a6268;
       }
     }
   }

@@ -1,0 +1,363 @@
+// About Page Styles
+.about-page {
+    background-color: #f8f9fa;
+}
+
+// Banner Section
+.about-banner {
+    position: relative;
+    height: 240px;
+    /* much softer, near-neutral background to avoid strong green */
+    background: linear-gradient(135deg, #eef6f1 0%, #f6faf7 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+
+    .banner-overlay {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .banner-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: none;
+
+        @media (max-width: 768px) {
+            font-size: 1.4rem;
+        }
+    }
+
+    .banner-subtitle {
+        font-size: 0.9rem;
+        color: #6b7a70;
+        text-align: center;
+        font-weight: 300;
+        letter-spacing: 0.4px;
+        margin-top: 6px;
+    }
+
+    /* Hide title underline if any appears in the banner area */
+    .title-underline {
+        display: none;
+    }
+}
+
+// Content Sections
+.about-content {
+    padding-bottom: 80px;
+}
+
+.about-section {
+    margin-bottom: 80px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    position: relative;
+
+    @media (max-width: 768px) {
+        font-size: 1.6rem;
+    }
+}
+
+.title-underline {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #bfe6b8 0%, #9ad59a 100%);
+    margin-bottom: 25px;
+    border-radius: 2px;
+}
+
+.section-intro {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.section-text {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+// Story Section
+.story-section {
+    .section-image {
+        img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+    }
+
+    .section-content {
+        padding-left: 30px;
+
+        @media (max-width: 991px) {
+            padding-left: 0;
+            margin-top: 30px;
+        }
+    }
+}
+
+// Vision Section
+.vision-section {
+    background: #fff;
+    padding: 60px 0;
+    border-radius: 15px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+
+    .section-image {
+        img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+    }
+
+    .section-content {
+        padding-right: 30px;
+
+        @media (max-width: 991px) {
+            padding-right: 0;
+            margin-top: 30px;
+        }
+    }
+
+    .mission-box {
+        background: #f6faf2;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #8fcf8f;
+
+        .box-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #5e9f5e;
+            margin-bottom: 12px;
+        }
+
+        .section-text {
+            margin-bottom: 0;
+        }
+    }
+}
+
+// Philosophy Cards
+.philosophy-section {
+    .philosophy-card {
+        background: #fff;
+        padding: 35px 25px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        height: 100%;
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            color: #8fcf8f;
+            margin-bottom: 20px;
+
+            i {
+                display: inline-block;
+            }
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .card-text {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+    }
+}
+
+// Core Values
+.values-section {
+    .value-card {
+        background: linear-gradient(135deg, #f6f8f9 0%, #eef3f5 100%);
+        padding: 36px 28px;
+        border-radius: 12px;
+        text-align: center;
+        color: #2c3e50;
+        transition: all 0.25s ease;
+        height: 100%;
+
+        &:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+        }
+
+        .value-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            opacity: 0.85;
+
+            i {
+                display: inline-block;
+            }
+        }
+
+        .value-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .value-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            opacity: 0.95;
+            margin-bottom: 0;
+        }
+    }
+}
+
+// Commitment Section
+.commitment-section {
+    .commitment-box {
+        background: linear-gradient(135deg, #eaf7ea 0%, #dff2df 100%);
+        padding: 50px 40px;
+        border-radius: 15px;
+        color: #214b21;
+
+        .section-title {
+            color: #1f3d1f;
+        }
+
+        .commitment-intro {
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .commitment-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 18px;
+            border-radius: 10px;
+            transition: all 0.22s ease;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.95);
+                transform: translateX(3px);
+            }
+
+            i {
+                font-size: 1.9rem;
+                min-width: 40px;
+            }
+
+            span {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+        }
+    }
+}
+
+// Closing Section
+.closing-section {
+    background: #fff;
+    padding: 60px 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+
+    .closing-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    .closing-text {
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .btn-shop-now {
+        display: inline-block;
+        padding: 15px 40px;
+        background: linear-gradient(135deg, #9ed97f 0%, #7cc36a 100%);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 6px 14px rgba(124, 195, 106, 0.16);
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(113, 205, 20, 0.4);
+            color: #fff;
+        }
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 991px) {
+    .about-banner {
+        height: 300px;
+    }
+
+    .about-section {
+        margin-bottom: 50px;
+    }
+
+    .section-title {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .commitment-section .commitment-box {
+        padding: 40px 20px;
+    }
+
+    .closing-section {
+        padding: 40px 20px;
+    }
+}

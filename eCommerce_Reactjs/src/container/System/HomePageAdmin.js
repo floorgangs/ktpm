@@ -26,16 +26,7 @@ import AddProductDetail from './Product/ProductDetail/AddProductDetail';
 import EditProductDetail from './Product/ProductDetail/EditProductDetail';
 import AddBanner from './Banner/AddBanner';
 import ManageBanner from './Banner/ManageBanner';
-import AddBlog from './Blog/AddBlog';
-import ManageBlog from './Blog/ManageBlog';
-import ManageSubject from './Subject/ManageSubject';
-import AddSubject from './Subject/AddSubject';
-import ManageTypeShip from './TypeShip/ManageTypeShip';
-import AddTypeShip from './TypeShip/AddTypeShip';
-import AddTypeVoucher from './Voucher/AddTypeVoucher';
-import ManageTypeVoucher from './Voucher/ManageTypeVoucher';
-import AddVoucher from './Voucher/AddVoucher';
-import ManageVoucher from './Voucher/ManageVoucher';
+import GHNConfig from './Shipping/GHNConfig';
 import ManageOrder from './Order/ManageOrder';
 import DetailOrder from './Order/DetailOrder';
 import Message from './Message/Message';
@@ -47,6 +38,12 @@ import DetailReceipt from './Receipt/DetailReceipt';
 import Turnover from './Statistic/Turnover';
 import Profit from './Statistic/Profit';
 import StockProduct from './Statistic/StockProduct';
+import AddBlog from './Blog/AddBlog';
+import ManageBlog from './Blog/ManageBlog';
+import ManageTypeVoucher from './Voucher/ManageTypeVoucher';
+import AddTypeVoucher from './Voucher/AddTypeVoucher';
+import ManageVoucher from './Voucher/ManageVoucher';
+import AddVoucher from './Voucher/AddVoucher';
 
 function HomePageAdmin(props) {
     return (
@@ -144,50 +141,8 @@ function HomePageAdmin(props) {
                                 <Route exact path="/admin/list-banner">
                                     <ManageBanner />
                                 </Route>
-                                <Route exact path="/admin/add-blog">
-                                    <AddBlog />
-                                </Route>
-                                <Route exact path="/admin/list-blog">
-                                    <ManageBlog />
-                                </Route>
-                                <Route exact path="/admin/edit-blog/:id">
-                                    <AddBlog />
-                                </Route>
-                                <Route exact path="/admin/list-subject">
-                                    <ManageSubject />
-                                </Route>
-                                <Route exact path="/admin/add-subject">
-                                    <AddSubject />
-                                </Route>
-                                <Route exact path="/admin/edit-subject/:id">
-                                    <AddSubject />
-                                </Route>
-                                <Route exact path="/admin/list-typeship">
-                                    <ManageTypeShip />
-                                </Route>
-                                <Route exact path="/admin/add-typeship">
-                                    <AddTypeShip />
-                                </Route>
-                                <Route exact path="/admin/edit-typeship/:id">
-                                    <AddTypeShip />
-                                </Route>
-                                <Route exact path="/admin/add-typevoucher">
-                                    <AddTypeVoucher />
-                                </Route>
-                                <Route exact path="/admin/list-typevoucher">
-                                    <ManageTypeVoucher />
-                                </Route>
-                                <Route exact path="/admin/edit-typevoucher/:id">
-                                    <AddTypeVoucher />
-                                </Route>
-                                <Route exact path="/admin/add-voucher">
-                                    <AddVoucher />
-                                </Route>
-                                <Route exact path="/admin/edit-voucher/:id">
-                                    <AddVoucher />
-                                </Route>
-                                <Route exact path="/admin/list-voucher">
-                                    <ManageVoucher />
+                                <Route exact path="/admin/ghn-config">
+                                    <GHNConfig />
                                 </Route>
                                 <Route exact path="/admin/list-order">
                                     <ManageOrder />
@@ -206,6 +161,33 @@ function HomePageAdmin(props) {
                                 </Route>
                                 <Route exact path="/admin/stock-product">
                                     <StockProduct />
+                                </Route>
+                                <Route exact path="/admin/add-blog">
+                                    <AddBlog />
+                                </Route>
+                                <Route exact path="/admin/edit-blog/:id">
+                                    <AddBlog />
+                                </Route>
+                                <Route exact path="/admin/list-blog">
+                                    <ManageBlog />
+                                </Route>
+                                <Route exact path="/admin/list-type-voucher">
+                                    <ManageTypeVoucher />
+                                </Route>
+                                <Route exact path="/admin/add-type-voucher">
+                                    <AddTypeVoucher />
+                                </Route>
+                                <Route exact path="/admin/edit-type-voucher/:id">
+                                    <AddTypeVoucher />
+                                </Route>
+                                <Route exact path="/admin/manage-voucher">
+                                    <ManageVoucher />
+                                </Route>
+                                <Route exact path="/admin/add-voucher">
+                                    <AddVoucher />
+                                </Route>
+                                <Route exact path="/admin/edit-voucher/:id">
+                                    <AddVoucher />
                                 </Route>
                             </main>
                             <Footer />

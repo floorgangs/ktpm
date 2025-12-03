@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
+import { useEffect, useState } from 'react';
 import { getAllBlog, deleteBlogService } from '../../../services/userService';
 import { toast } from 'react-toastify';
 import Lightbox from 'react-image-lightbox';
@@ -7,7 +8,9 @@ import '../Banner/AddBanner.scss';
 import { PAGINATION } from '../../../utils/constant';
 import ReactPaginate from 'react-paginate';
 import CommonUtils from '../../../utils/CommonUtils';
-import { Link } from "react-router-dom";
+import {
+    Link
+} from "react-router-dom";
 import FormSearch from '../../../component/Search/FormSearch';
 
 const ManageBlog = () => {
@@ -18,23 +21,24 @@ const ManageBlog = () => {
     const [count, setCount] = useState('')
     const [numberPage, setnumberPage] = useState('')
     const [keyword, setkeyword] = useState('')
-    const loadBlog = useCallback(async (searchKeyword) => {
+    useEffect(() => {
+        
+            loadBlog(keyword)
+    
+    }, [keyword])
+    let loadBlog = async (keyword) => {
         let arrData = await getAllBlog({
             subjectId:'',
             limit: PAGINATION.pagerow,
             offset: 0,
-            keyword:searchKeyword
+            keyword:keyword
 
         })
         if (arrData && arrData.errCode === 0) {
             setdataBlog(arrData.data)
             setCount(Math.ceil(arrData.count / PAGINATION.pagerow))
         }
-    }, [])
-
-    useEffect(() => {
-        loadBlog(keyword)
-    }, [keyword, loadBlog])
+    }
 
 
     let openPreviewImage = (url) => {
@@ -79,12 +83,14 @@ const ManageBlog = () => {
 
         }
     }
-    let handleSearchBlog = (searchKeyword) =>{
-        setkeyword(searchKeyword)
+    let handleSearchBlog = (keyword) =>{
+        loadBlog(keyword)
+        setkeyword(keyword)
     }
-    let handleOnchangeSearch = (searchKeyword) =>{
-        if(searchKeyword === ''){
-            setkeyword(searchKeyword)
+    let handleOnchangeSearch = (keyword) =>{
+        if(keyword === ''){
+            loadBlog(keyword)
+            setkeyword(keyword)
         }
     }
     let handleOnClickExport =async () =>{
@@ -119,11 +125,11 @@ const ManageBlog = () => {
                     <FormSearch title={"tiêu đề"}  handleOnchange={handleOnchangeSearch} handleSearch={handleSearchBlog} />
                     </div>
                     <div className='col-8'>
-                    <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i className="fa-solid fa-file-excel"></i></button>
+                    <button  style={{float:'right'}} onClick={() => handleOnClickExport()} className="btn btn-success" >Xuất excel <i class="fa-solid fa-file-excel"></i></button>
                     </div>
                     </div>
                     <div className="table-responsive">
-                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellSpacing="0">
+                        <table className="table table-bordered" style={{ border: '1' }} width="100%" cellspacing="0">
                             <thead>
                                 <tr>
                                     <th>STT</th>

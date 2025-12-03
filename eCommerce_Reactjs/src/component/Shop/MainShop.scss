@@ -1,0 +1,47 @@
+/* Shop Product Grid */
+.shop-product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 30px;
+    
+    @media (max-width: 992px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    @media (max-width: 576px) {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+.shop-product-item {
+    .product-card {
+        margin-bottom: 0;
+        height: 100%;
+    }
+}
+
+/* Toolbar spacing and control layout */
+.product_top_bar {
+    margin-bottom: 24px;
+
+    .left_dorp {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        /* Ensure the inline search block keeps its width but aligns nicely */
+        > div[style] {
+            margin-left: 0; /* remove inline extra margin if present */
+        }
+    }
+
+    @media (max-width: 576px) {
+        margin-bottom: 16px;
+        .left_dorp {
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+    }
+}

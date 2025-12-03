@@ -3,9 +3,7 @@ import userController from '../controllers/userController';
 import allcodeController from '../controllers/allcodeController';
 import productController from '../controllers/productController';
 import bannerController from '../controllers/bannerController';
-import blogController from '../controllers/blogController';
 import typeshipController from '../controllers/typeshipController';
-import voucherController from '../controllers/voucherController';
 import commentController from '../controllers/commentController';
 import shopCartController from '../controllers/shopCartController';
 import orderController from '../controllers/orderController';
@@ -16,6 +14,8 @@ import middlewareControllers from '../middlewares/jwtVerify';
 import supplierController from '../controllers/supplierController';
 import externalController from '../controllers/externalController';
 import receiptController from '../controllers/receiptController';
+import blogController from '../controllers/blogController';
+import voucherController from '../controllers/voucherController';
 let router = express.Router();
 
 let initwebRoutes = (app) => {
@@ -43,7 +43,6 @@ let initwebRoutes = (app) => {
     router.get('/api/get-all-code', allcodeController.getAllCodeService)
     router.get('/api/get-list-allcode', allcodeController.getListAllCodeService)
     router.get('/api/get-detail-all-code-by-id', allcodeController.getDetailAllCodeById)
-    router.get('/api/get-all-category-blog', allcodeController.getAllCategoryBlog)
 
     //==================API PRODUCT=========================//
     router.post('/api/create-new-product', middlewareControllers.verifyTokenAdmin, productController.createNewProduct)
@@ -78,14 +77,6 @@ let initwebRoutes = (app) => {
     router.put('/api/update-banner', middlewareControllers.verifyTokenAdmin, bannerController.updateBanner)
     router.delete('/api/delete-banner', middlewareControllers.verifyTokenAdmin, bannerController.deleteBanner)
 
-    //=================API BLOG===============================//
-    router.post('/api/create-new-blog', middlewareControllers.verifyTokenAdmin, blogController.createNewBlog)
-    router.get('/api/get-detail-blog', blogController.getDetailBlogById)
-    router.get('/api/get-all-blog', blogController.getAllBlog)
-    router.put('/api/update-blog', middlewareControllers.verifyTokenAdmin, blogController.updateBlog)
-    router.delete('/api/delete-blog', middlewareControllers.verifyTokenAdmin, blogController.deleteBlog)
-    router.get('/api/get-feature-blog', blogController.getFeatureBlog)
-    router.get('/api/get-new-blog', blogController.getNewBlog)
     //=================API TYPESHIP =======================//
     router.post('/api/create-new-typeship', middlewareControllers.verifyTokenAdmin, typeshipController.createNewTypeShip)
     router.get('/api/get-detail-typeship', typeshipController.getDetailTypeshipById)
@@ -93,26 +84,15 @@ let initwebRoutes = (app) => {
     router.put('/api/update-typeship', middlewareControllers.verifyTokenAdmin, typeshipController.updateTypeship)
     router.delete('/api/delete-typeship', middlewareControllers.verifyTokenAdmin, typeshipController.deleteTypeship)
 
-    //================API TYPEVOUCHER======================//
-    router.post('/api/create-new-typevoucher', middlewareControllers.verifyTokenAdmin, voucherController.createNewTypeVoucher)
-    router.get('/api/get-detail-typevoucher', voucherController.getDetailTypeVoucherById)
-    router.get('/api/get-all-typevoucher', voucherController.getAllTypeVoucher)
-    router.put('/api/update-typevoucher', middlewareControllers.verifyTokenAdmin, voucherController.updateTypeVoucher)
-    router.delete('/api/delete-typevoucher', middlewareControllers.verifyTokenAdmin, voucherController.deleteTypeVoucher)
-    router.get('/api/get-select-typevoucher', voucherController.getSelectTypeVoucher)
-    //=================API VOUCHER==========================//
-    router.post('/api/create-new-voucher', middlewareControllers.verifyTokenAdmin, voucherController.createNewVoucher)
-    router.get('/api/get-detail-voucher', voucherController.getDetailVoucherById)
-    router.get('/api/get-all-voucher', voucherController.getAllVoucher)
-    router.put('/api/update-voucher', middlewareControllers.verifyTokenAdmin, voucherController.updateVoucher)
-    router.delete('/api/delete-voucher', middlewareControllers.verifyTokenAdmin, voucherController.deleteVoucher)
-    router.post('/api/save-user-voucher', middlewareControllers.verifyTokenUser, voucherController.saveUserVoucher)
-    router.get('/api/get-all-voucher-by-userid', voucherController.getAllVoucherByUserId)
     //=================API REVIEW=============================//
     router.post('/api/create-new-review', middlewareControllers.verifyTokenUser, commentController.createNewReview)
     router.post('/api/reply-review', middlewareControllers.verifyTokenAdmin, commentController.ReplyReview)
     router.get('/api/get-all-review-by-productId', commentController.getAllReviewByProductId)
     router.delete('/api/delete-review', middlewareControllers.verifyTokenUser, commentController.deleteReview)
+
+    //=================API COMMENT BLOG=======================//
+    router.post('/api/create-new-comment-blog', middlewareControllers.verifyTokenUser, commentController.createNewCommentBlog)
+    router.get('/api/get-all-comment-by-blogId', commentController.getAllCommentByBlogId)
 
     //=================API SHOPCART==========================//
     router.post('/api/add-shopcart', middlewareControllers.verifyTokenUser, shopCartController.addShopCart)
@@ -129,7 +109,7 @@ let initwebRoutes = (app) => {
     router.post('/api/payment-order-success', middlewareControllers.verifyTokenUser, orderController.paymentOrderSuccess)
     router.post('/api/payment-order-vnpay-success', middlewareControllers.verifyTokenUser, orderController.paymentOrderVnpaySuccess)
     router.put('/api/confirm-order', orderController.confirmOrder)
-    router.get('/api/get-all-order-by-shipper', orderController.getAllOrdersByShipper)
+    // router.get('/api/get-all-order-by-shipper') - removed, using GHN third-party shipping
     router.post('/api/payment-order-vnpay', middlewareControllers.verifyTokenUser, orderController.paymentOrderVnpay)
     router.post('/api/vnpay_return', orderController.confirmOrderVnpay)
     router.put('/api/update-image-order', orderController.updateImageOrder)
@@ -145,11 +125,6 @@ let initwebRoutes = (app) => {
     router.get('/api/loadMessage', middlewareControllers.verifyTokenUser, messageController.loadMessage)
     router.get('/api/listRoomOfUser', middlewareControllers.verifyTokenUser, messageController.listRoomOfUser)
     router.get('/api/listRoomOfAdmin', middlewareControllers.verifyTokenAdmin, messageController.listRoomOfAdmin)
-    //==================API COMMENT============================//
-    router.post('/api/create-new-comment', middlewareControllers.verifyTokenUser, commentController.createNewComment)
-    router.post('/api/reply-comment', middlewareControllers.verifyTokenAdmin, commentController.ReplyComment)
-    router.get('/api/get-all-comment-by-blogId', commentController.getAllCommentByBlogId)
-    router.delete('/api/delete-comment', middlewareControllers.verifyTokenUser, commentController.deleteComment)
 
     //=================API STATISTIC==============================//
     router.get('/api/get-count-card-statistic', middlewareControllers.verifyTokenAdmin, statisticController.getCountCardStatistic)
@@ -173,6 +148,33 @@ let initwebRoutes = (app) => {
     router.put('/api/update-receipt', middlewareControllers.verifyTokenAdmin, receiptController.updateReceipt)
     router.delete('/api/delete-receipt', middlewareControllers.verifyTokenAdmin, receiptController.deleteReceipt)
     router.post('/api/create-new-detail-receipt', middlewareControllers.verifyTokenAdmin, receiptController.createNewReceiptDetail)
+
+    //=================API BLOG===============================//
+    router.post('/api/create-new-blog', middlewareControllers.verifyTokenAdmin, blogController.createNewBlog)
+    router.get('/api/get-detail-blog', blogController.getDetailBlogById)
+    router.get('/api/get-all-blog', blogController.getAllBlog)
+    router.put('/api/update-blog', middlewareControllers.verifyTokenAdmin, blogController.updateBlog)
+    router.delete('/api/delete-blog', middlewareControllers.verifyTokenAdmin, blogController.deleteBlog)
+    router.get('/api/get-feature-blog', blogController.getFeatureBlog)
+    router.get('/api/get-new-blog', blogController.getNewBlog)
+
+    //=================API VOUCHER===============================//
+    router.get('/api/get-all-type-voucher', voucherController.getAllTypeVoucher)
+    router.post('/api/create-new-type-voucher', middlewareControllers.verifyTokenAdmin, voucherController.createNewTypeVoucher)
+    router.put('/api/update-type-voucher', middlewareControllers.verifyTokenAdmin, voucherController.updateTypeVoucher)
+    router.delete('/api/delete-type-voucher', middlewareControllers.verifyTokenAdmin, voucherController.deleteTypeVoucher)
+
+    router.get('/api/get-all-voucher', middlewareControllers.verifyTokenAdmin, voucherController.getAllVoucher)
+    router.get('/api/get-detail-voucher', middlewareControllers.verifyTokenAdmin, voucherController.getDetailVoucher)
+    router.post('/api/create-new-voucher', middlewareControllers.verifyTokenAdmin, voucherController.createNewVoucher)
+    router.put('/api/update-voucher', middlewareControllers.verifyTokenAdmin, voucherController.updateVoucher)
+    router.delete('/api/delete-voucher', middlewareControllers.verifyTokenAdmin, voucherController.deleteVoucher)
+
+    router.get('/api/get-voucher-store', middlewareControllers.verifyTokenUser, voucherController.getVoucherStore)
+    router.post('/api/claim-voucher', middlewareControllers.verifyTokenUser, voucherController.claimVoucher)
+    router.get('/api/get-voucher-wallet', middlewareControllers.verifyTokenUser, voucherController.getVoucherWallet)
+    router.put('/api/revoke-voucher', middlewareControllers.verifyTokenAdmin, voucherController.revokeVoucher)
+
     // External proxied endpoints (avoid CORS on client)
     router.get('/api/get-exchange-rate', externalController.getExchangeRate)
     return app.use("/", router);

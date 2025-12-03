@@ -19,7 +19,8 @@ paypal.configure({
 let createNewOrder = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.addressUserId || !data.typeShipId) {
+            // Allow either typeShipId OR GHN shipping
+            if (!data.addressUserId || (!data.typeShipId && !data.shippingProvider)) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required parameter !'
@@ -28,12 +29,20 @@ let createNewOrder = (data) => {
 
                 let product = await db.OrderProduct.create({
 
+                    userId: data.userId,
                     addressUserId: data.addressUserId,
                     isPaymentOnlien: data.isPaymentOnlien,
                     statusId: 'S3',
-                    typeShipId: data.typeShipId,
+                    typeShipId: data.typeShipId || null,
                     voucherId: data.voucherId,
-                    note: data.note
+                    note: data.note,
+                    // GHN fields
+                    shipCode: data.shipCode || null,
+                    shippingProvider: data.shippingProvider || 'internal',
+                    ghnDistrictId: data.ghnAddress ? data.ghnAddress.districtId : null,
+                    ghnWardCode: data.ghnAddress ? data.ghnAddress.wardCode : null,
+                    ghnAddress: data.ghnAddress ? data.ghnAddress.fullAddress : null,
+                    shippingFee: data.shippingFee || 0
 
                 })
 
@@ -103,7 +112,6 @@ let getAllOrders = (data) => {
             let res = await db.OrderProduct.findAndCountAll(objectFilter)
             for (let i = 0; i < res.rows.length; i++) {
                 let addressUser = await db.AddressUser.findOne({ where: { id: res.rows[i].addressUserId } })
-                let shipper = await db.User.findOne({ where: { id: res.rows[i].shipperId } })
 
                 if (addressUser) {
                     let user = await db.User.findOne({
@@ -114,7 +122,6 @@ let getAllOrders = (data) => {
 
                     res.rows[i].userData = user
                     res.rows[i].addressUser = addressUser
-                    res.rows[i].shipperData = shipper
                 }
 
             }
@@ -139,67 +146,75 @@ let getDetailOrderById = (id) => {
                     errMessage: 'Missing required parameter !'
                 })
             } else {
-                let order = await db.OrderProduct.findOne({
-                    where: { id: id },
-                    include: [
-                        { model: db.TypeShip, as: 'typeShipData' },
-                        { model: db.Voucher, as: 'voucherData' },
-                        { model: db.Allcode, as: 'statusOrderData' },
+                let addressUser = await db.AddressUser.findAll({
+                    where: { userId: userId },
+                    raw: true
+                })
 
-                    ],
-                    raw: true,
-                    nest: true
-                })
-                if (order.image) {
-                    order.image = new Buffer(order.image, 'base64').toString('binary')
-                }
-                order.voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
-                    where: { id: order.voucherData.typeVoucherId }
-                })
-                let orderDetail = await db.OrderDetail.findAll({
-                    where: { orderId: id }
-                })
-                let addressUser = await db.AddressUser.findOne({
-                    where: { id: order.addressUserId }
-                })
-                order.addressUser = addressUser
-                let user = await db.User.findOne({
-                    where: { id: addressUser.userId },
-                    attributes: {
-                        exclude: ['password', 'image']
-                    },
-                    raw: true,
-                    nest: true
-                })
-                order.userData = user
-                for (let i = 0; i < orderDetail.length; i++) {
-                    orderDetail[i].productDetailSize = await db.ProductDetailSize.findOne({
-                        where: { id: orderDetail[i].productId },
+                let ordersByAddress = []
+
+                for (let i = 0; i < addressUser.length; i++) {
+                    let orderList = await db.OrderProduct.findAll({
+                        where: { addressUserId: addressUser[i].id },
                         include: [
-                            { model: db.Allcode, as: 'sizeData' },
+                            { model: db.TypeShip, as: 'typeShipData' },
+                            { model: db.Voucher, as: 'voucherData' },
+                            { model: db.Allcode, as: 'statusOrderData' },
+
                         ],
                         raw: true,
                         nest: true
                     })
-                    orderDetail[i].productDetail = await db.ProductDetail.findOne({
-                        where: { id: orderDetail[i].productDetailSize.productdetailId }
-                    })
-                    orderDetail[i].product = await db.Product.findOne({
-                        where: { id: orderDetail[i].productDetail.productId }
-                    })
-                    orderDetail[i].productImage = await db.ProductImage.findAll({
-                        where: { productdetailId: orderDetail[i].productDetail.id }
-                    })
-                    for (let j = 0; j < orderDetail[i].productImage.length; j++) {
-                        orderDetail[i].productImage[j].image = new Buffer(orderDetail[i].productImage[j].image, 'base64').toString('binary')
+
+                    for (let j = 0; j < orderList.length; j++) {
+                        if (orderList[j].voucherData) {
+                            orderList[j].voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
+                                where: { id: orderList[j].voucherData.typeVoucherId }
+                            })
+                        }
+                        let orderDetail = await db.OrderDetail.findAll({
+                            where: { orderId: orderList[j].id },
+                            raw: true,
+                            nest: true
+                        })
+                        for (let k = 0; k < orderDetail.length; k++) {
+                            orderDetail[k].productDetailSize = await db.ProductDetailSize.findOne({
+                                where: { id: orderDetail[k].productId },
+                                include: [
+                                    { model: db.Allcode, as: 'sizeData' },
+                                ],
+                                raw: true,
+                                nest: true
+                            })
+                            if (!orderDetail[k].productDetailSize) continue
+                            orderDetail[k].productDetail = await db.ProductDetail.findOne({
+                                where: { id: orderDetail[k].productDetailSize.productdetailId },
+                                raw: true,
+                                nest: true
+                            })
+                            if (!orderDetail[k].productDetail) continue
+                            orderDetail[k].product = await db.Product.findOne({
+                                where: { id: orderDetail[k].productDetail.productId },
+                                raw: true,
+                                nest: true
+                            })
+                            orderDetail[k].productImage = await db.ProductImage.findAll({
+                                where: { productdetailId: orderDetail[k].productDetail.id },
+                                raw: true
+                            })
+                            for (let f = 0; f < orderDetail[k].productImage.length; f++) {
+                                orderDetail[k].productImage[f].image = Buffer.from(orderDetail[k].productImage[f].image, 'base64').toString('binary')
+                            }
+                        }
+
+                        orderList[j].orderDetail = orderDetail
+                        ordersByAddress.push(orderList[j])
                     }
                 }
 
-                order.orderDetail = orderDetail;
-
                 resolve({
                     errCode: 0,
-                    data: order
+                    data: ordersByAddress
                 })
             }
 
@@ -271,9 +286,11 @@ let getAllOrdersByUser = (userId) => {
                         nest: true
                     })
                     for (let j = 0; j < addressUser[i].order.length; j++) {
-                        addressUser[i].order[j].voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
-                            where: { id: addressUser[i].order[j].voucherData.typeVoucherId }
-                        })
+                            if (addressUser[i].order[j].voucherData) {
+                                addressUser[i].order[j].voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
+                                    where: { id: addressUser[i].order[j].voucherData.typeVoucherId }
+                                })
+                            }
                         let orderDetail = await db.OrderDetail.findAll({
                             where: { orderId: addressUser[i].order[j].id }
                         })
@@ -321,57 +338,8 @@ let getAllOrdersByUser = (userId) => {
         }
     })
 }
-let getAllOrdersByShipper = (data) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            console.log(data.shipperId)
-            let objectFilter = {
-                include: [
-                    { model: db.TypeShip, as: 'typeShipData' },
-                    { model: db.Voucher, as: 'voucherData' },
-                    { model: db.Allcode, as: 'statusOrderData' },
+// getAllOrdersByShipper removed - using GHN third-party shipping
 
-                ],
-                order: [['createdAt', 'DESC']],
-                raw: true,
-                nest: true,
-                where: { shipperId: data.shipperId }
-            }
-
-            if (data.status && data.status == 'working') objectFilter.where = { ...objectFilter.where, statusId: 'S5' }
-            if (data.status && data.status == 'done') objectFilter.where = { ...objectFilter.where, statusId: 'S6' }
-
-            let res = await db.OrderProduct.findAll(objectFilter)
-
-            for (let i = 0; i < res.length; i++) {
-                let addressUser = await db.AddressUser.findOne({ where: { id: res[i].addressUserId } })
-                if (addressUser) {
-                    let user = await db.User.findOne({ where: { id: addressUser.userId } })
-                    res[i].userData = user
-                    res[i].addressUser = addressUser
-                }
-
-            }
-
-            resolve({
-                errCode: 0,
-                data: res,
-
-            })
-
-
-            resolve({
-                errCode: 0,
-                data: addressUser
-
-            })
-
-
-        } catch (error) {
-            reject(error)
-        }
-    })
-}
 let paymentOrder = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -494,12 +462,20 @@ let paymentOrderSuccess = (data) => {
 
                         let product = await db.OrderProduct.create({
 
+                            userId: data.userId,
                             addressUserId: data.addressUserId,
                             isPaymentOnlien: data.isPaymentOnlien,
                             statusId: 'S3',
-                            typeShipId: data.typeShipId,
+                            typeShipId: data.typeShipId || null,
                             voucherId: data.voucherId,
-                            note: data.note
+                            note: data.note,
+                            // GHN fields
+                            shipCode: data.shipCode || null,
+                            shippingProvider: data.shippingProvider || 'internal',
+                            ghnDistrictId: data.ghnAddress ? data.ghnAddress.districtId : null,
+                            ghnWardCode: data.ghnAddress ? data.ghnAddress.wardCode : null,
+                            ghnAddress: data.ghnAddress ? data.ghnAddress.fullAddress : null,
+                            shippingFee: data.shippingFee || 0
 
                         })
 
@@ -565,9 +541,16 @@ let paymentOrderVnpaySuccess = (data) => {
                 addressUserId: data.addressUserId,
                 isPaymentOnlien: data.isPaymentOnlien,
                 statusId: 'S3',
-                typeShipId: data.typeShipId,
+                typeShipId: data.typeShipId || null,
                 voucherId: data.voucherId,
-                note: data.note
+                note: data.note,
+                // GHN fields
+                shipCode: data.shipCode || null,
+                shippingProvider: data.shippingProvider || 'internal',
+                ghnDistrictId: data.ghnAddress ? data.ghnAddress.districtId : null,
+                ghnWardCode: data.ghnAddress ? data.ghnAddress.wardCode : null,
+                ghnAddress: data.ghnAddress ? data.ghnAddress.fullAddress : null,
+                shippingFee: data.shippingFee || 0
 
             })
 
@@ -616,14 +599,13 @@ let paymentOrderVnpaySuccess = (data) => {
 let confirmOrder = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.shipperId || !data.orderId || !data.statusId) {
+            if (!data.orderId || !data.statusId) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required parameter !'
                 })
             } else {
                 let orderProduct = await db.OrderProduct.findOne({ where: { id: data.orderId }, raw: false })
-                orderProduct.shipperId = data.shipperId
                 orderProduct.statusId = data.statusId
                 await orderProduct.save()
 
@@ -802,7 +784,6 @@ module.exports = {
     paymentOrder: paymentOrder,
     paymentOrderSuccess: paymentOrderSuccess,
     confirmOrder: confirmOrder,
-    getAllOrdersByShipper: getAllOrdersByShipper,
     paymentOrderVnpay: paymentOrderVnpay,
     confirmOrderVnpay: confirmOrderVnpay,
     paymentOrderVnpaySuccess: paymentOrderVnpaySuccess,

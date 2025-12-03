@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
         content: DataTypes.TEXT('long'),
         parentId: DataTypes.INTEGER,
         productId: DataTypes.INTEGER,
-        userId: DataTypes.INTEGER,
         blogId: DataTypes.INTEGER,
+        userId: DataTypes.INTEGER,
         star: DataTypes.INTEGER,
         image: DataTypes.BLOB('long')
     }, {

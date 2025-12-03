@@ -47,7 +47,8 @@ let createNewProduct = (data) => {
                     categoryId: data.categoryId,
                     madeby: data.madeby,
                     material: data.material,
-                    brandId: data.brandId
+                    brandId: data.brandId,
+                    document: data.document || null // Lưu document như MongoDB
                 })
                 if (product) {
                     let productdetail = await db.ProductDetail.create({
@@ -361,6 +362,9 @@ let updateProduct = (data) => {
                     product.categoryId = data.categoryId;
                     product.contentMarkdown = data.contentMarkdown;
                     product.contentHTML = data.contentHTML;
+                    if (data.document) {
+                        product.document = data.document; // Cập nhật document nếu có
+                    }
 
                     await product.save()
                     resolve({

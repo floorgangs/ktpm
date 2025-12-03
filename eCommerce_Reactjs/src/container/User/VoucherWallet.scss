@@ -1,0 +1,347 @@
+// Màu chủ đạo của Eiser Shop
+$primary-color: #71cd14;
+$primary-dark: #5cb312;
+$primary-light: #e8f7d9;
+$text-dark: #333;
+$text-gray: #666;
+$text-light: #999;
+$border-color: #e0e0e0;
+$bg-light: #f8f9fa;
+
+.voucher-page {
+    flex: 1;
+    padding: 25px;
+    background-color: #fff;
+    min-height: 500px;
+    border-radius: 8px;
+
+    .voucher-header {
+        margin-bottom: 25px;
+        
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: $text-dark;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            i {
+                color: $primary-color;
+            }
+        }
+        
+        p {
+            color: $text-gray;
+            font-size: 14px;
+            margin: 0;
+        }
+    }
+
+    .voucher-code-box {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: linear-gradient(135deg, $primary-light 0%, #fff 100%);
+        border-radius: 12px;
+        border: 2px dashed $primary-color;
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+            i {
+                color: $primary-color;
+                font-size: 18px;
+                padding-left: 10px;
+            }
+
+            input {
+                flex: 1;
+                padding: 12px;
+                border: none;
+                font-size: 14px;
+                outline: none;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+
+                &::placeholder {
+                    text-transform: none;
+                    letter-spacing: normal;
+                    color: #bbb;
+                }
+            }
+
+            button {
+                padding: 12px 24px;
+                background-color: $primary-color;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:hover {
+                    background-color: $primary-dark;
+                }
+            }
+        }
+    }
+
+    .voucher-section {
+        margin-bottom: 30px;
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: $text-dark;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid $border-color;
+
+            i {
+                color: $primary-color;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: $text-gray;
+            
+            i {
+                color: $primary-color;
+                margin-right: 8px;
+            }
+        }
+
+        .no-voucher {
+            text-align: center;
+            padding: 60px 20px;
+            background: $bg-light;
+            border-radius: 12px;
+
+            i {
+                font-size: 48px;
+                color: #ddd;
+                margin-bottom: 15px;
+                display: block;
+            }
+
+            p {
+                color: $text-gray;
+                margin: 0;
+            }
+        }
+    }
+
+    .voucher-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .voucher-card {
+        display: flex;
+        align-items: stretch;
+        border: 1px solid $border-color;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff;
+        transition: all 0.2s;
+
+        &:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: $primary-color;
+        }
+
+        &.saved {
+            border-color: $primary-color;
+            background: linear-gradient(90deg, $primary-light 0%, #fff 30%);
+        }
+
+        &.expired {
+            opacity: 0.6;
+            
+            .voucher-left .discount-badge {
+                background: #999;
+            }
+        }
+
+        &.disabled {
+            opacity: 0.5;
+        }
+
+        .voucher-left {
+            width: 90px;
+            background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 10px;
+            position: relative;
+
+            &::after {
+                content: '';
+                position: absolute;
+                right: -8px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 16px;
+                height: 16px;
+                background: #fff;
+                border-radius: 50%;
+            }
+
+            .discount-badge {
+                color: #fff;
+                font-size: 20px;
+                font-weight: 700;
+                text-align: center;
+                line-height: 1.2;
+            }
+
+            .remaining {
+                color: rgba(255,255,255,0.85);
+                font-size: 11px;
+                margin-top: 5px;
+            }
+        }
+
+        .voucher-info {
+            flex: 1;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .voucher-title {
+                font-size: 15px;
+                font-weight: 600;
+                color: $text-dark;
+                margin-bottom: 4px;
+            }
+
+            .voucher-condition {
+                font-size: 13px;
+                color: $text-gray;
+                margin-bottom: 8px;
+            }
+
+            .voucher-meta {
+                display: flex;
+                gap: 15px;
+                font-size: 12px;
+                color: $text-light;
+
+                .code {
+                    strong {
+                        color: $primary-color;
+                    }
+                }
+
+                .text-danger {
+                    color: #e74c3c;
+                }
+            }
+        }
+
+        .voucher-action, .voucher-status {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+
+            .btn-save {
+                padding: 10px 24px;
+                background: $primary-color;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:hover {
+                    background: $primary-dark;
+                }
+            }
+
+            .saved-badge {
+                color: $primary-color;
+                font-size: 14px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+
+                i {
+                    font-size: 18px;
+                }
+            }
+
+            .unavailable-text {
+                color: #999;
+                font-size: 13px;
+                font-weight: 500;
+            }
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .voucher-page {
+        padding: 15px;
+
+        .voucher-code-box {
+            padding: 15px;
+
+            .input-wrapper {
+                flex-wrap: wrap;
+
+                input {
+                    width: 100%;
+                }
+
+                button {
+                    width: 100%;
+                }
+            }
+        }
+
+        .voucher-card {
+            .voucher-left {
+                width: 70px;
+                
+                .discount-badge {
+                    font-size: 16px;
+                }
+            }
+
+            .voucher-info {
+                padding: 12px;
+                
+                .voucher-title {
+                    font-size: 14px;
+                }
+
+                .voucher-meta {
+                    flex-direction: column;
+                    gap: 5px;
+                }
+            }
+        }
+    }
+}

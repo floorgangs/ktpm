@@ -4,6 +4,8 @@ import { getAllProductUser } from '../../services/userService';
 import { PAGINATION } from '../../utils/constant';
 import ReactPaginate from 'react-paginate';
 import FormSearch from '../Search/FormSearch';
+import './MainShop.scss';
+
 function MainShop(props) {
 
     const [dataProduct, setdataProduct] = useState([])
@@ -126,37 +128,37 @@ function MainShop(props) {
                 </div>
                 
             </div>
-            <div style={{ marginBottom: '10px' }} className="latest_product_inner">
-                <div className="row">
+            <div className="shop-product-grid">
                     {dataProduct && dataProduct.length > 0 &&
                         dataProduct.map((item, index) => {
                             return (
-                                <ItemProduct id={item.id} width={"255px"} height={"254px"} type="col-lg-4 col-md-6" name={item.name} img={item.productDetail[0].productImage[0].image}
-                                    discountPrice={item.productDetail[0].discountPrice} price={item.productDetail[0].originalPrice}></ItemProduct>
+                                <div className="shop-product-item" key={index}>
+                                    <ItemProduct id={item.id} name={item.name} img={item.productDetail[0].productImage[0].image}
+                                        discountPrice={item.productDetail[0].discountPrice} price={item.productDetail[0].originalPrice}></ItemProduct>
+                                </div>
                             )
                         })
                     }
-
-
-                </div>
             </div>
-            <ReactPaginate
-                previousLabel={'Quay lại'}
-                nextLabel={'Tiếp'}
-                breakLabel={'...'}
-                pageCount={count}
-                marginPagesDisplayed={3}
-                containerClassName={"pagination justify-content-center"}
-                pageClassName={"page-item"}
-                pageLinkClassName={"page-link"}
-                previousLinkClassName={"page-link"}
-                nextClassName={"page-item"}
-                nextLinkClassName={"page-link"}
-                breakLinkClassName={"page-link"}
-                breakClassName={"page-item"}
-                activeClassName={"active"}
-                onPageChange={handleChangePage}
-            />
+            {count > 0 && (
+                <ReactPaginate
+                    previousLabel={'Quay lại'}
+                    nextLabel={'Tiếp'}
+                    breakLabel={'...'}
+                    pageCount={count}
+                    marginPagesDisplayed={3}
+                    containerClassName={"pagination justify-content-center"}
+                    pageClassName={"page-item"}
+                    pageLinkClassName={"page-link"}
+                    previousLinkClassName={"page-link"}
+                    nextClassName={"page-item"}
+                    nextLinkClassName={"page-link"}
+                    breakLinkClassName={"page-link"}
+                    breakClassName={"page-item"}
+                    activeClassName={"active"}
+                    onPageChange={handleChangePage}
+                />
+            )}
         </div>
     );
 }

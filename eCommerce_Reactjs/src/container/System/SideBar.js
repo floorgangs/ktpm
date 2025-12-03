@@ -77,8 +77,29 @@ const SideBar = () => {
                                         <Link to={'/admin/add-banner'} className="nav-link" >Thêm băng rôn</Link>
                                     </nav>
                                 </div>
+                                <button type="button" className="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseShip" aria-expanded="false" aria-controls="collapseLayouts" style={{ background: 'none', border: 'none', padding: 0 }}>
+                                    <div className="sb-nav-link-icon"><i className="fas fa-shipping-fast"></i></div>
+                                    Vận chuyển GHN
+                                    <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
+                                </button>
+                                <div className="collapse" id="collapseShip" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                    <nav className="sb-sidenav-menu-nested nav">
+                                        <Link to={'/admin/ghn-config'} className="nav-link" >Cấu hình GHN</Link>
+                                    </nav>
+                                </div>
+                                <button type="button" className="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseBlog" aria-expanded="false" aria-controls="collapseLayouts" style={{ background: 'none', border: 'none', padding: 0 }}>
+                                    <div className="sb-nav-link-icon"><i className="fas fa-blog"></i></div>
+                                    Quản lý Blog
+                                    <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
+                                </button>
+                                <div className="collapse" id="collapseBlog" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                    <nav className="sb-sidenav-menu-nested nav">
+                                        <Link to={'/admin/list-blog'} className="nav-link" >Danh sách Blog</Link>
+                                        <Link to={'/admin/add-blog'} className="nav-link" >Thêm Blog</Link>
+                                    </nav>
+                                </div>
                                 <button type="button" className="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseSubject" aria-expanded="false" aria-controls="collapseLayouts" style={{ background: 'none', border: 'none', padding: 0 }}>
-                                    <div className="sb-nav-link-icon"><i className="fab fa-blogger"></i></div>
+                                    <div className="sb-nav-link-icon"><i className="fas fa-th-list"></i></div>
                                     Quản lý chủ đề
                                     <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
                                 </button>
@@ -88,39 +109,17 @@ const SideBar = () => {
                                         <Link to={'/admin/add-subject'} className="nav-link" >Thêm chủ đề</Link>
                                     </nav>
                                 </div>
-                                <button type="button" className="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseBlog" aria-expanded="false" aria-controls="collapseLayouts" style={{ background: 'none', border: 'none', padding: 0 }}>
-                                    <div className="sb-nav-link-icon"><i className="fas fa-feather-alt"></i></div>
-                                    Quản lý bài đăng
-                                    <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
-                                </button>
-                                <div className="collapse" id="collapseBlog" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                    <nav className="sb-sidenav-menu-nested nav">
-                                        <Link to={'/admin/list-blog'} className="nav-link" >Danh sách bài đăng</Link>
-                                        <Link to={'/admin/add-blog'} className="nav-link" >Thêm bài đăng</Link>
-                                    </nav>
-                                </div>
-                                <button type="button" className="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseShip" aria-expanded="false" aria-controls="collapseLayouts" style={{ background: 'none', border: 'none', padding: 0 }}>
-                                    <div className="sb-nav-link-icon"><i className="fas fa-shipping-fast"></i></div>
-                                    Quản lý loại ship
-                                    <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
-                                </button>
-                                <div className="collapse" id="collapseShip" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                    <nav className="sb-sidenav-menu-nested nav">
-                                        <Link to={'/admin/list-typeship'} className="nav-link" >DS loại giao hàng</Link>
-                                        <Link to={'/admin/add-typeship'} className="nav-link" >Thêm loại giao hàng</Link>
-                                    </nav>
-                                </div>
                                 <button type="button" className="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseVoucher" aria-expanded="false" aria-controls="collapseLayouts" style={{ background: 'none', border: 'none', padding: 0 }}>
-                                    <div className="sb-nav-link-icon"><i className="fas fa-percentage"></i></div>
+                                    <div className="sb-nav-link-icon"><i className="fas fa-ticket-alt"></i></div>
                                     Quản lý voucher
                                     <div className="sb-sidenav-collapse-arrow"><i className="fas fa-angle-down" /></div>
                                 </button>
                                 <div className="collapse" id="collapseVoucher" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                     <nav className="sb-sidenav-menu-nested nav">
-                                        <Link to={'/admin/list-typevoucher'} className="nav-link" >DS loại khuyến mãi</Link>
-                                        <Link to={'/admin/list-voucher'} className="nav-link" >DS mã khuyến mãi</Link>
-                                        <Link to={'/admin/add-typevoucher'} className="nav-link" >Thêm loại khuyến mãi</Link>
-                                        <Link to={'/admin/add-voucher'} className="nav-link" >Thêm mã khuyến mãi</Link>
+                                        <Link to={'/admin/manage-voucher'} className="nav-link" >DS Voucher</Link>
+                                        <Link to={'/admin/add-voucher'} className="nav-link" >Thêm voucher</Link>
+                                        <Link to={'/admin/list-type-voucher'} className="nav-link" >DS loại voucher</Link>
+                                        <Link to={'/admin/add-type-voucher'} className="nav-link" >Thêm loại voucher</Link>
                                     </nav>
                                 </div>
                             </>

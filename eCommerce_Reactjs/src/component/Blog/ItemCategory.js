@@ -1,22 +1,23 @@
 import React from 'react';
 
 function ItemCategory(props) {
-  let handleClickCategory = (code) => {
+  const handleClickCategory = (code) => {
     props.handleClickCategory(code);
   };
 
+  const isActive = props.data.code === props.activeLinkId;
+  const countNumber = Number(props.data.countPost);
+  const hasCount = Number.isFinite(countNumber) && countNumber > 0;
+
   return (
-    <li>
-      <div
-        style={{ cursor: 'pointer' }}
-        onClick={() => handleClickCategory(props.data.code)}
-        className={props.data.code === props.activeLinkId ? 'd-flex activeCategory' : 'd-flex'}
-        role="button"
-      >
-        <p>{props.data.value}</p>
-        <p>({props.data.countPost})</p>
-      </div>
-    </li>
+    <button
+      type="button"
+      onClick={() => handleClickCategory(props.data.code)}
+      className={`blog-chip${isActive ? ' active' : ''}`}
+    >
+      <span className="blog-chip__label">{props.data.value}</span>
+      {hasCount && <span className="blog-chip__count">{countNumber}</span>}
+    </button>
   );
 }
 

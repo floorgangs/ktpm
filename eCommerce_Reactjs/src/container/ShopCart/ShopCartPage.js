@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import ShopCartItem from '../../component/ShopCart/ShopCartItem';
 import { useSelector, useDispatch } from 'react-redux';
 import { ChooseTypeShipStart, getItemCartStart } from '../../action/ShopCartAction'
-import storeVoucherLogo from '../../../src/resources/img/storeVoucher.png'
 import { getAllTypeShip, getAllAddressUserByUserIdService, createNewAddressUserrService } from '../../services/userService';
 import './ShopCartPage.scss';
-import VoucherModal from './VoucherModal';
 import { useHistory } from 'react-router-dom';
 import AddressUsersModal from './AdressUserModal';
 import { toast } from 'react-toastify';
@@ -13,13 +11,11 @@ import CommonUtils from '../../utils/CommonUtils';
 function ShopCartPage(props) {
     const dispatch = useDispatch()
     let history = useHistory();
-    const [isOpenModal, setisOpenModal] = useState(false)
     const [isOpenModalAddressUser, setisOpenModalAddressUser] = useState(false)
     const [user, setuser] = useState()
     const [typeShip, settypeShip] = useState([])
     let dataTypeShip = useSelector(state => state.shopcart.dataTypeShip)
     let dataCart = useSelector(state => state.shopcart.listCartItem)
-    let dataVoucher = useSelector(state => state.shopcart.dataVoucher)
     const [priceShip, setpriceShip] = useState(0)
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem('userData'));
@@ -54,16 +50,8 @@ function ShopCartPage(props) {
     }, [dataTypeShip])
 
     let price = 0;
-    let closeModal = () => {
-        setisOpenModal(false)
-
-    }
     let closeModaAddressUser = () => {
         setisOpenModalAddressUser(false)
-
-    }
-    let handleOpenModal = () => {
-        setisOpenModal(true)
 
     }
     let handleOpenAddressUserModal = async () => {
@@ -78,31 +66,20 @@ function ShopCartPage(props) {
             toast.error("Hãy đăng nhập để mua hàng")
         }
     }
-    let totalPriceDiscount = (price, discount) => {
-
-        if (discount.voucherData.typeVoucherOfVoucherData.typeVoucher === "percent") {
-
-            if (((price * discount.voucherData.typeVoucherOfVoucherData.value) / 100) > discount.voucherData.typeVoucherOfVoucherData.maxValue) {
-
-                return price - discount.voucherData.typeVoucherOfVoucherData.maxValue
-            } else {
-                return price - ((price * discount.voucherData.typeVoucherOfVoucherData.value) / 100)
-            }
-        } else {
-            return price - discount.voucherData.typeVoucherOfVoucherData.maxValue
-        }
-
-    }
 
     let sendDataFromModalAddress = async (data) => {
         setisOpenModalAddressUser(false)
 
         let res = await createNewAddressUserrService({
-            shipName: data.shipName,
-            shipAdress: data.shipAdress,
-            shipEmail: data.shipEmail,
-            shipPhonenumber: data.shipPhonenumber,
-            userId: user.id
+            name: data.name,
+            address: data.address,
+            email: data.email,
+            phonenumber: data.phonenumber,
+            userId: user.id,
+            // Standardized Vietnamese address
+            provinceName: data.provinceName,
+            districtName: data.districtName,
+            wardName: data.wardName
         })
         if (res && res.errCode === 0) {
             toast.success("Thêm địa chỉ thành công !")
@@ -110,9 +87,6 @@ function ShopCartPage(props) {
         } else {
             toast.error(res.errMessage)
         }
-    }
-    let closeModalFromVoucherItem = () => {
-        setisOpenModal(false)
     }
     let hanldeOnChangeTypeShip = (item) => {
         setpriceShip(item.price)
@@ -178,21 +152,10 @@ function ShopCartPage(props) {
 
                 </div>
                 <div className="box-shopcart-bottom">
-                    <div className="content-left">
-                        <div className="wrap-voucher">
-                            <img width="20px" height="20px" style={{ marginLeft: "-3px" }} src={storeVoucherLogo} alt="Voucher icon"></img>
-                            <span className="name-easier">Easier voucher</span>
-                            <span onClick={() => handleOpenModal()} className="choose-voucher">Chọn Hoặc Nhập Mã</span>
-                            {dataVoucher && dataVoucher.voucherData &&
-                                <span className="choose-voucher">Mã voucher: {dataVoucher.voucherData.codeVoucher}</span>
-                            }
-
-                        </div>
-                    </div>
-                    <div className="content-right">
+                    <div className="content-right" style={{ width: '100%' }}>
                         <div className="wrap-price">
                             <span className="text-total">Tổng thanh toán ({dataCart && dataCart.length} sản phẩm): </span>
-                            <span className="text-price">{dataVoucher && dataVoucher.voucherData ? CommonUtils.formatter.format(totalPriceDiscount(price, dataVoucher) + priceShip) : CommonUtils.formatter.format(price + (+priceShip))}</span>
+                            <span className="text-price">{CommonUtils.formatter.format(price + (+priceShip))}</span>
                         </div>
 
                         <div className="checkout_btn_inner">
@@ -201,8 +164,6 @@ function ShopCartPage(props) {
                     </div>
                 </div>
             </div>
-            <VoucherModal closeModalFromVoucherItem={closeModalFromVoucherItem} price={price + (+priceShip)} isOpenModal={isOpenModal}
-                closeModal={closeModal} id={user && user.id} />
             <AddressUsersModal sendDataFromModalAddress={sendDataFromModalAddress} isOpenModal={isOpenModalAddressUser} closeModaAddressUser={closeModaAddressUser} />
         </section>
     );

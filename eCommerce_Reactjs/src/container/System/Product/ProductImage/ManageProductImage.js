@@ -6,8 +6,8 @@ import {
 } from '../../../../services/userService';
 import { toast } from 'react-toastify';
 import './ManageProductImage.scss';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import { PAGINATION } from '../../../../utils/constant';
 import ReactPaginate from 'react-paginate';
 import { useParams } from "react-router-dom";
@@ -251,9 +251,7 @@ const ManageProductImage = () => {
 
                 {
                     isOpen === true &&
-                    <Lightbox mainSrc={imgPreview}
-                        onCloseRequest={() => setisOpen(false)}
-                    />
+                    <Lightbox open={isOpen} close={() => setisOpen(false)} slides={[{ src: imgPreview }]} />
                 }
                 <ReactPaginate
                     previousLabel={'Quay lại'}
@@ -333,9 +331,7 @@ const ManageProductImage = () => {
 
                 {
                     isOpen === true &&
-                    <Lightbox mainSrc={imgPreview}
-                        onCloseRequest={() => setisOpen(false)}
-                    />
+                    <Lightbox open={isOpen} close={() => setisOpen(false)} slides={[{ src: imgPreview }]} />
                 }
                 <ReactPaginate
                     previousLabel={'Quay lại'}

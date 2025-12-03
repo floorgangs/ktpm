@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
+import { useEffect, useState } from 'react';
 import { createNewBlogrService, getDetailBlogByIdService, updateBlogService } from '../../../services/userService';
 import CommonUtils from '../../../utils/CommonUtils';
 import Lightbox from 'react-image-lightbox';
@@ -18,34 +19,10 @@ const AddBlog = (props) => {
         title: '', shortdescription: '', image: '', isActionADD: true, imageReview: '', isOpen: false, contentMarkdown: '',
         contentHTML: '', subjectId: ''
     });
-    useEffect(() => {
-        if (dataSubject && dataSubject.length > 0) {
-            setInputValues((prev) => {
-                if (prev.subjectId) {
-                    return prev;
-                }
-                return {
-                    ...prev,
-                    subjectId: dataSubject[0].code
-                };
-            });
-        }
-    }, [dataSubject]);
+    if (dataSubject && dataSubject.length > 0 && inputValues.subjectId === '') {
 
-    const setStateBlog = useCallback((data) => {
-        setInputValues((prev) => ({
-            ...prev,
-            title: data.title,
-            shortdescription: data.shortdescription,
-            image: data.image,
-            imageReview: data.image,
-            isActionADD: false,
-            contentMarkdown: data.contentMarkdown,
-            contentHTML: data.contentHTML,
-            subjectId: data.subjectId,
-        }));
-
-    }, []);
+        setInputValues({ ...inputValues, subjectId: dataSubject[0].code })
+    }
     useEffect(() => {
         if (id) {
             let fetchBlog = async () => {
@@ -57,7 +34,21 @@ const AddBlog = (props) => {
             fetchBlog();
         }
 
-    }, [id, setStateBlog])
+    }, [id])
+    let setStateBlog = (data) => {
+        setInputValues({
+            ...inputValues,
+            title: data.title,
+            shortdescription: data.shortdescription,
+            image: data.image,
+            imageReview: data.image,
+            isActionADD: false,
+            contentMarkdown: data.contentMarkdown,
+            contentHTML: data.contentHTML,
+            subjectId: data.subjectId,
+        })
+
+    }
     const handleOnChange = event => {
         const { name, value } = event.target;
         setInputValues({ ...inputValues, [name]: value });
@@ -122,11 +113,11 @@ const AddBlog = (props) => {
         }
     }
     let handleEditorChange = ({ html, text }) => {
-        setInputValues((prev) => ({
-            ...prev,
+        setInputValues({
+            ...inputValues,
             contentMarkdown: text,
             contentHTML: html
-        }))
+        })
     }
     return (
         <div className="container-fluid px-4">

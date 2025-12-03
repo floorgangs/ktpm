@@ -4,8 +4,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetchAllcode } from '../../customize/fetch';
 import CommonUtils from '../../../utils/CommonUtils';
 import './AddProduct.scss';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import { CreateNewProduct } from '../../../services/userService';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
@@ -250,8 +250,10 @@ const AddProduct = (props) => {
                 </div>
             </div>
             {inputValues.isOpen === true &&
-                <Lightbox mainSrc={inputValues.imageReview}
-                    onCloseRequest={() => setInputValues((prevState) => ({ ...prevState, isOpen: false }))}
+                <Lightbox 
+                    open={inputValues.isOpen}
+                    close={() => setInputValues((prevState) => ({ ...prevState, isOpen: false }))}
+                    slides={[{ src: inputValues.imageReview }]}
                 />
             }
         </div>

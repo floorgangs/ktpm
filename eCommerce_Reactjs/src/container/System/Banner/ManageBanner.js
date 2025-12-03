@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getAllBanner, deleteBannerService } from '../../../services/userService';
 import { toast } from 'react-toastify';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import './AddBanner.scss';
 import { PAGINATION } from '../../../utils/constant';
 import ReactPaginate from 'react-paginate';
@@ -178,9 +178,7 @@ const ManageBanner = () => {
             </div>
             {
                 isOpen === true &&
-                <Lightbox mainSrc={imgPreview}
-                    onCloseRequest={() => setisOpen(false)}
-                />
+                <Lightbox open={isOpen} close={() => setisOpen(false)} slides={[{ src: imgPreview }]} />
             }
         </div >
     )

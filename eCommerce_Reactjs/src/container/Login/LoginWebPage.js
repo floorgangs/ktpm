@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
 import './LoginWebPage.css';
 import { FacebookLoginButton, GoogleLoginButton } from "react-social-login-buttons";
@@ -11,6 +11,8 @@ const LoginWebPage = () => {
     const [inputValues, setInputValues] = useState({
         email: '', password: 'passwordsecrect', firstName: '', lastName: '', phonenumber: '', isOpen: false, dataUser: {}
     });
+    const [isSignup, setIsSignup] = useState(false); // false = login form, true = signup form
+    
     const handleOnChange = event => {
         const { name, value } = event.target;
         setInputValues(prev => ({ ...prev, [name]: value }));
@@ -18,13 +20,12 @@ const LoginWebPage = () => {
     };
     const handleSwitchClick = event => {
         event.preventDefault();
+        setIsSignup(prev => !prev);
     };
-    let handleLogin = async () => {
-        const element = document.querySelector('form');
-        element.addEventListener('submit', event => {
+    let handleLogin = async (event) => {
+        if (event && typeof event.preventDefault === 'function') {
             event.preventDefault();
-
-        });
+        }
         let res = await handleLoginService({
             email: inputValues.email,
             password: inputValues.password
@@ -49,11 +50,6 @@ const LoginWebPage = () => {
         }
     }
     let handleLoginSocial = async (email) => {
-        const element = document.querySelector('form');
-        element.addEventListener('submit', event => {
-            event.preventDefault();
-
-        });
         let res = await handleLoginService({
             email: email,
             password: inputValues.password
@@ -78,12 +74,27 @@ const LoginWebPage = () => {
         }
     }
 
-    let handleSaveUser = async () => {
-        const element = document.querySelector('form');
-        element.addEventListener('submit', event => {
+    let handleSaveUser = async (event) => {
+        if (event && typeof event.preventDefault === 'function') {
             event.preventDefault();
+        }
 
-        });
+        // Normalize full name: signup form uses a single input (name="firstName") for full name.
+        // If user provided only fullName in firstName, split into firstName + lastName for backend.
+        const fullName = (inputValues.firstName || '').trim();
+        let firstNameVal = inputValues.firstName || '';
+        let lastNameVal = inputValues.lastName || '';
+        if (fullName && !lastNameVal) {
+            const parts = fullName.split(/\s+/);
+            if (parts.length === 1) {
+                firstNameVal = parts[0];
+                lastNameVal = '';
+            } else {
+                lastNameVal = parts.pop();
+                firstNameVal = parts.join(' ');
+            }
+        }
+
         let res = await checkPhonenumberEmail({
             phonenumber: inputValues.phonenumber,
             email: inputValues.email
@@ -93,10 +104,12 @@ const LoginWebPage = () => {
         } else {
             setInputValues(prev => ({
                 ...prev,
+                firstName: firstNameVal,
+                lastName: lastNameVal,
                 dataUser: {
                     email: prev.email,
-                    firstName: prev.firstName,
-                    lastName: prev.lastName,
+                    firstName: firstNameVal,
+                    lastName: lastNameVal,
                     phonenumber: prev.phonenumber,
                     password: prev.password,
                     roleId: 'R2',
@@ -104,7 +117,6 @@ const LoginWebPage = () => {
                 isOpen: true
             }))
         }
-
 
     }
     const getBase64FromUrl = async (url) => {
@@ -186,6 +198,31 @@ const LoginWebPage = () => {
             })
     }
 
+    useEffect(() => {
+        const groups = Array.from(document.querySelectorAll('.form .form-group'));
+        const handlers = groups.map(group => {
+            const input = group.querySelector('input');
+            const label = group.querySelector('label');
+            if (!input || !label) return null;
+            const onFocus = () => label.classList.add('active');
+            const onBlur = () => { if (!input.value) label.classList.remove('active'); };
+            const onInput = () => { if (input.value && input.value.toString().trim() !== '') label.classList.add('active'); else label.classList.remove('active'); };
+            input.addEventListener('focus', onFocus);
+            input.addEventListener('blur', onBlur);
+            input.addEventListener('input', onInput);
+            if (input.value && input.value.toString().trim() !== '') label.classList.add('active');
+            return { input, onFocus, onBlur, onInput };
+        });
+        return () => {
+            handlers.forEach(h => {
+                if (!h) return;
+                h.input.removeEventListener('focus', h.onFocus);
+                h.input.removeEventListener('blur', h.onBlur);
+                h.input.removeEventListener('input', h.onInput);
+            });
+        };
+    }, [inputValues.isOpen, isSignup]);
+
     return (
         <>
             {inputValues.isOpen === false &&
@@ -205,8 +242,8 @@ const LoginWebPage = () => {
                                 {/* Form Box */}
                                 <div className="col-sm-6 form">
                                     {/* Login Form */}
-                                    <div className="login form-peice ">
-                                        <form className="login-form" >
+                                    <div className={`login form-peice ${isSignup ? 'switched' : ''}`}>
+                                        <form className="login-form" onSubmit={handleLogin}>
                                             <div className="form-group">
                                                 <label htmlFor="loginemail">Địa chỉ email</label>
                                                 <input name="email" onChange={(event) => handleOnChange(event)} type="email" id="loginemail" required />
@@ -216,7 +253,7 @@ const LoginWebPage = () => {
                                                 <input name="password" onChange={(event) => handleOnChange(event)} type="password" id="loginPassword" required />
                                             </div>
                                             <div className="CTA">
-                                                <input onClick={() => handleLogin()} type="submit" value="Đăng nhập" />
+                                                <input type="submit" value="Đăng nhập" />
                                                 <a href="/" onClick={handleSwitchClick} style={{ cursor: 'pointer' }} className="switch">Tài khoản mới</a>
                                             </div>
                                             <FacebookLoginButton text="Đăng nhập với Facebook" iconSize="25px" style={{ width: "300px", height: "40px", fontSize: "16px", marginTop: "40px", marginBottom: "10px" }} onClick={() => signInwithFacebook()} />
@@ -224,19 +261,12 @@ const LoginWebPage = () => {
                                         </form>
                                     </div>{/* End Login Form */}
                                     {/* Signup Form */}
-                                    <div className="signup form-peice switched">
-                                        <form className="signup-form" >
-                                            <div style={{ display: 'flex', gap: '10px' }}>
-                                                <div className="form-group" style={{ flex: 1 }}>
-                                                    <label htmlFor="firstName">Họ</label>
-                                                    <input type="text" name="firstName" onChange={(event) => handleOnChange(event)} id="firstName" className="name" />
-                                                    <span className="error" />
-                                                </div>
-                                                <div className="form-group" style={{ flex: 1 }}>
-                                                    <label htmlFor="lastName">Tên</label>
-                                                    <input type="text" name="lastName" onChange={(event) => handleOnChange(event)} id="lastName" className="name" />
-                                                    <span className="error" />
-                                                </div>
+                                    <div className={`signup form-peice ${isSignup ? '' : 'switched'}`}>
+                                        <form className="signup-form" onSubmit={handleSaveUser}>
+                                            <div className="form-group">
+                                                <label htmlFor="fullName">Họ và tên</label>
+                                                <input type="text" name="firstName" onChange={(event) => handleOnChange(event)} id="fullName" className="name" />
+                                                <span className="error" />
                                             </div>
 
                                             <div className="form-group">
@@ -259,7 +289,7 @@ const LoginWebPage = () => {
                                                 <span className="error" />
                                             </div>
                                             <div className="CTA">
-                                                <input onClick={() => handleSaveUser()} type="submit" value="Lưu" id="submit" />
+                                                <input type="submit" value="Lưu" id="submit" />
                                                 <a href="/" onClick={handleSwitchClick} style={{ cursor: 'pointer' }} className="switch">Tôi có tài khoản</a>
                                             </div>
                                         </form>
@@ -276,7 +306,13 @@ const LoginWebPage = () => {
 
 
             {inputValues.isOpen === true &&
-                <Otp dataUser={inputValues.dataUser} />
+                <Otp
+                    dataUser={inputValues.dataUser}
+                    onGoBack={() => {
+                        setInputValues(prev => ({ ...prev, isOpen: false }));
+                        setIsSignup(true);
+                    }}
+                />
             }
         </>
     )

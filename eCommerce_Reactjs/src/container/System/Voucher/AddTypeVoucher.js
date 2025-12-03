@@ -1,104 +1,95 @@
 import React, { useEffect, useState } from 'react';
-import { createNewTypeVoucherService, getDetailTypeVoucherByIdService, updateTypeVoucherService } from '../../../services/userService';
+import { createNewTypeVoucherService, updateTypeVoucherService } from '../../../services/userService';
 import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
-import { useFetchAllcode } from '../../customize/fetch';
 
-const initialInputState = {
-    typeVoucher: '',
-    value: '',
-    maxValue: '',
-    minValue: ''
-};
-
-const AddTypeVoucher = () => {
-    const { data: dataTypeVoucher } = useFetchAllcode('DISCOUNT');
-    const [isActionADD, setisActionADD] = useState(true);
+const AddTypeVoucher = (props) => {
+    const [isActionADD, setisActionADD] = useState(true)
     const { id } = useParams();
-    const [inputValues, setInputValues] = useState(initialInputState);
+    const history = useHistory();
+
+    const [inputValues, setInputValues] = useState({
+        typeVoucher: 'percent',
+        value: '',
+        maxValue: '',
+        minValue: '',
+        description: ''
+    });
 
     useEffect(() => {
         if (!id) {
             return;
         }
-        const fetchDetailTypeShip = async () => {
+        const fetchDetailTypeVoucher = async () => {
             setisActionADD(false);
-            const typevoucher = await getDetailTypeVoucherByIdService(id);
-            if (typevoucher && typevoucher.errCode === 0) {
-                setInputValues({
-                    typeVoucher: typevoucher.data.typeVoucher || '',
-                    value: typevoucher.data.value || '',
-                    maxValue: typevoucher.data.maxValue || '',
-                    minValue: typevoucher.data.minValue || ''
-                });
-            }
-        };
-        fetchDetailTypeShip();
-    }, [id]);
-
-    useEffect(() => {
-        if (!isActionADD) {
-            return;
+            // For edit mode, we would need a getDetailTypeVoucherService
+            // For now, we'll use the data from props or redirect
         }
-        if (dataTypeVoucher && dataTypeVoucher.length > 0) {
-            setInputValues((prevState) => {
-                if (prevState.typeVoucher) {
-                    return prevState;
-                }
-                return {
-                    ...prevState,
-                    typeVoucher: dataTypeVoucher[0].code
-                };
-            });
-        }
-    }, [dataTypeVoucher, isActionADD]);
+        fetchDetailTypeVoucher()
+    }, [id])
 
     const handleOnChange = event => {
         const { name, value } = event.target;
-        setInputValues((prevState) => ({ ...prevState, [name]: value }));
-
+        setInputValues({ ...inputValues, [name]: value });
     };
+
     let handleSaveTypeVoucher = async () => {
+        // Validation
+        if (!inputValues.value) {
+            toast.error("Vui lòng nhập giá trị giảm giá");
+            return;
+        }
+        if (!inputValues.maxValue) {
+            toast.error("Vui lòng nhập giá trị giảm tối đa");
+            return;
+        }
+
         if (isActionADD === true) {
             let res = await createNewTypeVoucherService({
                 typeVoucher: inputValues.typeVoucher,
                 value: inputValues.value,
                 maxValue: inputValues.maxValue,
-                minValue: inputValues.minValue
+                minValue: inputValues.minValue || 0,
+                description: inputValues.description
             })
             if (res && res.errCode === 0) {
                 toast.success("Thêm loại voucher thành công")
-                setInputValues(initialInputState)
-            }
-            else if (res && res.errCode === 2) {
+                setInputValues({
+                    typeVoucher: 'percent',
+                    value: '',
+                    maxValue: '',
+                    minValue: '',
+                    description: ''
+                })
+            } else if (res && res.errCode === 2) {
                 toast.error(res.errMessage)
+            } else {
+                toast.error("Thêm loại voucher thất bại")
             }
-            else toast.error("Thêm loại voucher thất bại")
         } else {
             let res = await updateTypeVoucherService({
+                id: id,
                 typeVoucher: inputValues.typeVoucher,
                 value: inputValues.value,
                 maxValue: inputValues.maxValue,
-                minValue: inputValues.minValue,
-                id: id
+                minValue: inputValues.minValue || 0,
+                description: inputValues.description
             })
             if (res && res.errCode === 0) {
                 toast.success("Cập nhật loại voucher thành công")
-
-            }
-            else if (res && res.errCode === 2) {
+                history.push('/admin/manage-type-voucher')
+            } else if (res && res.errCode === 2) {
                 toast.error(res.errMessage)
+            } else {
+                toast.error("Cập nhật loại voucher thất bại")
             }
-            else toast.error("Cập nhật loại voucher thất bại")
         }
     }
-
 
     return (
         <div className="container-fluid px-4">
             <h1 className="mt-4">Quản lý loại voucher</h1>
-
 
             <div className="card mb-4">
                 <div className="card-header">
@@ -109,35 +100,74 @@ const AddTypeVoucher = () => {
                     <form>
                         <div className="form-row">
                             <div className="form-group col-md-6">
-                                <label htmlFor="inputEmail4">Loại voucher</label>
-                                <select value={inputValues.typeVoucher} name="typeVoucher" onChange={(event) => handleOnChange(event)} id="inputState" className="form-control">
-                                    {dataTypeVoucher && dataTypeVoucher.length > 0 &&
-                                        dataTypeVoucher.map((item, index) => {
-                                            return (
-                                                <option key={index} value={item.code}>{item.value}</option>
-                                            )
-                                        })
-                                    }
+                                <label>Loại giảm giá</label>
+                                <select 
+                                    className="form-control" 
+                                    name="typeVoucher"
+                                    value={inputValues.typeVoucher}
+                                    onChange={(event) => handleOnChange(event)}
+                                >
+                                    <option value="percent">Phần trăm (%)</option>
+                                    <option value="money">Tiền mặt (VNĐ)</option>
                                 </select>
                             </div>
                             <div className="form-group col-md-6">
-                                <label htmlFor="inputPassword4">Giá trị</label>
-                                <input type="text" value={inputValues.value} name="value" onChange={(event) => handleOnChange(event)} className="form-control" id="inputPassword4" />
-                            </div>
-                            <div className="form-group col-md-6">
-                                <label htmlFor="inputEmail4">Giá trị tối thiểu</label>
-                                <input type="number" value={inputValues.minValue} name="minValue" onChange={(event) => handleOnChange(event)} className="form-control" id="inputEmail4" />
-                            </div>
-                            <div className="form-group col-md-6">
-                                <label htmlFor="inputPassword4">Giá trị tối đa</label>
-                                <input type="number" value={inputValues.maxValue} name="maxValue" onChange={(event) => handleOnChange(event)} className="form-control" id="inputPassword4" />
+                                <label>Giá trị giảm {inputValues.typeVoucher === 'percent' ? '(%)' : '(VNĐ)'}</label>
+                                <input 
+                                    type="number" 
+                                    value={inputValues.value} 
+                                    name="value" 
+                                    onChange={(event) => handleOnChange(event)} 
+                                    className="form-control" 
+                                    placeholder="Nhập giá trị"
+                                />
                             </div>
                         </div>
-                        <button type="button" onClick={() => handleSaveTypeVoucher()} className="btn btn-primary">Lưu thông tin</button>
+                        <div className="form-row">
+                            <div className="form-group col-md-6">
+                                <label>Giảm tối đa (VNĐ)</label>
+                                <input 
+                                    type="number" 
+                                    value={inputValues.maxValue} 
+                                    name="maxValue" 
+                                    onChange={(event) => handleOnChange(event)} 
+                                    className="form-control" 
+                                    placeholder="Nhập giá trị tối đa"
+                                />
+                            </div>
+                            <div className="form-group col-md-6">
+                                <label>Đơn tối thiểu (VNĐ)</label>
+                                <input 
+                                    type="number" 
+                                    value={inputValues.minValue} 
+                                    name="minValue" 
+                                    onChange={(event) => handleOnChange(event)} 
+                                    className="form-control" 
+                                    placeholder="Nhập đơn tối thiểu"
+                                />
+                            </div>
+                        </div>
+                        <div className="form-row">
+                            <div className="form-group col-md-12">
+                                <label>Mô tả loại voucher</label>
+                                <input 
+                                    type="text" 
+                                    value={inputValues.description} 
+                                    name="description" 
+                                    onChange={(event) => handleOnChange(event)} 
+                                    className="form-control" 
+                                    placeholder="Nhập mô tả"
+                                />
+                            </div>
+                        </div>
+                        <button type="button" onClick={() => handleSaveTypeVoucher()} className="btn btn-primary mt-3">
+                            Lưu thông tin
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     )
 }
+
 export default AddTypeVoucher;

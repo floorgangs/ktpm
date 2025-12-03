@@ -21,6 +21,36 @@
     }
 
 }
+
+/* Buy Now Button in Detail Page */
+.card_area {
+    .buy_now_btn {
+        display: inline-block;
+        padding: 12px 30px;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #71cd14;
+        color: #fff;
+        margin-right: 10px;
+
+        &:hover {
+            background: #5da511;
+            transform: translateY(-1px);
+        }
+    }
+
+    .main_btn {
+        border-radius: 25px;
+        padding: 12px 30px;
+    }
+}
+
 .box {
     width: 100%;
     padding: 2em;

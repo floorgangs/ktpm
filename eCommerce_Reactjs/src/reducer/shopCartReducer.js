@@ -53,6 +53,12 @@ const shopCartReducer = (state = initState, action) => {
                     ...copyState,
                 }
             }
+        case SHOP_CART.CLEAR_CART:
+            {
+                return {
+                    ...initState
+                }
+            }
         default:
             return state
     }

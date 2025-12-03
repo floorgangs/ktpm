@@ -62,7 +62,7 @@ const ChangePassword = () => {
                                 <input type="password" value={inputValues.confirmpassword} name="confirmpassword" onChange={(event) => handleOnChange(event)} className="form-control" id="exampleInputPassword1" />
                             </div>
 
-                            <button onClick={() => handleSavePassword()} type="button" className="btn btn-primary ml-3">Lưu thông tin</button>
+                            <button onClick={() => handleSavePassword()} type="button" className="btn btn-primary ms-3">Lưu thông tin</button>
                         </form>
                     </div>
                 </div>

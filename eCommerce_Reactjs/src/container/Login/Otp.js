@@ -11,6 +11,12 @@ const Otp = (props) => {
         so1: '', so2: '', so3: '', so4: '', so5: '', so6: ''
     });
 
+    const handleGoBack = () => {
+        if (props.onGoBack && typeof props.onGoBack === 'function') {
+            props.onGoBack();
+        }
+    };
+
     const configureCaptcha = useCallback(() => {
         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sign-in-button', {
             size: 'invisible',
@@ -177,12 +183,13 @@ const Otp = (props) => {
                     <div>
                         <small>
                             Ban khong nhan duoc Otp ?
-                            <a href="/" onClick={handleResendClick} style={{ color: '#3366FF' }} className="text-decoration-none ml-2">Gui lai</a>
+                            <a href="/" onClick={handleResendClick} style={{ color: '#3366FF' }} className="text-decoration-none ms-2">Gui lai</a>
                         </small>
                     </div>
                     <div className="mt-3 mb-5">
                         <div id="sign-in-button"></div>
                         <button onClick={submitOTP} className="btn btn-success px-4 verify-btn">Xac thuc</button>
+                        <button onClick={handleGoBack} className="btn btn-secondary px-4 ms-2">Quay lai</button>
                     </div>
                 </div>
             </div>

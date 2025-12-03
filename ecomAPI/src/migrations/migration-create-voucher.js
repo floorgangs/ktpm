@@ -1,30 +1,52 @@
 'use strict';
 
-const { sequelize } = require("../models");
-
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.createTable('Vouchers', {
+        await queryInterface.createTable('vouchers', {
             id: {
                 allowNull: false,
-                primaryKey: true,
-                type: Sequelize.INTEGER,
                 autoIncrement: true,
-            },
-            fromDate: {
-                type: Sequelize.STRING
-            },
-            toDate: {
-                type: Sequelize.STRING
-            },
-            typeVoucherId: {
+                primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            amount: {
-                type: Sequelize.INTEGER
+            title: {
+                type: Sequelize.STRING,
+                allowNull: false
             },
             codeVoucher: {
-                type: Sequelize.STRING
+                type: Sequelize.STRING,
+                allowNull: false,
+                unique: true
+            },
+            description: {
+                type: Sequelize.TEXT
+            },
+            fromDate: {
+                type: Sequelize.DATE,
+                allowNull: false
+            },
+            toDate: {
+                type: Sequelize.DATE,
+                allowNull: false
+            },
+            typeVoucherId: {
+                type: Sequelize.INTEGER,
+                allowNull: false
+            },
+            amount: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                defaultValue: 0
+            },
+            limitPerUser: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                defaultValue: 1
+            },
+            status: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                defaultValue: 1
             },
             createdAt: {
                 allowNull: false,
@@ -36,7 +58,7 @@ module.exports = {
             }
         });
     },
-    down: async (queryInterface, Sequelize) => {
-        await queryInterface.dropTable('Vouchers');
+    down: async (queryInterface) => {
+        await queryInterface.dropTable('vouchers');
     }
 };

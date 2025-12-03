@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom';
 const Header = () => {
     const [user, setUser] = useState({})
     let handleLogout = () => {
+        // Clear user data and token
         localStorage.removeItem("userData");
         localStorage.removeItem("token");
+        
+        // Clear cart from redux persist
+        localStorage.removeItem("persist:shopcart");
+        
         window.location.href = '/login'
     }
     useEffect(() => {

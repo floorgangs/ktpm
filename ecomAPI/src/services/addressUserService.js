@@ -12,10 +12,14 @@ let createNewAddressUser = (data) => {
             } else {
                 await db.AddressUser.create({
                     userId: data.userId,
-                    shipName: data.shipName,
-                    shipAdress: data.shipAdress,
-                    shipEmail: data.shipEmail,
-                    shipPhonenumber: data.shipPhonenumber,
+                    name: data.name,
+                    address: data.address,
+                    email: data.email,
+                    phonenumber: data.phonenumber,
+                    // Standardized Vietnamese address (provider-agnostic)
+                    provinceName: data.provinceName || null,
+                    districtName: data.districtName || null,
+                    wardName: data.wardName || null,
                 })
                 resolve({
                     errCode: 0,
@@ -90,7 +94,7 @@ let deleteAddressUser = (data) => {
 let editAddressUser = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.id || !data.shipName || !data.shipAdress || !data.shipEmail || !data.shipPhonenumber) {
+            if (!data.id || !data.name || !data.address || !data.email || !data.phonenumber) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required parameter !'
@@ -103,10 +107,14 @@ let editAddressUser = (data) => {
                     raw: false
                 })
                 if (addressUser) {
-                    addressUser.shipName = data.shipName
-                    addressUser.shipPhonenumber = data.shipPhonenumber
-                    addressUser.shipAdress = data.shipAdress
-                    addressUser.shipEmail = data.shipEmail
+                    addressUser.name = data.name
+                    addressUser.phonenumber = data.phonenumber
+                    addressUser.address = data.address
+                    addressUser.email = data.email
+                    // Standardized Vietnamese address (provider-agnostic)
+                    if (data.provinceName !== undefined) addressUser.provinceName = data.provinceName
+                    if (data.districtName !== undefined) addressUser.districtName = data.districtName
+                    if (data.wardName !== undefined) addressUser.wardName = data.wardName
 
                     await addressUser.save()
                     resolve({

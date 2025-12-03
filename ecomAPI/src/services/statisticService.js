@@ -121,21 +121,7 @@ let getCountStatusOrder = (data) => {
         }
     })
 }
-let totalPriceDiscount = (price, discount) => {
 
-    if (discount.voucherData.typeVoucherOfVoucherData.typeVoucher === "percent") {
-
-        if (((price * discount.voucherData.typeVoucherOfVoucherData.value) / 100) > discount.voucherData.typeVoucherOfVoucherData.maxValue) {
-
-            return price - discount.voucherData.typeVoucherOfVoucherData.maxValue
-        } else {
-            return price - ((price * discount.voucherData.typeVoucherOfVoucherData.value) / 100)
-        }
-    } else {
-        return price - discount.voucherData.typeVoucherOfVoucherData.maxValue
-    }
-
-}
 function DaysOfMonth(thang, nam) {
     var mon = parseInt(thang, 10);
     var yar = parseInt(nam, 10);
@@ -174,7 +160,6 @@ let getStatisticByMonth = (data) => {
                         where: { statusId: 'S6' },
                         include: [
                             { model: db.TypeShip, as: 'typeShipData' },
-                            { model: db.Voucher, as: 'voucherData' },
                             { model: db.Allcode, as: 'statusOrderData' },
 
                         ],
@@ -184,19 +169,11 @@ let getStatisticByMonth = (data) => {
                 )
                 for (let i = 0; i < orderProduct.length; i++) {
                     orderProduct[i].orderDetail = await db.OrderDetail.findAll({ where: { orderId: orderProduct[i].id } })
-                    orderProduct[i].voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
-                        where: { id: orderProduct[i].voucherData.typeVoucherId }
-                    })
                     let totalprice = 0
                     for (let j = 0; j < orderProduct[i].orderDetail.length; j++) {
                         totalprice = totalprice + (orderProduct[i].orderDetail[j].realPrice * orderProduct[i].orderDetail[j].quantity)
                     }
-                    if (orderProduct[i].voucherId) {
-                        orderProduct[i].totalpriceProduct = totalPriceDiscount(totalprice, orderProduct[i]) + orderProduct[i].typeShipData.price
-                    } else {
-                        orderProduct[i].totalpriceProduct = totalprice + orderProduct[i].typeShipData.price
-                    }
-
+                    orderProduct[i].totalpriceProduct = totalprice + orderProduct[i].typeShipData.price
                 }
 
 
@@ -246,7 +223,6 @@ let getStatisticByDay = (data) => {
                         where: { statusId: 'S6' },
                         include: [
                             { model: db.TypeShip, as: 'typeShipData' },
-                            { model: db.Voucher, as: 'voucherData' },
                             { model: db.Allcode, as: 'statusOrderData' },
 
                         ],
@@ -256,19 +232,11 @@ let getStatisticByDay = (data) => {
                 )
                 for (let i = 0; i < orderProduct.length; i++) {
                     orderProduct[i].orderDetail = await db.OrderDetail.findAll({ where: { orderId: orderProduct[i].id } })
-                    orderProduct[i].voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
-                        where: { id: orderProduct[i].voucherData.typeVoucherId }
-                    })
                     let totalprice = 0
                     for (let j = 0; j < orderProduct[i].orderDetail.length; j++) {
                         totalprice = totalprice + (orderProduct[i].orderDetail[j].realPrice * orderProduct[i].orderDetail[j].quantity)
                     }
-
-                    if (orderProduct[i].voucherId) {
-                        orderProduct[i].totalpriceProduct = totalPriceDiscount(totalprice, orderProduct[i]) + orderProduct[i].typeShipData.price
-                    } else {
-                        orderProduct[i].totalpriceProduct = totalprice + orderProduct[i].typeShipData.price
-                    }
+                    orderProduct[i].totalpriceProduct = totalprice + orderProduct[i].typeShipData.price
                 }
 
 
@@ -330,7 +298,6 @@ let getStatisticProfit = (data) => {
                         where: { statusId: 'S6' },
                         include: [
                             { model: db.TypeShip, as: 'typeShipData' },
-                            { model: db.Voucher, as: 'voucherData' },
                             { model: db.Allcode, as: 'statusOrderData' },
 
                         ],
@@ -341,9 +308,6 @@ let getStatisticProfit = (data) => {
 
                 for (let i = 0; i < orderProduct.length; i++) {
                     orderProduct[i].orderDetail = await db.OrderDetail.findAll({ where: { orderId: orderProduct[i].id } })
-                    orderProduct[i].voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
-                        where: { id: orderProduct[i].voucherData.typeVoucherId }
-                    })
                     let totalprice = 0
                     let importPrice = 0
                     for (let j = 0; j < orderProduct[i].orderDetail.length; j++) {
@@ -359,15 +323,8 @@ let getStatisticProfit = (data) => {
                         totalprice = totalprice + (orderProduct[i].orderDetail[j].realPrice * orderProduct[i].orderDetail[j].quantity)
                     }
                     orderProduct[i].importPrice = importPrice
-                    if (orderProduct[i].voucherId) {
-                        orderProduct[i].totalpriceProduct = totalPriceDiscount(totalprice, orderProduct[i]) + orderProduct[i].typeShipData.price
-                        orderProduct[i].profitPrice = totalPriceDiscount(totalprice, orderProduct[i]) + orderProduct[i].typeShipData.price - importPrice
-
-                    } else {
-                        orderProduct[i].totalpriceProduct = totalprice + orderProduct[i].typeShipData.price
-                        orderProduct[i].profitPrice = (totalprice + orderProduct[i].typeShipData.price) - importPrice
-                    }
-
+                    orderProduct[i].totalpriceProduct = totalprice + orderProduct[i].typeShipData.price
+                    orderProduct[i].profitPrice = (totalprice + orderProduct[i].typeShipData.price) - importPrice
                 }
 
                 orderProduct = orderProduct.filter(item => {
@@ -432,7 +389,6 @@ let getStatisticOverturn = (data) => {
                         where: { statusId: 'S6' },
                         include: [
                             { model: db.TypeShip, as: 'typeShipData' },
-                            { model: db.Voucher, as: 'voucherData' },
                             { model: db.Allcode, as: 'statusOrderData' },
 
                         ],
@@ -442,19 +398,11 @@ let getStatisticOverturn = (data) => {
                 )
                 for (let i = 0; i < orderProduct.length; i++) {
                     orderProduct[i].orderDetail = await db.OrderDetail.findAll({ where: { orderId: orderProduct[i].id } })
-                    orderProduct[i].voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
-                        where: { id: orderProduct[i].voucherData.typeVoucherId }
-                    })
                     let totalprice = 0
                     for (let j = 0; j < orderProduct[i].orderDetail.length; j++) {
                         totalprice = totalprice + (orderProduct[i].orderDetail[j].realPrice * orderProduct[i].orderDetail[j].quantity)
                     }
-
-                    if (orderProduct[i].voucherId) {
-                        orderProduct[i].totalpriceProduct = totalPriceDiscount(totalprice, orderProduct[i]) + orderProduct[i].typeShipData.price
-                    } else {
-                        orderProduct[i].totalpriceProduct = totalprice + orderProduct[i].typeShipData.price
-                    }
+                    orderProduct[i].totalpriceProduct = totalprice + orderProduct[i].typeShipData.price
                 }
                 orderProduct = orderProduct.filter(item => {
 

@@ -2,18 +2,22 @@ import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function PopularItemBlog(props) {
+function SpecialItemBlog(props) {
+    const createdAt = props?.data?.createdAt ? moment(props.data.createdAt).format('DD/MM/YYYY HH:mm') : '';
+
     return (
-        <div className="media post_item">
-            <img style={{width:'80px', height:'80px', objectFit:'cover', borderRadius:'5px'}} src={props.data.image} alt="post" />
-            <div className="media-body">
-                <Link to={`/blog-detail/${props.data.id}`}>
-                    <h3>{props.data.title}</h3>
+        <div className="featured-post">
+            <Link to={`/detail-blog/${props.data.id}`} className="featured-post__thumb" aria-label={props.data.title}>
+                <img src={props.data.image} alt={props.data.title} />
+            </Link>
+            <div className="featured-post__content">
+                <Link to={`/detail-blog/${props.data.id}`} className="featured-post__title">
+                    {props.data.title}
                 </Link>
-                <p>{moment(props.createdAt).format("DD/MM/YYYY HH:mm")}</p>
+                {createdAt && <span className="featured-post__date">{createdAt}</span>}
             </div>
         </div>
     );
 }
 
-export default PopularItemBlog;
+export default SpecialItemBlog;

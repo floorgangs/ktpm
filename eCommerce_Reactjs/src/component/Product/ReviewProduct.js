@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ReviewProduct.scss';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import CommonUtils from '../../utils/CommonUtils';
 import { createNewReviewService, getAllReviewByProductIdService, ReplyReviewService, deleteReviewService } from '../../services/userService';
 import { useParams } from 'react-router';
@@ -276,9 +276,7 @@ function ReviewProduct(props) {
             </div>
             {
                 inputValues.isOpen === true &&
-                <Lightbox mainSrc={inputValues.imageReview}
-                    onCloseRequest={() => setInputValues({ ...inputValues, isOpen: false, imageReview: '' })}
-                />
+                <Lightbox open={inputValues.isOpen} close={() => setInputValues({ ...inputValues, isOpen: false, imageReview: '' })} slides={[{ src: inputValues.imageReview }]} />
             }
             <ReviewModal
                 isOpenModal={inputValues.isOpenModal}

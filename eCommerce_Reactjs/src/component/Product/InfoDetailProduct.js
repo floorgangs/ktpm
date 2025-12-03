@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { addItemCartStart } from '../../action/ShopCartAction';
+import { getAllAddressUserByUserIdService } from '../../services/userService';
 import './InfoDetailProduct.scss';
 import CommonUtils from '../../utils/CommonUtils';
 
@@ -15,31 +17,38 @@ function InfoDetailProduct(props) {
     const [isOpen, setIsOpen] = useState(false);
     const [imgPreview, setImgPreview] = useState('');
     const [activeLinkId, setActiveLinkId] = useState('');
-    const [quantity, setQuantity] = useState('');
+    const [quantity, setQuantity] = useState(0);
     const [quantityProduct, setQuantityProduct] = useState(1);
 
     const dispatch = useDispatch();
+    const history = useHistory();
 
     useEffect(() => {
-        if (dataProduct && dataProduct.productDetail) {
+        if (dataProduct && dataProduct.productDetail && dataProduct.productDetail.length > 0) {
             const detail = dataProduct.productDetail;
+            const firstSize = detail[0].productDetailSize && detail[0].productDetailSize[0];
             setProductDetail(detail);
             setArrDetail(detail[0]);
-            setActiveLinkId(detail[0].productDetailSize[0].id);
-            setQuantity(detail[0].productDetailSize[0].stock);
-            sendDataFromInforDetail(detail[0].productDetailSize[0]);
+            if (firstSize) {
+                setActiveLinkId(firstSize.id);
+                setQuantity(firstSize.stock || 0);
+                setQuantityProduct(1);
+                sendDataFromInforDetail(firstSize);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dataProduct]);
 
     const handleSelectDetail = (event) => {
-        const index = event.target.value;
+        const index = Number(event.target.value);
         const selected = productDetail[index];
         setArrDetail(selected);
         if (selected && selected.productDetailSize.length > 0) {
-            setActiveLinkId(selected.productDetailSize[0].id);
-            setQuantity(selected.productDetailSize[0].stock);
-            sendDataFromInforDetail(selected.productDetailSize[0]);
+            const size = selected.productDetailSize[0];
+            setActiveLinkId(size.id);
+            setQuantity(size.stock || 0);
+            setQuantityProduct(1);
+            sendDataFromInforDetail(size);
         }
     };
 
@@ -50,19 +59,87 @@ function InfoDetailProduct(props) {
 
     const handleClickBoxSize = (data) => {
         setActiveLinkId(data.id);
-        setQuantity(data.stock);
+        setQuantity(data.stock || 0);
+        setQuantityProduct(1);
         sendDataFromInforDetail(data);
     };
 
     const handleAddShopCart = () => {
-        if (userId) {
-            dispatch(addItemCartStart({
+        if (!userId) {
+            toast.error('Đăng nhập để thêm vào giỏ hàng');
+            return;
+        }
+        const available = Number(quantity) || 0;
+        if (!available) {
+            toast.error('Sản phẩm tạm hết hàng');
+            return;
+        }
+        let qty = Number(quantityProduct) || 1;
+        if (qty > available) {
+            toast.error(`Chỉ còn ${available} sản phẩm`);
+            setQuantityProduct(available);
+            qty = available;
+        }
+        dispatch(addItemCartStart({
+            userId,
+            productdetailsizeId: activeLinkId,
+            quantity: qty,
+        }));
+    };
+
+    const navigateAfterCartUpdate = async (uid) => {
+        let addressList = [];
+        try {
+            const addressRes = await getAllAddressUserByUserIdService(uid);
+            if (addressRes && addressRes.errCode === 0 && Array.isArray(addressRes.data)) {
+                addressList = addressRes.data;
+            }
+        } catch (error) {
+            addressList = [];
+        }
+
+        if (addressList.length > 0) {
+            history.push(`/order/${uid}`);
+        } else {
+            toast.info('Bạn chưa có địa chỉ nhận hàng, vui lòng thêm trước khi thanh toán');
+            history.push(`/user/address/${uid}`);
+        }
+    };
+
+    const handleBuyNow = async () => {
+        if (!userId) {
+            toast.error('Đăng nhập để mua hàng');
+            return;
+        }
+        const available = Number(quantity) || 0;
+        if (!available) {
+            toast.error('Sản phẩm tạm hết hàng');
+            return;
+        }
+        try {
+            let qty = Number(quantityProduct) || 1;
+            if (qty > available) {
+                toast.error(`Chỉ còn ${available} sản phẩm`);
+                setQuantityProduct(available);
+                qty = available;
+            }
+            const res = await dispatch(addItemCartStart({
                 userId,
                 productdetailsizeId: activeLinkId,
-                quantity: quantityProduct,
+                quantity: qty,
             }));
-        } else {
-            toast.error('Đăng nhập để thêm vào giỏ hàng');
+            if (res && res.errCode === 0) {
+                toast.success('Đã thêm vào giỏ hàng, chuyển đến thanh toán...');
+                await navigateAfterCartUpdate(userId);
+            } else if (res && res.errCode === 2) {
+                const remain = Number(res.quantity) || 0;
+                if (remain > 0) {
+                    setQuantityProduct(remain);
+                }
+                toast.error(res.errMessage || 'Số lượng sản phẩm không đủ');
+            }
+        } catch (error) {
+            toast.error('Có lỗi xảy ra');
         }
     };
 
@@ -143,8 +220,22 @@ function InfoDetailProduct(props) {
                             <input
                                 type="number"
                                 value={quantityProduct}
-                                onChange={(e) => setQuantityProduct(e.target.value)}
+                                onChange={(e) => {
+                                    const raw = Number(e.target.value);
+                                    const available = Number(quantity) || 0;
+                                    if (!Number.isInteger(raw) || raw <= 0) {
+                                        setQuantityProduct(1);
+                                        return;
+                                    }
+                                    if (available && raw > available) {
+                                        setQuantityProduct(available);
+                                        return;
+                                    }
+                                    setQuantityProduct(raw);
+                                }}
                                 min="1"
+                                max={quantity || undefined}
+                                disabled={!((Number(quantity) || 0) > 0)}
                             />
                         </div>
 
@@ -176,6 +267,13 @@ function InfoDetailProduct(props) {
                     <div className="card_area">
                         <button
                             type="button"
+                            className="buy_now_btn"
+                            onClick={handleBuyNow}
+                        >
+                            Mua ngay
+                        </button>
+                        <button
+                            type="button"
                             className="main_btn"
                             onClick={handleAddShopCart}
                         >
@@ -189,7 +287,7 @@ function InfoDetailProduct(props) {
             </div>
 
             {isOpen && (
-                <Lightbox mainSrc={imgPreview} onCloseRequest={() => setIsOpen(false)} />
+                <Lightbox open={isOpen} close={() => setIsOpen(false)} slides={[{ src: imgPreview }]} />
             )}
         </div>
     );

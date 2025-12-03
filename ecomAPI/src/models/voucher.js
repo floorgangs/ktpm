@@ -1,28 +1,27 @@
 'use strict';
-const {
-    Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Voucher extends Model {
-        /**
-         * Helper method for defining associations.
-         * This method is not a part of Sequelize lifecycle.
-         * The `models/index` file will call this method automatically.
-         */
         static associate(models) {
-            Voucher.belongsTo(models.TypeVoucher, { foreignKey: 'typeVoucherId', targetKey: 'id', as: 'typeVoucherOfVoucherData' })
-            Voucher.hasMany(models.OrderProduct, { foreignKey: 'voucherId', as: 'voucherData' })
+            Voucher.belongsTo(models.TypeVoucher, { foreignKey: 'typeVoucherId', targetKey: 'id', as: 'typeVoucherData' });
+            Voucher.hasMany(models.VoucherUsed, { foreignKey: 'voucherId', as: 'voucherUsage' });
+            Voucher.hasMany(models.OrderProduct, { foreignKey: 'voucherId', as: 'ordersUsingVoucher' });
         }
     };
     Voucher.init({
-        fromDate: DataTypes.STRING,
-        toDate: DataTypes.STRING,
+        title: DataTypes.STRING,
+        codeVoucher: DataTypes.STRING,
+        description: DataTypes.TEXT,
+        fromDate: DataTypes.DATE,
+        toDate: DataTypes.DATE,
         typeVoucherId: DataTypes.INTEGER,
         amount: DataTypes.INTEGER,
-        codeVoucher: DataTypes.STRING
+        limitPerUser: DataTypes.INTEGER,
+        status: DataTypes.INTEGER
     }, {
         sequelize,
         modelName: 'Voucher',
+        tableName: 'vouchers'
     });
     return Voucher;
 };

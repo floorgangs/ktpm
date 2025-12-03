@@ -1,0 +1,152 @@
+.info-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+
+    label {
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+
+        &.masked {
+            font-family: monospace;
+        }
+    }
+}
+
+.shipping-result {
+    background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+    border: 1px solid #b7eb8f;
+    border-radius: 8px;
+    padding: 20px;
+
+    h5 {
+        color: #389e0d;
+        margin-bottom: 15px;
+    }
+
+    .result-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 6px;
+
+        .label {
+            color: #666;
+        }
+
+        .value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        &.total {
+            background: #52c41a;
+            
+            .label, .value {
+                color: white;
+            }
+
+            .value {
+                font-size: 20px;
+            }
+        }
+    }
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        padding: 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        i {
+            font-size: 18px;
+        }
+
+        &.pending {
+            color: #999;
+        }
+    }
+}
+
+.instruction-list {
+    li {
+        padding: 8px 0;
+        color: #555;
+    }
+}
+
+// Card header colors
+.card-header {
+    &.bg-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+
+    &.bg-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    }
+
+    &.bg-info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    }
+
+    &.bg-warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+        color: white;
+    }
+}
+
+// Form styles
+.form-select {
+    border-radius: 6px;
+    padding: 10px 12px;
+
+    &:focus {
+        border-color: #ee4d2d;
+        box-shadow: 0 0 0 2px rgba(238, 77, 45, 0.1);
+    }
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 6px;
+    font-weight: 500;
+
+    &:hover {
+        background: linear-gradient(135deg, #0f8a80 0%, #32d971 100%);
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        opacity: 0.7;
+        transform: none;
+    }
+}

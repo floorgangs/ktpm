@@ -15,10 +15,14 @@ module.exports = (sequelize, DataTypes) => {
     };
     AddressUser.init({
         userId: DataTypes.INTEGER,
-        shipName: DataTypes.STRING,
-        shipAdress: DataTypes.STRING,
-        shipEmail: DataTypes.STRING,
-        shipPhonenumber: DataTypes.STRING,
+        name: DataTypes.STRING,
+        address: DataTypes.STRING,
+        email: DataTypes.STRING,
+        phonenumber: DataTypes.STRING,
+        // Standardized Vietnamese address fields (provider-agnostic)
+        provinceName: DataTypes.STRING,
+        districtName: DataTypes.STRING,
+        wardName: DataTypes.STRING,
     }, {
         sequelize,
         modelName: 'AddressUser',

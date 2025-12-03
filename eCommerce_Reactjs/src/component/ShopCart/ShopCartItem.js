@@ -47,11 +47,10 @@ function ShopCartItem(props) {
     let handleDeleteShopCart = async () => {
 
         let res = await deleteItemShopCartService({
-            data: {
-                id: props.id
-            }
+            id: props.id
         })
         if (res && res.errCode === 0) {
+            toast.success("Đã xóa sản phẩm khỏi giỏ hàng")
             dispatch(getItemCartStart(props.userId))
             setisOpenModal(false)
         } else {
@@ -88,14 +87,12 @@ function ShopCartItem(props) {
                 <h5 style={{ color: '#71cd14' }}>{CommonUtils.formatter.format(quantity * props.price)}</h5>
             </td>
             {props.isOrder === false &&
-                <>
-                    <td className="link-delete" onClick={() => setisOpenModal(true)}>Xóa</td>
-                    <DeleteShopCartModal handleDeleteShopCart={handleDeleteShopCart} name={props.name} isOpenModal={isOpenModal}
-                        closeModal={closeModal} />
-                </>
-
+                <td className="link-delete" onClick={() => setisOpenModal(true)}>Xóa</td>
             }
-
+            {props.isOrder === false && isOpenModal &&
+                <DeleteShopCartModal handleDeleteShopCart={handleDeleteShopCart} name={props.name} isOpenModal={isOpenModal}
+                    closeModal={closeModal} />
+            }
         </tr>
     );
 }

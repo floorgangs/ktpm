@@ -62,7 +62,7 @@ const ManageOrder = () => {
                     <i className="fas fa-table me-1" />
                     Danh sách đơn đặt hàng
                 </div>
-                <select value={StatusId} onChange={(event) => handleOnchangeStatus(event)} className="form-select col-3 ml-3 mt-3">
+                <select value={StatusId} onChange={(event) => handleOnchangeStatus(event)} className="form-select col-3 ms-3 mt-3">
                     <option value={'ALL'}>Trạng thái đơn hàng</option>
                     {
                         dataStatusOrder && dataStatusOrder.length > 0 &&
@@ -92,7 +92,7 @@ const ManageOrder = () => {
                                     <th>Mã voucher</th>
                                     <th>Hình thức</th>
                                     <th>Trạng thái</th>
-                                    <th>Shipper</th>
+                                    <th>Mã vận đơn</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -106,11 +106,24 @@ const ManageOrder = () => {
                                                 <td>{item.userData.phonenumber}</td>
                                                 <td>{item.userData.email}</td>
                                                 <td>{moment.utc(item.createdAt).local().format('DD/MM/YYYY HH:mm:ss')}</td>
-                                                <td>{item.typeShipData.type}</td>
-                                                <td>{item.voucherData.codeVoucher}</td>
+                                                <td>
+                                                    {item.shippingProvider === 'GHN' ? (
+                                                        <span style={{ color: '#ee4d2d', fontWeight: '500' }}>
+                                                            <img src="https://file.hstatic.net/200000472237/file/giao-hang-nhanh_f0ba75003cb04ea7926e8ea128be94c2.png" alt="GHN" style={{ height: '16px', marginRight: '4px' }} />
+                                                            GHN
+                                                        </span>
+                                                    ) : (
+                                                        item.typeShipData?.type || 'Nội bộ'
+                                                    )}
+                                                </td>
+                                                <td>{item.voucherData?.codeVoucher || '-'}</td>
                                                 <td>{item.isPaymentOnlien === 0 ? 'Thanh toán tiền mặt' : 'Thanh toán online'}</td>
-                                                <td>{item.statusOrderData.value}</td>
-                                                <td>{item.shipperData && item.shipperData.firstName + " " + item.shipperData.lastName + " - " + item.shipperData.phonenumber}</td>
+                                                <td>{item.statusOrderData?.value}</td>
+                                                <td>
+                                                    {item.shipCode ? (
+                                                        <span style={{ color: '#1890ff', fontWeight: '500', fontSize: '12px' }}>{item.shipCode}</span>
+                                                    ) : '-'}
+                                                </td>
                                                 <td>
                                                     <Link to={`/admin/order-detail/${item.id}`}>Xem chi tiết</Link>
 

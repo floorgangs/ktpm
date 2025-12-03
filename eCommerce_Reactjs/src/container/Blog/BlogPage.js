@@ -1,73 +1,96 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ItemBlog from '../../component/Blog/ItemBlog';
 import RightBlog from '../../component/Blog/RightBlog';
-import { PAGINATION } from '../../utils/constant'
-import { getAllBlog } from '../../services/userService'
+import { PAGINATION } from '../../utils/constant';
+import { getAllBlog } from '../../services/userService';
 import ReactPaginate from 'react-paginate';
-import {getAllCategoryBlogService,getFeatureBlog} from '../../services/userService'
+import { getAllCategoryBlogService, getFeatureBlog } from '../../services/userService';
 import { Link } from 'react-router-dom';
+import './BlogPage.scss';
 function BlogPage(props) {
-  const [dataBlog, setdataBlog] = useState([])
-  const [dataFeatureBlog, setdataFeatureBlog] = useState([])
-  const [dataSubject, setdataSubject] = useState([])
-  const [count, setCount] = useState('')
-  const [subjectId,setsubjectId] = useState('')
-  const [keyword, setkeyword] = useState('')
-  const fetchData = useCallback(async ({ subject = '', search = '', page = 0 } = {}) => {
-    const arrData = await getAllBlog({
-      subjectId: subject,
-      limit: PAGINATION.pagerow,
-      offset: page * PAGINATION.pagerow,
-      keyword: search
-    })
-    if (arrData && arrData.errCode === 0) {
-      setdataBlog(arrData.data)
-      setCount(Math.ceil(arrData.count / PAGINATION.pagerow))
-    }
-  }, [])
-  const loadFeatureBlog = useCallback(async () =>{
-    const res = await getFeatureBlog(6)
-    if(res && res.errCode === 0){
-      setdataFeatureBlog(res.data)
-    }
-  },[])
-  const loadCategoryBlog = useCallback( async() =>{
-    const res = await getAllCategoryBlogService('SUBJECT')
-    if(res && res.errCode === 0){
-        setdataSubject(res.data)
-    }
-  },[])
+  const [dataBlog, setdataBlog] = useState([]);
+  const [dataFeatureBlog, setdataFeatureBlog] = useState([]);
+  const [dataSubject, setdataSubject] = useState([]);
+  const [count, setCount] = useState(0);
+  const [subjectId, setsubjectId] = useState('');
+  const [keyword, setkeyword] = useState('');
   useEffect(() => {
     try {
       window.scrollTo(0, 0);
-      loadCategoryBlog()
-      fetchData()
-      loadFeatureBlog()
+      loadCategoryBlog();
+      fetchData('', '');
+      loadFeatureBlog();
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 
-}, [fetchData, loadCategoryBlog, loadFeatureBlog])
+}, [])
 
+
+
+let fetchData = async (code, keywordSearch) => {
+  let arrData = await getAllBlog({
+      subjectId: code,
+      limit: PAGINATION.pagerow,
+      offset: 0,
+      keyword: keywordSearch
+  });
+  if (arrData && arrData.errCode === 0) {
+      setdataBlog(arrData.data);
+      const totalPage = arrData.count ? Math.ceil(arrData.count / PAGINATION.pagerow) : 0;
+      setCount(totalPage);
+    } else {
+      setdataBlog([]);
+      setCount(0);
+    }
+};
+let loadFeatureBlog = async() =>{
+  let res = await getFeatureBlog(6);
+  if(res && res.errCode === 0){
+    setdataFeatureBlog(res.data);
+  } else {
+    setdataFeatureBlog([]);
+  }
+};
+let loadCategoryBlog = async() =>{
+  let res = await getAllCategoryBlogService('SUBJECT');
+  if(res && res.errCode === 0){
+      setdataSubject(res.data);
+  } else {
+      setdataSubject([]);
+  }
+};
 let handleChangePage = async (number) => {
-  await fetchData({ subject: subjectId, search: keyword, page: number.selected })
-}
-let handleClickCategory = (code) =>{
-  setsubjectId(code)
-  fetchData({ subject: code, search: '' })
+  let arrData = await getAllBlog({
+    subjectId: subjectId,
+      limit: PAGINATION.pagerow,
+      offset: number.selected * PAGINATION.pagerow,
+      keyword: keyword
 
-}
+  });
+  if (arrData && arrData.errCode === 0) {
+      setdataBlog(arrData.data);
+    } else {
+      setdataBlog([]);
+    }
+  
+};
+let handleClickCategory = (code) =>{
+  setsubjectId(code);
+  fetchData(code,'');
+
+};
 let handleSearchBlog = (text) =>{
-  fetchData({ subject: '', search: text })
-  setkeyword(text)
-}
-let handleOnchangeSearch = (value) =>{
-  if(value === ''){
-    fetchData({ subject: '', search: '' })
-      setkeyword('')
+  fetchData('',text);
+  setkeyword(text);
+};
+let handleOnchangeSearch = (keywordText) =>{
+  if(keywordText === ''){
+    fetchData('',keywordText);
+      setkeyword(keywordText);
    }
   
-}
+};
     return (
         <>
         <section className="banner_area">
@@ -86,42 +109,42 @@ let handleOnchangeSearch = (value) =>{
         </div>
       </div>
     </section>
-    <section className="blog_area section_gap">
+    <section className="blog-page">
             <div className="container">
-                <div className="row">
-                    <div className="col-lg-8 mb-5 mb-lg-0">
-                        <div className="blog_left_sidebar">
+                <div className="blog-page__layout">
+                    <div className="blog-page__main">
+                        <div className="blog-card-grid">
                            {dataBlog && dataBlog.length > 0 && 
                            dataBlog.map((item,index) =>{
                             return(
-                              <ItemBlog key={index} data={item}></ItemBlog>
+                              <ItemBlog key={item.id || index} data={item}></ItemBlog>
                             )
                            })
                            }
-                     
-                       
-                          
                         </div>
-                    
-                         <ReactPaginate
-                         previousLabel={'Quay lại'}
-                         nextLabel={'Tiếp'}
-                         breakLabel={'...'}
-                         pageCount={count}
-                         marginPagesDisplayed={3}
-                         containerClassName={"pagination justify-content-center"}
-                         pageClassName={"page-item"}
-                         pageLinkClassName={"page-link"}
-                         previousLinkClassName={"page-link"}
-                         nextClassName={"page-item"}
-                         nextLinkClassName={"page-link"}
-                         breakLinkClassName={"page-link"}
-                         breakClassName={"page-item"}
-                         activeClassName={"active"}
-                         onPageChange={handleChangePage}
-                     />
-                      
-                       
+                        {count > 1 && (
+                          <div className="blog-pagination">
+                            <ReactPaginate
+                              previousLabel={'Quay lại'}
+                              nextLabel={'Tiếp'}
+                              breakLabel={'...'}
+                              pageCount={count}
+                              marginPagesDisplayed={1}
+                              pageRangeDisplayed={3}
+                              containerClassName={'pagination'}
+                              pageClassName={'page-item'}
+                              pageLinkClassName={'page-link'}
+                              previousClassName={'page-item'}
+                              previousLinkClassName={'page-link'}
+                              nextClassName={'page-item'}
+                              nextLinkClassName={'page-link'}
+                              breakClassName={'page-item'}
+                              breakLinkClassName={'page-link'}
+                              activeClassName={'active'}
+                              onPageChange={handleChangePage}
+                            />
+                          </div>
+                        )}
                     </div>
                     <RightBlog handleOnchangeSearch={handleOnchangeSearch} handleSearchBlog={handleSearchBlog} dataFeatureBlog={dataFeatureBlog} isPage={true} handleClickCategory={handleClickCategory} data={dataSubject} />
                 </div>

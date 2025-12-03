@@ -1,5 +1,13 @@
 import axios from "../axios";
 
+// Utility to build query strings with optional params.
+const buildQueryString = (params = {}) => {
+    const query = Object.entries(params)
+        .filter(([, value]) => value !== undefined && value !== null && value !== "")
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    return query.length ? `?${query.join("&")}` : ""
+}
+
 //==================USER==========================//
 const getAllUsers = (data) => {
     return axios.get(`/api/get-all-user?limit=${data.limit}&offset=${data.offset}&keyword=${data.keyword}`)
@@ -51,10 +59,6 @@ const getAllCodeService = (type) => {
     return axios.get(`/api/get-all-code?type=${type}`)
 
 }
-const getAllCategoryBlogService = (type) => {
-    return axios.get(`/api/get-all-category-blog?type=${type}`)
-
-}
 const getListAllCodeService = (data) => {
     return axios.get(`/api/get-list-allcode?type=${data.type}&limit=${data.limit}&offset=${data.offset}&keyword=${data.keyword}`)
 
@@ -90,6 +94,9 @@ const getAllProductUser = (data) => {
 const getAllProductAdmin = (data) => {
     return axios.get(`/api/get-all-product-admin?limit=${data.limit}&offset=${data.offset}&sortPrice=${data.sortPrice}&sortName=${data.sortName}&categoryId=${data.categoryId}&brandId=${data.brandId}&keyword=${data.keyword}`)
 
+}
+const getAllProductService = (data) => {
+    return axios.get(`/api/get-all-product-admin?limit=${data.limit || ''}&offset=${data.offset || ''}&sortPrice=${data.sortPrice || ''}&sortName=${data.sortName || ''}&categoryId=${data.categoryId || ''}&brandId=${data.brandId || ''}&keyword=${data.keyword || ''}`)
 }
 const handleBanProductService = (data) => {
     return axios.post(`/api/unactive-product`, data)
@@ -174,28 +181,6 @@ const getDetailBannerByIdService = (id) => {
 const getAllBanner = (data) => {
     return axios.get(`/api/get-all-banner?limit=${data.limit}&offset=${data.offset}&keyword=${data.keyword}`)
 }
-//=================BLOG=========================//
-const createNewBlogrService = (data) => {
-    return axios.post(`/api/create-new-blog`, data)
-}
-const updateBlogService = (data) => {
-    return axios.put(`/api/update-blog`, data)
-}
-const deleteBlogService = (data) => {
-    return axios.delete(`/api/delete-blog`, { data: data })
-}
-const getDetailBlogByIdService = (id) => {
-    return axios.get(`/api/get-detail-blog?id=${id}`)
-}
-const getAllBlog = (data) => {
-    return axios.get(`/api/get-all-blog?limit=${data.limit}&offset=${data.offset}&subjectId=${data.subjectId}&keyword=${data.keyword}`)
-}
-const getFeatureBlog = (limit) => {
-    return axios.get(`/api/get-feature-blog?limit=${limit}`)
-}
-const getNewBlog = (limit) => {
-    return axios.get(`/api/get-new-blog?limit=${limit}`)
-}
 //===================TYPESHIP=====================//
 const createNewTypeShipService = (data) => {
     return axios.post(`/api/create-new-typeship`, data)
@@ -211,47 +196,6 @@ const getDetailTypeShipByIdService = (id) => {
 }
 const getAllTypeShip = (data) => {
     return axios.get(`/api/get-all-typeship?limit=${data.limit}&offset=${data.offset}&keyword=${data.keyword}`)
-}
-//===================TYPE VOUCHER===============//
-const createNewTypeVoucherService = (data) => {
-    return axios.post(`/api/create-new-typevoucher`, data)
-}
-const updateTypeVoucherService = (data) => {
-    return axios.put(`/api/update-typevoucher`, data)
-}
-const deleteTypeVoucherService = (data) => {
-    return axios.delete(`/api/delete-typevoucher`, { data: data })
-}
-const getDetailTypeVoucherByIdService = (id) => {
-    return axios.get(`/api/get-detail-typevoucher?id=${id}`)
-}
-const getAllTypeVoucher = (data) => {
-    return axios.get(`/api/get-all-typevoucher?limit=${data.limit}&offset=${data.offset}`)
-}
-const getSelectTypeVoucher = () => {
-    return axios.get(`/api/get-select-typevoucher`)
-}
-//=====================VOUCHER===================//
-const createNewVoucherService = (data) => {
-    return axios.post(`/api/create-new-voucher`, data)
-}
-const updateVoucherService = (data) => {
-    return axios.put(`/api/update-voucher`, data)
-}
-const deleteVoucherService = (data) => {
-    return axios.delete(`/api/delete-voucher`, { data: data })
-}
-const getDetailVoucherByIdService = (id) => {
-    return axios.get(`/api/get-detail-voucher?id=${id}`)
-}
-const getAllVoucher = (data) => {
-    return axios.get(`/api/get-all-voucher?limit=${data.limit}&offset=${data.offset}`)
-}
-const saveUserVoucherService = (data) => {
-    return axios.post(`/api/save-user-voucher`, data)
-}
-const getAllVoucherByUserIdService = (data) => {
-    return axios.get(`/api/get-all-voucher-by-userid?limit=${data.limit}&offset=${data.offset}&id=${data.id}`)
 }
 //========================REVIEW======================//
 const createNewReviewService = (data) => {
@@ -350,17 +294,36 @@ const listRoomOfAdmin = () => {
 
 }
 //========================COMMENT=======================
-const createNewcommentService = (data) => {
-    return axios.post(`/api/create-new-comment`, data)
-}
 const getAllcommentByBlogIdService = (id) => {
     return axios.get(`/api/get-all-comment-by-blogId?id=${id}`)
 }
-const ReplycommentService = (data) => {
-    return axios.post(`/api/reply-comment`, data)
+const createNewcommentService = (data) => {
+    return axios.post(`/api/create-new-comment-blog`, data)
 }
-const deletecommentService = (data) => {
-    return axios.delete(`/api/delete-comment`, { data: data })
+//=================BLOG=========================//
+const getAllCategoryBlogService = (type) => {
+    return axios.get(`/api/get-all-code?type=${type}`)
+}
+const createNewBlogrService = (data) => {
+    return axios.post(`/api/create-new-blog`, data)
+}
+const updateBlogService = (data) => {
+    return axios.put(`/api/update-blog`, data)
+}
+const deleteBlogService = (data) => {
+    return axios.delete(`/api/delete-blog`, { data: data })
+}
+const getDetailBlogByIdService = (id) => {
+    return axios.get(`/api/get-detail-blog?id=${id}`)
+}
+const getAllBlog = (data) => {
+    return axios.get(`/api/get-all-blog?limit=${data.limit}&offset=${data.offset}&subjectId=${data.subjectId}&keyword=${data.keyword}`)
+}
+const getFeatureBlog = (limit) => {
+    return axios.get(`/api/get-feature-blog?limit=${limit}`)
+}
+const getNewBlog = (limit) => {
+    return axios.get(`/api/get-new-blog?limit=${limit}`)
 }
 //======================STATISTIC========================//
 const getCountCardStatistic = () => {
@@ -383,6 +346,65 @@ const getStatisticProfit = (data) => {
 }
 const getStatisticStockProduct = (data) => {
     return axios.get(`/api/get-statistic-stock-product?limit=${data.limit}&offset=${data.offset}`)
+}
+//=======================VOUCHER===========================//
+const getAllTypeVoucherService = (params = {}) => {
+    const query = buildQueryString({
+        limit: params.limit,
+        offset: params.offset,
+        keyword: params.keyword
+    })
+    return axios.get(`/api/get-all-type-voucher${query}`)
+}
+const createNewTypeVoucherService = (data) => {
+    return axios.post(`/api/create-new-type-voucher`, data)
+}
+const updateTypeVoucherService = (data) => {
+    return axios.put(`/api/update-type-voucher`, data)
+}
+const deleteTypeVoucherService = (data) => {
+    return axios.delete(`/api/delete-type-voucher`, { data })
+}
+
+const getAllVoucherService = (params = {}) => {
+    const query = buildQueryString({
+        limit: params.limit,
+        offset: params.offset,
+        status: params.status,
+        typeVoucherId: params.typeVoucherId,
+        keyword: params.keyword
+    })
+    return axios.get(`/api/get-all-voucher${query}`)
+}
+const getDetailVoucherService = (id) => {
+    return axios.get(`/api/get-detail-voucher?id=${id}`)
+}
+const createNewVoucherService = (data) => {
+    return axios.post(`/api/create-new-voucher`, data)
+}
+const updateVoucherService = (data) => {
+    return axios.put(`/api/update-voucher`, data)
+}
+const deleteVoucherService = (data) => {
+    return axios.delete(`/api/delete-voucher`, { data })
+}
+const getVoucherStoreService = (params = {}) => {
+    const query = buildQueryString({
+        userId: params.userId,
+        typeVoucherId: params.typeVoucherId,
+        keyword: params.keyword
+    })
+    return axios.get(`/api/get-voucher-store${query}`)
+}
+const claimVoucherService = (data) => {
+    return axios.post(`/api/claim-voucher`, data)
+}
+const getVoucherWalletService = (userId) => {
+    const query = buildQueryString({ userId })
+    return axios.get(`/api/get-voucher-wallet${query}`)
+}
+const revokeVoucherService = (data) => {
+    return axios.put(`/api/revoke-voucher`, data)
 }
 //=======================SUPPLIER==========================//
 const createNewSupplierService = (data) => {
@@ -427,24 +449,27 @@ export {
     getAllUsers, getAllCodeService, createNewUser, DeleteUserService, getDetailUserById, UpdateUserService,
     createAllCodeService, getDetailAllcodeById, UpdateAllcodeService, DeleteAllcodeService, handleLoginService,
     handleSendVerifyEmail, handleVerifyEmail, handleChangePassword, CreateNewProduct, getAllProductUser, getAllProductAdmin,
-    handleBanProductService, handleActiveProductService, getDetailProductByIdService, UpdateProductService,
+    getAllProductService, handleBanProductService, handleActiveProductService, getDetailProductByIdService, UpdateProductService,
     getAllProductDetailByIdService, getAllProductDetailImageByIdService, CreateNewProductDetailService,
     getProductDetailByIdService, UpdateProductDetailService, createNewProductImageService, getProductDetailImageByIdService,
     UpdateProductDetailImageService, DeleteProductDetailImageService, DeleteProductDetailService,
     createNewBannerService, updateBannerService, deleteBannerService, getDetailBannerByIdService, getAllBanner,
-    createNewBlogrService, updateBlogService, deleteBlogService, getDetailBlogByIdService, getAllBlog, getListAllCodeService,
+    getListAllCodeService,
     createNewTypeShipService, updateTypeShipService, deleteTypeShipService, getDetailTypeShipByIdService, getAllTypeShip,
-    createNewTypeVoucherService, updateTypeVoucherService, deleteTypeVoucherService, getDetailTypeVoucherByIdService, getAllTypeVoucher,
-    createNewVoucherService, updateVoucherService, deleteVoucherService, getDetailVoucherByIdService, getAllVoucher, getSelectTypeVoucher,
     getAllProductDetailSizeByIdService, createNewProductSizeService, getProductDetailSizeByIdService, UpdateProductDetailSizeService,
     DeleteProductDetailSizeService, createNewReviewService, getAllReviewByProductIdService, ReplyReviewService, deleteReviewService,
-    getProductFeatureService, getProductNewService, saveUserVoucherService, getAllVoucherByUserIdService, addShopCartService,
+    getProductFeatureService, getProductNewService, addShopCartService,
     getAllShopCartByUserIdService, deleteItemShopCartService, createNewOrderService, createNewAddressUserrService, getAllAddressUserByUserIdService,
     deleteAddressUserService, editAddressUserService, getDetailAddressUserByIdService, getAllOrder, getDetailOrder, updateStatusOrderService,
-    getAllOrdersByUser, paymentOrderService, paymentOrderSuccessService, createNewRoom, sendMessage, loadMessage, listRoomOfUser, listRoomOfAdmin, getAllCategoryBlogService,
-    createNewcommentService, getAllcommentByBlogIdService, ReplycommentService, deletecommentService, getFeatureBlog, getNewBlog, getCountCardStatistic, getCountStatusOrder,
+    getAllOrdersByUser, paymentOrderService, paymentOrderSuccessService, createNewRoom, sendMessage, loadMessage, listRoomOfUser, listRoomOfAdmin,
+    getAllCategoryBlogService, createNewBlogrService, updateBlogService, deleteBlogService, getDetailBlogByIdService, getAllBlog,
+    getFeatureBlog, getNewBlog, getAllcommentByBlogIdService, createNewcommentService,
+    getCountCardStatistic, getCountStatusOrder,
     getStatisticByMonth, getStatisticByDay, checkPhonenumberEmail, createNewSupplierService, updateSupplierService, deleteSupplierService, getDetailSupplierByIdService,
     getAllSupplier, createNewReceiptService, getAllReceipt, getDetailReceiptByIdService, deleteReceiptService, updateReceiptService, createNewReceiptDetailService,
     getStatisticOverturn, getStatisticProfit, getProductShopcartService, getDetailUserByEmail,
-    getStatisticStockProduct, getExchangeRate, paymentOrderVnpayService, confirmOrderVnpay, paymentOrderVnpaySuccessService
+    getStatisticStockProduct, getExchangeRate, paymentOrderVnpayService, confirmOrderVnpay, paymentOrderVnpaySuccessService,
+    getAllTypeVoucherService, createNewTypeVoucherService, updateTypeVoucherService, deleteTypeVoucherService,
+    getAllVoucherService, getDetailVoucherService, createNewVoucherService, updateVoucherService, deleteVoucherService, getVoucherStoreService,
+    claimVoucherService, getVoucherWalletService, revokeVoucherService
 }

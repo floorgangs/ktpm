@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { createNewBannerService, getDetailBannerByIdService, updateBannerService } from '../../../services/userService';
 import CommonUtils from '../../../utils/CommonUtils';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import { toast } from 'react-toastify';
 import { useParams } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
@@ -130,9 +130,7 @@ const AddBanner = (props) => {
                 </div>
             </div>
             {inputValues.isOpen === true &&
-                <Lightbox mainSrc={inputValues.imageReview}
-                    onCloseRequest={() => setInputValues({ ...inputValues, isOpen: false })}
-                />
+                <Lightbox open={inputValues.isOpen} close={() => setInputValues({ ...inputValues, isOpen: false })} slides={[{ src: inputValues.imageReview }]} />
             }
         </div>
     )

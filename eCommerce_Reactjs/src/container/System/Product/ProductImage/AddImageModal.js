@@ -2,8 +2,8 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import CommonUtils from '../../../../utils/CommonUtils';
 import { toast } from 'react-toastify';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 import { Modal, ModalFooter, ModalBody, Button } from 'reactstrap';
 import { getProductDetailImageByIdService } from '../../../../services/userService';
 
@@ -116,9 +116,7 @@ const AddImageModal = (props) => {
                 </ModalFooter>
             </Modal>
             {inputValues.isOpen === true &&
-                <Lightbox mainSrc={inputValues.imageReview}
-                    onCloseRequest={() => setInputValues(prev => ({ ...prev, isOpen: false }))}
-                />
+                <Lightbox open={inputValues.isOpen} close={() => setInputValues(prev => ({ ...prev, isOpen: false }))} slides={[{ src: inputValues.imageReview }]} />
             }
         </div >
     )

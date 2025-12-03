@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 import orderLogo from '../../../src/resources/img/orderLogo.png'
-import storeVoucherLogo from '../../../src/resources/img/storeVoucher.png'
 function CategoryUser(props) {
 
     return (
@@ -17,7 +16,7 @@ function CategoryUser(props) {
                     </ul>
                 </li>
                 <li><img width="20px" height="20px" style={{ marginLeft: "-3px" }} src={orderLogo} alt="order" /> <Link to={`/user/order/${props.id}`}>Đơn mua</Link></li>
-                <li><img width="20px" height="20px" style={{ marginLeft: "-3px" }} src={storeVoucherLogo} alt="store voucher" /> <Link to={`/user/store-voucher/${props.id}`}>Kho voucher</Link></li>
+                <li><i style={{ color: '#71cd14' }} className="fas fa-ticket-alt"></i> <Link to={`/user/voucher/${props.id}`}>Voucher</Link></li>
             </ul>
         </div>
 

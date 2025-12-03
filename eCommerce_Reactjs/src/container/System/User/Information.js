@@ -114,7 +114,7 @@ const Information = () => {
                 <div className="col-md-3 border-right">
                     <div className="d-flex flex-column align-items-center text-center p-3 py-5">
                         <img className="rounded-circle mt-5" height="170px" style={{ objectFit: "cover" }} width="150px" src={inputValues.image} alt="user avatar" />
-                        <span className="font-weight-bold">{inputValues.lastName}</span>
+                        <span className="fw-bold">{inputValues.lastName}</span>
                         <div className="box-email-verify">
                             <span className="text-black-50">{inputValues.email}
                             </span>
@@ -135,11 +135,22 @@ const Information = () => {
                 <div className="col-md-6 border-right">
                     <div className="p-3 py-5">
                         <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h4 className="text-right">Thông tin cá nhân</h4>
+                            <h4 className="text-end">Thông tin cá nhân</h4>
                         </div>
                         <div className="row mt-2">
-                            <div className="col-md-6"><label className="labels">Họ <span style={{color: '#dc3545'}}>*</span></label><input name="firstName" onChange={(event) => handleOnChange(event)} value={inputValues.firstName} type="text" className="form-control" placeholder="Nhập họ" /></div>
-                            <div className="col-md-6"><label className="labels">Tên <span style={{color: '#dc3545'}}>*</span></label><input name="lastName" onChange={(event) => handleOnChange(event)} value={inputValues.lastName} type="text" className="form-control" placeholder="Nhập tên" /></div>
+                            <div className="col-md-12">
+                                <label className="labels">Họ và Tên <span style={{color: '#dc3545'}}>*</span></label>
+                                <div className="d-flex gap-2">
+                                    <div className="flex-fill">
+                                        <input name="firstName" onChange={(event) => handleOnChange(event)} value={inputValues.firstName} type="text" className="form-control" placeholder="Họ (VD: Nguyễn)" />
+                                        <small className="text-muted">Họ</small>
+                                    </div>
+                                    <div className="flex-fill">
+                                        <input name="lastName" onChange={(event) => handleOnChange(event)} value={inputValues.lastName} type="text" className="form-control" placeholder="Tên (VD: Văn A)" />
+                                        <small className="text-muted">Tên</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div className="row mt-3">
                             <div className="col-md-12"><label className="labels">Số điện thoại <span style={{color: '#dc3545'}}>*</span></label><input name="phonenumber" onChange={(event) => handleOnChange(event)} type="text" className="form-control" value={inputValues.phonenumber} placeholder="Nhập số điện thoại" /></div>

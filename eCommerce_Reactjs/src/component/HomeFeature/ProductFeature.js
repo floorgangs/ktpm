@@ -8,10 +8,34 @@ import './ProductFeature.scss';
 function ProductFeature(props) {
     let settings = {
         dots: false,
-        Infinity: false,
+        infinite: false,
         speed: 500,
         slidesToShow: 4,
         slidesToScroll: 1,
+        arrows: true,
+        responsive: [
+            {
+                breakpoint: 1200,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                }
+            },
+            {
+                breakpoint: 992,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                }
+            },
+            {
+                breakpoint: 576,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                }
+            }
+        ]
     }
 
     return (
@@ -21,14 +45,16 @@ function ProductFeature(props) {
                 <HeaderContent mainContent={props.title}
                     infoContent="Bạn sẽ không thất vọng khi lựa chọn"> </HeaderContent>
 
-                <div className="row box-productFeature">
+                <div className="box-productFeature">
                     {props.data && props.data.length > 0 ? (
                         <Slider {...settings}>
                             {props.data.map((item, index) => {
                                 return (
-                                    <ItemProduct id={item.id} key={index} width={350} height={419} type="col-lg-4 col-md-6" name={item.name} img={item.productDetail[0].productImage[0].image}
-                                        price={item.productDetail[0].originalPrice} discountPrice={item.productDetail[0].discountPrice}>
-                                    </ItemProduct>
+                                    <div className="slider-item" key={index}>
+                                        <ItemProduct id={item.id} name={item.name} img={item.productDetail[0].productImage[0].image}
+                                            price={item.productDetail[0].originalPrice} discountPrice={item.productDetail[0].discountPrice}>
+                                        </ItemProduct>
+                                    </div>
                                 )
                             })}
                         </Slider>

@@ -8,7 +8,6 @@ import DetailProductPage from './container/DetailProduct/DetailProductPage';
 import ShopCartPage from './container/ShopCart/ShopCartPage';
 import BlogPage from './container/Blog/BlogPage';
 import DetailBlog from './container/Blog/DetailBlog';
-
 import HomePageAdmin from './container/System/HomePageAdmin';
 import { ToastContainer } from 'react-toastify';
 import {
@@ -21,19 +20,19 @@ import { Redirect } from 'react-router';
 import VerifyEmail from './container/System/Email/VerifyEmail';
 import LoginWebPage from './container/Login/LoginWebPage';
 import UserHomePage from './container/User/UseHomePage';
-import VoucherHomePage from './container/Voucher/VoucherHomePage';
 import OrderHomePage from './container/Order/OrderHomePage';
 import TopMenu from './container/Header/TopMenu';
 import PaymentSuccess from './container/User/PaymentSuccess';
 import VnpayPaymentPage from './container/Order/VnpayPaymentPage';
 import VnpayPaymentSuccess from './container/Order/VnpayPaymentSuccess';
+import AboutPage from './container/About/AboutPage';
 
 function App() {
 
   return (
     <Router>
-      <Switch>
-        <div className="App">
+      <div className="App">
+        <Switch>
           <Route exact path="/">
             <Header />
             <HomePage />
@@ -76,22 +75,22 @@ function App() {
           </Route>
           <Route exact path="/payment/vnpay">
             <TopMenu user={JSON.parse(localStorage.getItem("userData")) ? JSON.parse(localStorage.getItem("userData")) : ''} />
-              <VnpayPaymentPage />
-              <Footer />
-            </Route>
-            <Route exact path="/payment/vnpay_return">
+            <VnpayPaymentPage />
+            <Footer />
+          </Route>
+          <Route exact path="/payment/vnpay_return">
             <TopMenu user={JSON.parse(localStorage.getItem("userData")) ? JSON.parse(localStorage.getItem("userData")) : ''} />
-              <VnpayPaymentSuccess />
-              <Footer />
-            </Route>
+            <VnpayPaymentSuccess />
+            <Footer />
+          </Route>
           <Route path="/login">
             <Header />
             <LoginWebPage />
             <Footer />
           </Route>
-          <Route path="/voucher">
+          <Route path="/about">
             <Header />
-            <VoucherHomePage />
+            <AboutPage />
             <Footer />
           </Route>
           <Route path="/blog">
@@ -99,17 +98,11 @@ function App() {
             <BlogPage />
             <Footer />
           </Route>
-          <Route path="/blog-detail/:id">
+          <Route path="/detail-blog/:id">
             <Header />
             <DetailBlog />
             <Footer />
           </Route>
-          <Route path="/about">
-            <Header />
-
-            <Footer />
-          </Route>
-          
           <Route path="/verify-email">
             <Header />
             <VerifyEmail />
@@ -120,19 +113,19 @@ function App() {
             <OrderHomePage />
             <Footer />
           </Route>
-          <ToastContainer
-            position="top-right"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-        </div>
-      </Switch>
+        </Switch>
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </Router>
 
   );
