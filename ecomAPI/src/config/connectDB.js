@@ -18,13 +18,32 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
     }
 });
 
+// Retry configuration
+const MAX_RETRIES = 10;
+const RETRY_DELAY = 5000; // 5 seconds
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 let connectDB = async () => {
-    try {
-        await sequelize.authenticate();
-        console.log(`✓ Connected to MySQL at ${dbHost}:${dbPort}/${dbName}`);
-    } catch (error) {
-        console.error('✗ Unable to connect to the database:', error);
-        process.exit(1);
+    let retries = 0;
+    
+    while (retries < MAX_RETRIES) {
+        try {
+            await sequelize.authenticate();
+            console.log(`✓ Connected to MySQL at ${dbHost}:${dbPort}/${dbName}`);
+            return;
+        } catch (error) {
+            retries++;
+            console.log(`✗ Unable to connect to database (attempt ${retries}/${MAX_RETRIES}): ${error.message}`);
+            
+            if (retries < MAX_RETRIES) {
+                console.log(`Retrying in ${RETRY_DELAY / 1000} seconds...`);
+                await sleep(RETRY_DELAY);
+            } else {
+                console.error('✗ Max retries reached. Could not connect to database.');
+                process.exit(1);
+            }
+        }
     }
 }
 
