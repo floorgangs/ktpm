@@ -5,6 +5,7 @@ import './GHNConfig.scss';
 
 const GHNConfig = () => {
     // GHN Configuration
+    // eslint-disable-next-line no-unused-vars
     const [config, setConfig] = useState({
         token: GHN_CONFIG.TOKEN,
         shopId: GHN_CONFIG.SHOP_ID,
@@ -23,6 +24,7 @@ const GHNConfig = () => {
     const [testLoading, setTestLoading] = useState(false);
 
     // Statistics
+    // eslint-disable-next-line no-unused-vars
     const [stats, setStats] = useState({
         totalOrders: 0,
         totalShippingFee: 0,
@@ -124,7 +126,7 @@ const GHNConfig = () => {
         <div className="container-fluid px-4">
             <h1 className="mt-4">
                 <img 
-                    src="https://file.hstatic.net/200000472237/file/giao-hang-nhanh_f0ba75003cb04ea7926e8ea128be94c2.png" 
+                    src="https://cdn.haitrieu.com/wp-content/uploads/2022/05/Logo-GHN-Orange.png" 
                     alt="GHN" 
                     style={{ height: '32px', marginRight: '12px', verticalAlign: 'middle' }} 
                 />

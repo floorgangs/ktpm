@@ -3,25 +3,24 @@ services:
   mysql:
     image: mysql:8.0
     container_name: ecom_mysql
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: ecom
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_USER: ecomuser
-      MYSQL_PASSWORD: ecompassword
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./ecom.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - ecom_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
-      timeout: 20s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
       retries: 10
-      interval: 10s
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      interval: 5s
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --lower_case_table_names=1
 
   # Backend API
   backend:
@@ -29,7 +28,7 @@ services:
       context: ./ecomAPI
       dockerfile: Dockerfile
     container_name: ecom_backend
-    restart: always
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
@@ -38,19 +37,13 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: ecom
-      DB_USER: ecomuser
-      DB_PASSWORD: ecompassword
-      JWT_SECRET: your-secret-key-change-this-in-production
-      URL_REACT: http://localhost:3000
-      AUTO_MIGRATE: "true"
+      DB_USER: root
+      DB_PASSWORD: ""
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - ecom_network
-    volumes:
-      - ./ecom-fixed.sql:/app/ecom-fixed.sql
-    entrypoint: ["/bin/sh", "-c", "sleep 5 && npx sequelize-cli db:migrate && (mysql -h$${DB_HOST} -u$${DB_USER} -p$${DB_PASSWORD} $${DB_NAME} < /app/ecom-fixed.sql || echo 'Data import skipped') && npm start"]
 
   # Frontend React
   frontend:
@@ -58,12 +51,11 @@ services:
       context: ./eCommerce_Reactjs
       dockerfile: Dockerfile
     container_name: ecom_frontend
-    restart: always
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       REACT_APP_BACKEND_URL: http://localhost:8080
-      CHOKIDAR_USEPOLLING: true
     depends_on:
       - backend
     networks:
@@ -73,8 +65,8 @@ services:
 
 volumes:
   mysql_data:
-    driver: local
 
 networks:
   ecom_network:
     driver: bridge
+

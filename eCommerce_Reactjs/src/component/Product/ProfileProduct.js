@@ -1,7 +1,11 @@
 import React from 'react';
 
 function ProfileProduct(props) {
-    let data = props.data
+    const data = props.data || {};
+    const renderValue = (value) => {
+        if (value === 0) return 0;
+        return value || 'Đang cập nhật';
+    };
     return (
         <div className="table-responsive">
             <table className="table">
@@ -11,7 +15,7 @@ function ProfileProduct(props) {
                             <h5>Chiều rộng</h5>
                         </td>
                         <td>
-                            <h5>{data.width}</h5>
+                            <h5>{renderValue(data.width)}</h5>
                         </td>
                     </tr>
                     <tr>
@@ -19,7 +23,7 @@ function ProfileProduct(props) {
                             <h5>Chiều dài</h5>
                         </td>
                         <td>
-                            <h5>{data.height}</h5>
+                            <h5>{renderValue(data.height)}</h5>
                         </td>
                     </tr>
                     <tr>
@@ -27,7 +31,7 @@ function ProfileProduct(props) {
                             <h5>Khối lượng</h5>
                         </td>
                         <td>
-                            <h5>{data.weight}</h5>
+                            <h5>{renderValue(data.weight)}</h5>
                         </td>
                     </tr>
                     <tr>

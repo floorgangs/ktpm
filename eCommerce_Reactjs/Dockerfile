@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
@@ -14,9 +14,6 @@ COPY . .
 
 # Expose port
 EXPOSE 3000
-
-# Set environment variable to avoid issues with watching files
-ENV CHOKIDAR_USEPOLLING=true
 
 # Start application
 CMD ["npm", "start"]

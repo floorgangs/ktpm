@@ -89,6 +89,7 @@ const ManageOrder = () => {
                                     <th>Email</th>
                                     <th>Ngày đặt</th>
                                     <th>Loại ship</th>
+                                    <th>Phí ship</th>
                                     <th>Mã voucher</th>
                                     <th>Hình thức</th>
                                     <th>Trạng thái</th>
@@ -100,28 +101,69 @@ const ManageOrder = () => {
                             <tbody>
                                 {dataOrder && dataOrder.length > 0 &&
                                     dataOrder.map((item, index) => {
+                                        const shippingData = item.shippingData ? (typeof item.shippingData === 'string' ? JSON.parse(item.shippingData) : item.shippingData) : null;
                                         return (
-                                            <tr key={index}>
+                                            <tr key={index} style={(() => {
+                                                const isRefundPending = item.statusId === 'S7'
+                                                    && item.isPaymentOnlien === 1
+                                                    && shippingData
+                                                    && shippingData.refundStatus !== 'completed';
+                                                if (isRefundPending) {
+                                                    return { backgroundColor: '#fff7ed' };
+                                                }
+                                                return {};
+                                            })()}>
                                                 <td>{item.id}</td>
                                                 <td>{item.userData.phonenumber}</td>
                                                 <td>{item.userData.email}</td>
                                                 <td>{moment.utc(item.createdAt).local().format('DD/MM/YYYY HH:mm:ss')}</td>
                                                 <td>
-                                                    {item.shippingProvider === 'GHN' ? (
-                                                        <span style={{ color: '#ee4d2d', fontWeight: '500' }}>
-                                                            <img src="https://file.hstatic.net/200000472237/file/giao-hang-nhanh_f0ba75003cb04ea7926e8ea128be94c2.png" alt="GHN" style={{ height: '16px', marginRight: '4px' }} />
-                                                            GHN
-                                                        </span>
-                                                    ) : (
-                                                        item.typeShipData?.type || 'Nội bộ'
-                                                    )}
+                                                    {(() => {
+                                                        if (shippingData && shippingData.provider === 'GHN') {
+                                                            return (
+                                                                <span style={{ color: '#ee4d2d', fontWeight: '500' }}>
+                                                                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/05/Logo-GHN-Orange.png" alt="GHN" style={{ height: '16px', marginRight: '4px' }} />
+                                                                    GHN
+                                                                </span>
+                                                            )
+                                                        } else if (shippingData && shippingData.provider === 'GHTK') {
+                                                            return (
+                                                                <span style={{ color: '#2e8b57', fontWeight: '500' }}>
+                                                                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/05/Logo-GHTK-Green.png" alt="GHTK" style={{ height: '16px', marginRight: '4px' }} />
+                                                                    GHTK
+                                                                </span>
+                                                            )
+                                                        } else if (shippingData && shippingData.provider === 'VIETTEL_POST') {
+                                                            return (
+                                                                <span style={{ color: '#e60000', fontWeight: '500' }}>
+                                                                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/05/Logo-Viettel-Post.png" alt="ViettelPost" style={{ height: '16px', marginRight: '4px' }} />
+                                                                    Viettel Post
+                                                                </span>
+                                                            )
+                                                        }
+                                                        // Chưa đẩy đơn cho ĐVVC
+                                                        return <span style={{ color: '#999', fontStyle: 'italic' }}>Chưa gửi ĐVVC</span>
+                                                    })()}
+                                                </td>
+                                                <td>
+                                                    {shippingData
+                                                        ? CommonUtils.formatter.format(Number(shippingData.shippingFee || 0))
+                                                        : '-'}
                                                 </td>
                                                 <td>{item.voucherData?.codeVoucher || '-'}</td>
                                                 <td>{item.isPaymentOnlien === 0 ? 'Thanh toán tiền mặt' : 'Thanh toán online'}</td>
-                                                <td>{item.statusOrderData?.value}</td>
                                                 <td>
-                                                    {item.shipCode ? (
-                                                        <span style={{ color: '#1890ff', fontWeight: '500', fontSize: '12px' }}>{item.shipCode}</span>
+                                                    <div>{item.statusOrderData?.value}</div>
+                                                    {(item.statusId === 'S7' && item.isPaymentOnlien === 1) && (() => {
+                                                        const refundStatus = shippingData?.refundStatus === 'completed' ? 'completed' : 'pending';
+                                                        return refundStatus === 'completed'
+                                                            ? <span className="badge bg-success" style={{ fontSize: '10px', marginTop: '4px' }}>Đã hoàn tiền</span>
+                                                            : <span className="badge bg-warning text-dark" style={{ fontSize: '10px', marginTop: '4px' }}>Chưa hoàn tiền</span>;
+                                                    })()}
+                                                </td>
+                                                <td>
+                                                    {shippingData && shippingData.shipCode ? (
+                                                        <span style={{ color: '#1890ff', fontWeight: '500', fontSize: '12px' }}>{shippingData.shipCode}</span>
                                                     ) : '-'}
                                                 </td>
                                                 <td>

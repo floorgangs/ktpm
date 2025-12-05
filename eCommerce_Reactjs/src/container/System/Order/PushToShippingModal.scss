@@ -1,0 +1,188 @@
+.push-shipping-modal {
+    .provider-selection {
+        .provider-list {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .provider-card {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            position: relative;
+
+            &:hover {
+                border-color: #1890ff;
+                background: #f0f7ff;
+            }
+
+            &.selected {
+                border-color: #52c41a;
+                background: #f6ffed;
+            }
+
+            &.disabled {
+                cursor: not-allowed;
+                opacity: 0.6;
+
+                &:hover {
+                    border-color: #e8e8e8;
+                    background: transparent;
+                }
+            }
+
+            img {
+                width: 40px;
+                height: 40px;
+                object-fit: contain;
+                margin-right: 12px;
+            }
+
+            .provider-info {
+                display: flex;
+                flex-direction: column;
+
+                .provider-name {
+                    font-weight: 600;
+                    color: #333;
+                }
+
+                .provider-time {
+                    font-size: 12px;
+                    color: #666;
+                }
+            }
+
+            .check-icon {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #52c41a;
+                font-size: 18px;
+            }
+        }
+    }
+
+    .order-info-section {
+        .info-card {
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            height: 100%;
+
+            label {
+                font-size: 12px;
+                color: #666;
+                text-transform: uppercase;
+                margin-bottom: 8px;
+                display: block;
+            }
+
+            p {
+                margin-bottom: 4px;
+            }
+
+            .address-text {
+                font-size: 13px;
+                color: #666;
+            }
+
+            .items-list {
+                padding-left: 18px;
+                margin: 0;
+                font-size: 13px;
+
+                li {
+                    margin-bottom: 4px;
+                }
+            }
+        }
+    }
+
+    .mapped-address-info {
+        font-size: 13px;
+    }
+
+    .package-section,
+    .cod-section {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-control {
+            font-size: 14px;
+        }
+    }
+
+    .shipping-fee-display {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+
+        h6 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .fee-breakdown {
+            .fee-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                &.total {
+                    padding-top: 12px;
+                    margin-top: 8px;
+                    border-top: 2px solid rgba(255, 255, 255, 0.3);
+                    border-bottom: none;
+
+                    .total-amount {
+                        font-size: 20px;
+                        font-weight: 700;
+                    }
+                }
+            }
+        }
+    }
+
+    .note-section {
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .push-shipping-modal {
+        .provider-list {
+            flex-direction: column;
+        }
+
+        .provider-card {
+            min-width: 100%;
+        }
+    }
+}

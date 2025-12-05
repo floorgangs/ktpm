@@ -4,6 +4,7 @@
     "password": null,
     "database": "ecom",
     "host": "127.0.0.1",
+    "port": 3306,
     "dialect": "mysql",
     "logging": false,
     "query": {
@@ -22,23 +23,19 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "ecomuser",
-    "password": "ecompassword",
+    "username": "root",
+    "password": "",
     "database": "ecom",
     "host": "mysql",
+    "port": 3306,
     "dialect": "mysql",
-    "logging": true,
+    "logging": false,
     "query": {
       "raw": true
     },
     "timezone": "+07:00",
     "dialectOptions": {
-      "charset": "utf8mb4",
-      "collate": "utf8mb4_unicode_ci"
-    },
-    "define": {
-      "charset": "utf8mb4",
-      "collate": "utf8mb4_unicode_ci"
+      "charset": "utf8mb4"
     }
   }
 }

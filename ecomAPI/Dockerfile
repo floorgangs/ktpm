@@ -1,7 +1,4 @@
-FROM node:22-alpine
-
-# Install MySQL client for data import
-RUN apk add --no-cache mysql-client
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
@@ -18,5 +15,5 @@ COPY . .
 # Expose port
 EXPOSE 8080
 
-# Wait for database and start application
+# Wait for MySQL and start
 CMD ["sh", "-c", "sleep 10 && npm start"]

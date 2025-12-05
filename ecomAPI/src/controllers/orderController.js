@@ -146,6 +146,46 @@ let updateImageOrder = async (req, res) => {
         })
     }
 }
+let updateShippingInfo = async (req, res) => {
+    try {
+        let data = await orderService.updateShippingInfo(req.body);
+        return res.status(200).json(data);
+    } catch (error) {
+        console.log(error)
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from server'
+        })
+    }
+}
+
+let updateRefundStatus = async (req, res) => {
+    try {
+        let data = await orderService.updateRefundStatus(req.body);
+        const status = data && data.errCode === 0 ? 200 : 400;
+        return res.status(status).json(data);
+    } catch (error) {
+        console.log(error)
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from server'
+        })
+    }
+}
+
+let handleGHNWebhook = async (req, res) => {
+    try {
+        const result = await orderService.handleGHNWebhook(req.body);
+        const statusCode = result.errCode === 0 ? 200 : (result.errCode === 3 ? 404 : 400);
+        return res.status(statusCode).json(result);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            errCode: -1,
+            errMessage: 'Error from server'
+        });
+    }
+}
 module.exports = {
     createNewOrder: createNewOrder,
     getAllOrders: getAllOrders,
@@ -158,5 +198,8 @@ module.exports = {
     paymentOrderVnpay: paymentOrderVnpay,
     confirmOrderVnpay: confirmOrderVnpay,
     paymentOrderVnpaySuccess: paymentOrderVnpaySuccess,
-    updateImageOrder: updateImageOrder
+    updateImageOrder: updateImageOrder,
+    updateShippingInfo: updateShippingInfo,
+    handleGHNWebhook: handleGHNWebhook,
+    updateRefundStatus: updateRefundStatus
 }

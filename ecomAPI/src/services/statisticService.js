@@ -66,9 +66,9 @@ let getCountStatusOrder = (data) => {
                             let updatedAt = moment.utc(item.updatedAt).local().format('DD/MM/YYYY').split('/')
                             updatedAt = Number(updatedAt[2] + updatedAt[1] + updatedAt[0])
 
-                            let twoDate = moment(data.twoDate).format("DD/MM/YYYY").split('/')
+                            let twoDate = moment(new Date(data.twoDate)).format("DD/MM/YYYY").split('/')
                             twoDate = Number(twoDate[2] + twoDate[1] + twoDate[0])
-                            let oneDate = moment(data.oneDate).format("DD/MM/YYYY").split('/')
+                            let oneDate = moment(new Date(data.oneDate)).format("DD/MM/YYYY").split('/')
                             oneDate = Number(oneDate[2] + oneDate[1] + oneDate[0])
 
                             if ((updatedAt >= oneDate) && (updatedAt <= twoDate)) {
@@ -80,14 +80,14 @@ let getCountStatusOrder = (data) => {
                         else if (data.type == "month") {
                             let updatedAtMonth = moment.utc(item.updatedAt).local().format('M')
                             let updatedAtYear = moment.utc(item.updatedAt).local().format('YYYY')
-                            if (moment(data.oneDate).format('M') == updatedAtMonth && moment(data.oneDate).format('YYYY') == updatedAtYear) {
+                            if (moment(new Date(data.oneDate)).format('M') == updatedAtMonth && moment(new Date(data.oneDate)).format('YYYY') == updatedAtYear) {
 
                                 return true
                             }
 
                         } else {
                             let updatedAtYear = moment.utc(item.updatedAt).local().format('YYYY')
-                            if (moment(data.oneDate).format('YYYY') == updatedAtYear) {
+                            if (moment(new Date(data.oneDate)).format('YYYY') == updatedAtYear) {
 
                                 return true
                             }

@@ -104,6 +104,8 @@ let initwebRoutes = (app) => {
     router.get('/api/get-all-order', orderController.getAllOrders)
     router.get('/api/get-detail-order', orderController.getDetailOrderById)
     router.put('/api/update-status-order', middlewareControllers.verifyTokenUser, orderController.updateStatusOrder)
+    router.put('/api/update-shipping-info', middlewareControllers.verifyTokenAdmin, orderController.updateShippingInfo)
+    router.put('/api/update-refund-status', middlewareControllers.verifyTokenAdmin, orderController.updateRefundStatus)
     router.get('/api/get-all-order-by-user', middlewareControllers.verifyTokenUser, orderController.getAllOrdersByUser)
     router.post('/api/payment-order', middlewareControllers.verifyTokenUser, orderController.paymentOrder)
     router.post('/api/payment-order-success', middlewareControllers.verifyTokenUser, orderController.paymentOrderSuccess)
@@ -113,6 +115,7 @@ let initwebRoutes = (app) => {
     router.post('/api/payment-order-vnpay', middlewareControllers.verifyTokenUser, orderController.paymentOrderVnpay)
     router.post('/api/vnpay_return', orderController.confirmOrderVnpay)
     router.put('/api/update-image-order', orderController.updateImageOrder)
+    router.post('/api/webhook/ghn', orderController.handleGHNWebhook)
     //=================API ADDRESS USER ======================//
     router.post('/api/create-new-address-user', middlewareControllers.verifyTokenUser, addressUserController.createNewAddressUser)
     router.get('/api/get-all-address-user', middlewareControllers.verifyTokenUser, addressUserController.getAllAddressUserByUserId)

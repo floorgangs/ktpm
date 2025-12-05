@@ -121,7 +121,7 @@ let getAllProductAdmin = (data) => {
 
                     res.rows[i].price = res.rows[i].productDetail[0].discountPrice
                     res.rows[i].productDetail[j].productImage = await db.ProductImage.findAll({ where: { productdetailId: res.rows[i].productDetail[j].id }, raw: true })
-                    for (let k = 0; k < res.rows[i].productDetail[j].productImage.length > 0; k++) {
+                    for (let k = 0; k < res.rows[i].productDetail[j].productImage.length; k++) {
                         res.rows[i].productDetail[j].productImage[k].image = new Buffer(res.rows[i].productDetail[j].productImage[k].image, 'base64').toString('binary')
                     }
                 }
@@ -179,7 +179,7 @@ let getAllProductUser = (data) => {
 
                     res.rows[i].price = res.rows[i].productDetail[0].discountPrice
                     res.rows[i].productDetail[j].productImage = await db.ProductImage.findAll({ where: { productdetailId: res.rows[i].productDetail[j].id }, raw: true })
-                    for (let k = 0; k < res.rows[i].productDetail[j].productImage.length > 0; k++) {
+                    for (let k = 0; k < res.rows[i].productDetail[j].productImage.length; k++) {
                         res.rows[i].productDetail[j].productImage[k].image = new Buffer(res.rows[i].productDetail[j].productImage[k].image, 'base64').toString('binary')
                     }
                 }
@@ -294,7 +294,7 @@ let getDetailProductById = (id) => {
                 res.productDetail = await db.ProductDetail.findAll({
                     where: { productId: res.id }
                 })
-                for (let i = 0; i < res.productDetail.length > 0; i++) {
+                for (let i = 0; i < res.productDetail.length; i++) {
                     res.productDetail[i].productImage = await db.ProductImage.findAll({ where: { productdetailId: res.productDetail[i].id } })
 
                     res.productDetail[i].productDetailSize = await db.ProductDetailSize.findAll({
@@ -318,7 +318,7 @@ let getDetailProductById = (id) => {
                         }
                         for (let h = 0; h < orderDetail.length; h++) {
                             let order = await db.OrderProduct.findOne({ where: { id: orderDetail[h].orderId } })
-                            if (order.statusId != 'S7') {
+                            if (order && order.statusId != 'S7') {
 
                                 quantity = quantity - orderDetail[h].quantity
                             }
@@ -402,7 +402,7 @@ let getAllProductDetailById = (data) => {
                             where: { productdetailId: productdetail.rows[i].id }
                         })
                         if (productdetail.rows[i].productImageData && productdetail.rows[i].productImageData.length > 0) {
-                            for (let j = 0; j < productdetail.rows[i].productImageData.length > 0; j++) {
+                            for (let j = 0; j < productdetail.rows[i].productImageData.length; j++) {
                                 productdetail.rows[i].productImageData[j].image = new Buffer(productdetail.rows[i].productImageData[j].image, 'base64').toString('binary')
                             }
                         }
@@ -758,7 +758,7 @@ let getAllProductDetailSizeById = (data) => {
                     raw: true,
                     nest: true
                 })
-                for (let i = 0; i < productsize.rows.length > 0; i++) {
+                for (let i = 0; i < productsize.rows.length; i++) {
                     let receiptDetail = await db.ReceiptDetail.findAll({ where: { productDetailSizeId: productsize.rows[i].id } })
                     let orderDetail = await db.OrderDetail.findAll({ where: { productId: productsize.rows[i].id } })
                     let quantity = 0
@@ -946,7 +946,7 @@ let getProductFeature = (limit) => {
 
                     res[i].price = res[i].productDetail[0].discountPrice
                     res[i].productDetail[j].productImage = await db.ProductImage.findAll({ where: { productdetailId: res[i].productDetail[j].id }, raw: true })
-                    for (let k = 0; k < res[i].productDetail[j].productImage.length > 0; k++) {
+                    for (let k = 0; k < res[i].productDetail[j].productImage.length; k++) {
                         res[i].productDetail[j].productImage[k].image = new Buffer(res[i].productDetail[j].productImage[k].image, 'base64').toString('binary')
                     }
                 }
@@ -990,7 +990,7 @@ let getProductNew = (limit) => {
 
                     res[i].price = res[i].productDetail[0].discountPrice
                     res[i].productDetail[j].productImage = await db.ProductImage.findAll({ where: { productdetailId: res[i].productDetail[j].id }, raw: true })
-                    for (let k = 0; k < res[i].productDetail[j].productImage.length > 0; k++) {
+                    for (let k = 0; k < res[i].productDetail[j].productImage.length; k++) {
                         res[i].productDetail[j].productImage[k].image = new Buffer(res[i].productDetail[j].productImage[k].image, 'base64').toString('binary')
                     }
                 }
@@ -1055,7 +1055,7 @@ let getProductShopCart = (data) => {
 
                             productArr[g].price = productArr[g].productDetail[0].discountPrice
                             productArr[g].productDetail[j].productImage = await db.ProductImage.findAll({ where: { productdetailId: productArr[g].productDetail[j].id }, raw: true })
-                            for (let k = 0; k < productArr[g].productDetail[j].productImage.length > 0; k++) {
+                            for (let k = 0; k < productArr[g].productDetail[j].productImage.length; k++) {
                                 productArr[g].productDetail[j].productImage[k].image = new Buffer(productArr[g].productDetail[j].productImage[k].image, 'base64').toString('binary')
                             }
                         }

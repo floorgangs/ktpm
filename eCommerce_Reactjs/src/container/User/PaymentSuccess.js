@@ -32,6 +32,16 @@ function PaymentSuccess() {
             orderData.paymentId = query.get("paymentId")
             orderData.token = query.get("token")
             orderData.PayerID = query.get("PayerID")
+
+            orderData.paymentMeta = {
+                gateway: 'PAYPAL',
+                paymentId: query.get('paymentId'),
+                payerId: query.get('PayerID'),
+                token: query.get('token'),
+                amount: orderData.total || orderData.totalPrice || null,
+                currency: 'USD',
+                paidAt: new Date().toISOString()
+            }
     
             createNewOrder(orderData)
         }

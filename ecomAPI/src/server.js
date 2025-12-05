@@ -58,6 +58,8 @@ socketIo.on("connection", (socket) => {
   });
 let port = process.env.PORT || 8004;
 
+connectDB();
+
 server.listen(port, () => {
     console.log("Backend Nodejs is running on the port : " + port)
 });

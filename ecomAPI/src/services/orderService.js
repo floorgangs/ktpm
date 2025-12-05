@@ -9,6 +9,64 @@ require('dotenv').config()
 import moment from 'moment';
 import localization from 'moment/locale/vi';
 import { EXCHANGE_RATES } from '../utils/constants'
+
+const normalizeVietnamese = (value) => {
+    if (!value || typeof value !== 'string') {
+        return '';
+    }
+    return value
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/[^a-z0-9\s_\-]/g, '')
+        .replace(/[_\-]/g, ' ')
+        .trim();
+};
+
+const GHN_STATUS_TO_INTERNAL = {
+    // In transit stages
+    'san sang giao': { statusId: 'S5', label: 'Đang vận chuyển' },
+    'dang lay hang': { statusId: 'S5', label: 'Đang vận chuyển' },
+    'dang giao hang': { statusId: 'S5', label: 'Đang vận chuyển' },
+    'ready to pick': { statusId: 'S5', label: 'Đang vận chuyển' },
+    'picking': { statusId: 'S5', label: 'Đang vận chuyển' },
+    'delivering': { statusId: 'S5', label: 'Đang vận chuyển' },
+    // Delivered
+    'giao thanh cong': { statusId: 'S6', label: 'Thành công' },
+    'delivered': { statusId: 'S6', label: 'Thành công' },
+    // Return flow
+    'dang tra hang': { statusId: 'S8', label: 'Đang hoàn hàng' },
+    'cho tra hang': { statusId: 'S8', label: 'Đang hoàn hàng' },
+    'returning': { statusId: 'S8', label: 'Đang hoàn hàng' },
+    // Cancelled
+    'huy': { statusId: 'S7', label: 'Đã hủy' },
+    'cancelled': { statusId: 'S7', label: 'Đã hủy' }
+};
+
+const extractGhnWebhookPayload = (payload) => {
+    if (!payload || typeof payload !== 'object') {
+        return { orderCode: null, rawStatus: null };
+    }
+
+    const flattened = {
+        orderCode: payload.orderCode || payload.OrderCode || payload.code || payload.Code,
+        status: payload.status || payload.Status || payload.currentStatus || payload.CurrentStatus,
+        data: payload.data || payload.Data
+    };
+
+    if (!flattened.orderCode && flattened.data) {
+        flattened.orderCode = flattened.data.orderCode || flattened.data.OrderCode;
+    }
+    if (!flattened.status && flattened.data) {
+        flattened.status = flattened.data.status || flattened.data.Status;
+    }
+
+    return {
+        orderCode: flattened.orderCode,
+        rawStatus: flattened.status
+    };
+};
 moment.updateLocale('vi', localization);
 paypal.configure({
     'mode': 'sandbox',
@@ -16,19 +74,62 @@ paypal.configure({
     'client_secret': 'ENWZDMzk17X3mHFJli7sFlS9RT1Vi_aocaLsrftWZ2tjHtBVFMzr4kPf5_9iIcsbFWsHf95vXVi6EADv'
 });
 
+const parseShippingData = (value) => {
+    if (!value) {
+        return null;
+    }
+    if (typeof value === 'object') {
+        return value;
+    }
+    try {
+        return JSON.parse(value);
+    } catch (error) {
+        console.error('Failed to parse shippingData:', error);
+        return null;
+    }
+};
+
 let createNewOrder = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            // Allow either typeShipId OR GHN shipping
-            if (!data.addressUserId || (!data.typeShipId && !data.shippingProvider)) {
+            // Require addressUserId and either typeShipId OR shippingFee (for GHN orders)
+            if (!data.addressUserId || (!data.typeShipId && !data.shippingFee)) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required parameter !'
                 })
             } else {
 
-                let product = await db.OrderProduct.create({
+                // Build shippingData JSON if shipping info provided
+                let shippingData = null;
+                if (data.shippingProvider || data.shippingFee || data.ghnAddress) {
+                    shippingData = {
+                        provider: data.shippingProvider || null,
+                        shipCode: data.shipCode || null,
+                        shippingFee: data.shippingFee || 0,
+                        ...(data.ghnAddress && {
+                            districtId: data.ghnAddress.districtId,
+                            wardCode: data.ghnAddress.wardCode,
+                            address: data.ghnAddress.fullAddress
+                        })
+                    };
+                }
 
+                if (data.paymentMeta) {
+                    shippingData = {
+                        ...(shippingData || {}),
+                        paymentMeta: data.paymentMeta
+                    };
+                } else if (data.isPaymentOnlien === 0) {
+                    shippingData = {
+                        ...(shippingData || {}),
+                        paymentMeta: {
+                            method: 'COD'
+                        }
+                    };
+                }
+
+                let product = await db.OrderProduct.create({
                     userId: data.userId,
                     addressUserId: data.addressUserId,
                     isPaymentOnlien: data.isPaymentOnlien,
@@ -36,14 +137,7 @@ let createNewOrder = (data) => {
                     typeShipId: data.typeShipId || null,
                     voucherId: data.voucherId,
                     note: data.note,
-                    // GHN fields
-                    shipCode: data.shipCode || null,
-                    shippingProvider: data.shippingProvider || 'internal',
-                    ghnDistrictId: data.ghnAddress ? data.ghnAddress.districtId : null,
-                    ghnWardCode: data.ghnAddress ? data.ghnAddress.wardCode : null,
-                    ghnAddress: data.ghnAddress ? data.ghnAddress.fullAddress : null,
-                    shippingFee: data.shippingFee || 0
-
+                    shippingData: shippingData ? JSON.stringify(shippingData) : null
                 })
 
                 data.arrDataShopCart = data.arrDataShopCart.map((item, index) => {
@@ -110,6 +204,20 @@ let getAllOrders = (data) => {
             }
             if (data.statusId && data.statusId !== 'ALL') objectFilter.where = { statusId: data.statusId }
             let res = await db.OrderProduct.findAndCountAll(objectFilter)
+            if (res && Array.isArray(res.rows)) {
+                res.rows.sort((a, b) => {
+                    const shippingA = parseShippingData(a.shippingData);
+                    const shippingB = parseShippingData(b.shippingData);
+                    const aPriority = (shippingA && shippingA.refundRequired && shippingA.refundStatus !== 'completed') ? 0 : 1;
+                    const bPriority = (shippingB && shippingB.refundRequired && shippingB.refundStatus !== 'completed') ? 0 : 1;
+                    if (aPriority !== bPriority) {
+                        return aPriority - bPriority;
+                    }
+                    const timeA = new Date(a.createdAt).getTime();
+                    const timeB = new Date(b.createdAt).getTime();
+                    return timeB - timeA;
+                });
+            }
             for (let i = 0; i < res.rows.length; i++) {
                 let addressUser = await db.AddressUser.findOne({ where: { id: res.rows[i].addressUserId } })
 
@@ -146,75 +254,92 @@ let getDetailOrderById = (id) => {
                     errMessage: 'Missing required parameter !'
                 })
             } else {
-                let addressUser = await db.AddressUser.findAll({
-                    where: { userId: userId },
+                // Lấy đơn hàng theo orderId
+                let order = await db.OrderProduct.findOne({
+                    where: { id: id },
+                    include: [
+                        { model: db.TypeShip, as: 'typeShipData' },
+                        { model: db.Voucher, as: 'voucherData' },
+                        { model: db.Allcode, as: 'statusOrderData' },
+                    ],
+                    raw: true,
+                    nest: true
+                })
+
+                if (!order) {
+                    resolve({
+                        errCode: 2,
+                        errMessage: 'Order not found!'
+                    })
+                    return;
+                }
+
+                // Lấy thông tin địa chỉ user
+                let addressUser = await db.AddressUser.findOne({
+                    where: { id: order.addressUserId },
                     raw: true
                 })
 
-                let ordersByAddress = []
+                // Lấy thông tin user
+                let user = null;
+                if (addressUser) {
+                    user = await db.User.findOne({
+                        where: { id: addressUser.userId },
+                        attributes: ['id', 'email', 'firstName', 'lastName', 'phonenumber'],
+                        raw: true
+                    })
+                }
 
-                for (let i = 0; i < addressUser.length; i++) {
-                    let orderList = await db.OrderProduct.findAll({
-                        where: { addressUserId: addressUser[i].id },
+                // Lấy typeVoucher nếu có voucher
+                if (order.voucherData && order.voucherData.typeVoucherId) {
+                    order.voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
+                        where: { id: order.voucherData.typeVoucherId }
+                    })
+                }
+
+                // Lấy chi tiết đơn hàng
+                let orderDetail = await db.OrderDetail.findAll({
+                    where: { orderId: id },
+                    raw: true,
+                    nest: true
+                })
+                for (let k = 0; k < orderDetail.length; k++) {
+                    orderDetail[k].productDetailSize = await db.ProductDetailSize.findOne({
+                        where: { id: orderDetail[k].productId },
                         include: [
-                            { model: db.TypeShip, as: 'typeShipData' },
-                            { model: db.Voucher, as: 'voucherData' },
-                            { model: db.Allcode, as: 'statusOrderData' },
-
+                            { model: db.Allcode, as: 'sizeData' },
                         ],
                         raw: true,
                         nest: true
                     })
-
-                    for (let j = 0; j < orderList.length; j++) {
-                        if (orderList[j].voucherData) {
-                            orderList[j].voucherData.typeVoucherOfVoucherData = await db.TypeVoucher.findOne({
-                                where: { id: orderList[j].voucherData.typeVoucherId }
-                            })
-                        }
-                        let orderDetail = await db.OrderDetail.findAll({
-                            where: { orderId: orderList[j].id },
-                            raw: true,
-                            nest: true
-                        })
-                        for (let k = 0; k < orderDetail.length; k++) {
-                            orderDetail[k].productDetailSize = await db.ProductDetailSize.findOne({
-                                where: { id: orderDetail[k].productId },
-                                include: [
-                                    { model: db.Allcode, as: 'sizeData' },
-                                ],
-                                raw: true,
-                                nest: true
-                            })
-                            if (!orderDetail[k].productDetailSize) continue
-                            orderDetail[k].productDetail = await db.ProductDetail.findOne({
-                                where: { id: orderDetail[k].productDetailSize.productdetailId },
-                                raw: true,
-                                nest: true
-                            })
-                            if (!orderDetail[k].productDetail) continue
-                            orderDetail[k].product = await db.Product.findOne({
-                                where: { id: orderDetail[k].productDetail.productId },
-                                raw: true,
-                                nest: true
-                            })
-                            orderDetail[k].productImage = await db.ProductImage.findAll({
-                                where: { productdetailId: orderDetail[k].productDetail.id },
-                                raw: true
-                            })
-                            for (let f = 0; f < orderDetail[k].productImage.length; f++) {
-                                orderDetail[k].productImage[f].image = Buffer.from(orderDetail[k].productImage[f].image, 'base64').toString('binary')
-                            }
-                        }
-
-                        orderList[j].orderDetail = orderDetail
-                        ordersByAddress.push(orderList[j])
+                    if (!orderDetail[k].productDetailSize) continue
+                    orderDetail[k].productDetail = await db.ProductDetail.findOne({
+                        where: { id: orderDetail[k].productDetailSize.productdetailId },
+                        raw: true,
+                        nest: true
+                    })
+                    if (!orderDetail[k].productDetail) continue
+                    orderDetail[k].product = await db.Product.findOne({
+                        where: { id: orderDetail[k].productDetail.productId },
+                        raw: true,
+                        nest: true
+                    })
+                    orderDetail[k].productImage = await db.ProductImage.findAll({
+                        where: { productdetailId: orderDetail[k].productDetail.id },
+                        raw: true
+                    })
+                    for (let f = 0; f < orderDetail[k].productImage.length; f++) {
+                        orderDetail[k].productImage[f].image = Buffer.from(orderDetail[k].productImage[f].image, 'base64').toString('binary')
                     }
                 }
 
+                order.orderDetail = orderDetail
+                order.addressUser = addressUser
+                order.userData = user
+
                 resolve({
                     errCode: 0,
-                    data: ordersByAddress
+                    data: order
                 })
             }
 
@@ -236,10 +361,72 @@ let updateStatusOrder = (data) => {
                     where: { id: data.id },
                     raw: false
                 })
+                if (!order) {
+                    resolve({
+                        errCode: 2,
+                        errMessage: 'Order not found!'
+                    })
+                    return;
+                }
+
+                const previousStatusId = order.statusId;
+                let shippingDataObj = order.shippingData
+                    ? (typeof order.shippingData === 'string'
+                        ? JSON.parse(order.shippingData)
+                        : order.shippingData)
+                    : null;
+                let shippingDataChanged = false;
+
                 order.statusId = data.statusId
+                if (data.statusId === 'S7') {
+                    const now = new Date().toISOString();
+                    if (!shippingDataObj) {
+                        shippingDataObj = {};
+                    }
+
+                    const cancelReason = data.cancelReason
+                        || data.reason
+                        || data.cancel_note
+                        || (data.dataOrder && data.dataOrder.cancelReason)
+                        || null;
+
+                    shippingDataObj.cancellation = {
+                        requestedAt: now,
+                        reason: cancelReason,
+                        requestedBy: data.requestedBy || 'user',
+                        source: data.source || 'customer-portal'
+                    };
+
+                    if (order.isPaymentOnlien === 1) {
+                        const refundHistory = Array.isArray(shippingDataObj.refundHistory)
+                            ? shippingDataObj.refundHistory
+                            : [];
+
+                        refundHistory.push({
+                            status: 'pending',
+                            method: 'manual',
+                            amount: data.dataOrder && data.dataOrder.totalPaid ? data.dataOrder.totalPaid : null,
+                            createdAt: now,
+                            note: 'Order cancelled by customer - awaiting manual refund'
+                        });
+
+                        shippingDataObj.refundRequired = true;
+                        shippingDataObj.refundStatus = 'pending';
+                        shippingDataObj.refundMethod = 'manual';
+                        shippingDataObj.refundLastUpdatedAt = now;
+                        shippingDataObj.refundHistory = refundHistory.slice(-20);
+                    }
+
+                    shippingDataChanged = true;
+                }
+
+                if (shippingDataChanged) {
+                    order.shippingData = shippingDataObj ? JSON.stringify(shippingDataObj) : null;
+                }
+
                 await order.save()
                 // cong lai stock khi huy don
-                if (data.statusId == 'S7' && data.dataOrder.orderDetail && data.dataOrder.orderDetail.length > 0) {
+                if (data.statusId == 'S7' && data.dataOrder && data.dataOrder.orderDetail && data.dataOrder.orderDetail.length > 0) {
                     for (let i = 0; i < data.dataOrder.orderDetail.length; i++) {
                         let productDetailSize = await db.ProductDetailSize.findOne({
                             where: { id: data.dataOrder.orderDetail[i].productDetailSize.id },
@@ -253,7 +440,13 @@ let updateStatusOrder = (data) => {
 
                 resolve({
                     errCode: 0,
-                    errMessage: 'ok'
+                    errMessage: 'ok',
+                    data: {
+                        previousStatusId,
+                        currentStatusId: order.statusId,
+                        refundRequired: order.isPaymentOnlien === 1 && data.statusId === 'S7',
+                        refundStatus: shippingDataObj && shippingDataObj.refundStatus ? shippingDataObj.refundStatus : null
+                    }
                 })
             }
         } catch (error) {
@@ -340,6 +533,110 @@ let getAllOrdersByUser = (userId) => {
 }
 // getAllOrdersByShipper removed - using GHN third-party shipping
 
+let updateRefundStatus = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.orderId || !data.status) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter !'
+                })
+                return;
+            }
+
+            const normalizedStatus = String(data.status).toLowerCase();
+            const allowedStatus = ['pending', 'completed'];
+            if (!allowedStatus.includes(normalizedStatus)) {
+                resolve({
+                    errCode: 2,
+                    errMessage: 'Invalid refund status'
+                })
+                return;
+            }
+
+            const order = await db.OrderProduct.findOne({
+                where: { id: data.orderId },
+                raw: false
+            });
+
+            if (!order) {
+                resolve({
+                    errCode: 3,
+                    errMessage: 'Order not found!'
+                })
+                return;
+            }
+
+            // Ensure shippingData is properly parsed as object
+            let rawShipping = order.shippingData;
+            let shippingDataObj = {};
+            if (rawShipping) {
+                if (typeof rawShipping === 'string') {
+                    try {
+                        shippingDataObj = JSON.parse(rawShipping) || {};
+                    } catch (e) {
+                        console.error('Failed to parse shippingData:', e);
+                        shippingDataObj = {};
+                    }
+                } else if (typeof rawShipping === 'object') {
+                    shippingDataObj = rawShipping;
+                }
+            }
+            
+            const now = new Date().toISOString();
+            const history = Array.isArray(shippingDataObj.refundHistory)
+                ? shippingDataObj.refundHistory
+                : [];
+
+            history.push({
+                status: normalizedStatus,
+                note: data.note || null,
+                amount: data.amount || shippingDataObj.refundAmount || null,
+                updatedAt: now,
+                updatedBy: data.updatedBy || 'admin'
+            });
+
+            shippingDataObj.refundHistory = history.slice(-20);
+            shippingDataObj.refundStatus = normalizedStatus;
+            shippingDataObj.refundLastUpdatedAt = now;
+            shippingDataObj.refundLastUpdatedBy = data.updatedBy || 'admin';
+
+            if (data.amount) {
+                shippingDataObj.refundAmount = data.amount;
+            }
+
+            if (data.note) {
+                shippingDataObj.refundNote = data.note;
+            }
+
+            if (normalizedStatus === 'completed') {
+                shippingDataObj.refundRequired = false;
+                shippingDataObj.refundCompletedAt = now;
+                shippingDataObj.refundCompletedBy = data.updatedBy || 'admin';
+            } else {
+                shippingDataObj.refundRequired = true;
+                shippingDataObj.refundCompletedAt = null;
+                delete shippingDataObj.refundCompletedBy;
+            }
+
+            order.shippingData = JSON.stringify(shippingDataObj);
+            await order.save();
+
+            resolve({
+                errCode: 0,
+                errMessage: 'ok',
+                data: {
+                    refundStatus: shippingDataObj.refundStatus,
+                    refundRequired: shippingDataObj.refundRequired,
+                    refundNote: shippingDataObj.refundNote || null
+                }
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 let paymentOrder = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -362,8 +659,6 @@ let paymentOrder = (data) => {
                 })
                 data.result[i].realPrice = parseFloat((data.result[i].realPrice / EXCHANGE_RATES.USD).toFixed(2))
 
-                console.log(data.result[i].realPrice)
-                console.log(data.total)
                 listItem.push({
                     "name": data.result[i].product.name + " | " + data.result[i].productDetail.nameDetail + " | " + data.result[i].productDetailSize.sizeData.value,
                     "sku": data.result[i].productId + "",
@@ -372,7 +667,6 @@ let paymentOrder = (data) => {
                     "quantity": data.result[i].quantity
                 })
                 totalPriceProduct += data.result[i].realPrice * data.result[i].quantity
-                console.log(data.total - totalPriceProduct)
             }
             listItem.push({
                 "name": "Phi ship + Voucher",
@@ -460,8 +754,36 @@ let paymentOrderSuccess = (data) => {
                     } else {
 
 
-                        let product = await db.OrderProduct.create({
+                        // Build shippingData JSON if shipping info provided
+                        let shippingData = null;
+                        if (data.shippingProvider || data.shippingFee || data.ghnAddress) {
+                            shippingData = {
+                                provider: data.shippingProvider || null,
+                                shipCode: data.shipCode || null,
+                                shippingFee: data.shippingFee || 0,
+                                ...(data.ghnAddress && {
+                                    districtId: data.ghnAddress.districtId,
+                                    wardCode: data.ghnAddress.wardCode,
+                                    address: data.ghnAddress.fullAddress
+                                })
+                            };
+                        }
 
+                        if (data.paymentMeta) {
+                            shippingData = {
+                                ...(shippingData || {}),
+                                paymentMeta: data.paymentMeta
+                            };
+                        } else {
+                            shippingData = {
+                                ...(shippingData || {}),
+                                paymentMeta: {
+                                    method: data.isPaymentOnlien === 1 ? 'ONLINE' : 'COD'
+                                }
+                            };
+                        }
+
+                        let product = await db.OrderProduct.create({
                             userId: data.userId,
                             addressUserId: data.addressUserId,
                             isPaymentOnlien: data.isPaymentOnlien,
@@ -469,14 +791,7 @@ let paymentOrderSuccess = (data) => {
                             typeShipId: data.typeShipId || null,
                             voucherId: data.voucherId,
                             note: data.note,
-                            // GHN fields
-                            shipCode: data.shipCode || null,
-                            shippingProvider: data.shippingProvider || 'internal',
-                            ghnDistrictId: data.ghnAddress ? data.ghnAddress.districtId : null,
-                            ghnWardCode: data.ghnAddress ? data.ghnAddress.wardCode : null,
-                            ghnAddress: data.ghnAddress ? data.ghnAddress.fullAddress : null,
-                            shippingFee: data.shippingFee || 0
-
+                            shippingData: shippingData ? JSON.stringify(shippingData) : null
                         })
 
                         data.arrDataShopCart = data.arrDataShopCart.map((item, index) => {
@@ -536,22 +851,43 @@ let paymentOrderSuccess = (data) => {
 let paymentOrderVnpaySuccess = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let product = await db.OrderProduct.create({
+            // Build shippingData JSON if shipping info provided
+            let shippingData = null;
+            if (data.shippingProvider || data.shippingFee || data.ghnAddress) {
+                shippingData = {
+                    provider: data.shippingProvider || null,
+                    shipCode: data.shipCode || null,
+                    shippingFee: data.shippingFee || 0,
+                    ...(data.ghnAddress && {
+                        districtId: data.ghnAddress.districtId,
+                        wardCode: data.ghnAddress.wardCode,
+                        address: data.ghnAddress.fullAddress
+                    })
+                };
+            }
 
+            if (data.paymentMeta) {
+                shippingData = {
+                    ...(shippingData || {}),
+                    paymentMeta: data.paymentMeta
+                };
+            } else {
+                shippingData = {
+                    ...(shippingData || {}),
+                    paymentMeta: {
+                        method: data.isPaymentOnlien === 1 ? 'ONLINE' : 'COD'
+                    }
+                };
+            }
+
+            let product = await db.OrderProduct.create({
                 addressUserId: data.addressUserId,
                 isPaymentOnlien: data.isPaymentOnlien,
                 statusId: 'S3',
                 typeShipId: data.typeShipId || null,
                 voucherId: data.voucherId,
                 note: data.note,
-                // GHN fields
-                shipCode: data.shipCode || null,
-                shippingProvider: data.shippingProvider || 'internal',
-                ghnDistrictId: data.ghnAddress ? data.ghnAddress.districtId : null,
-                ghnWardCode: data.ghnAddress ? data.ghnAddress.wardCode : null,
-                ghnAddress: data.ghnAddress ? data.ghnAddress.fullAddress : null,
-                shippingFee: data.shippingFee || 0
-
+                shippingData: shippingData ? JSON.stringify(shippingData) : null
             })
 
             data.arrDataShopCart = data.arrDataShopCart.map((item, index) => {
@@ -775,6 +1111,177 @@ let updateImageOrder = (data) => {
         }
     })
 }
+
+/**
+ * Update shipping info for an order
+ * Hỗ trợ lưu thông tin vận chuyển linh hoạt cho nhiều đơn vị (GHN, GHTK, ViettelPost...)
+ * @param {object} data - { orderId, shipCode, shippingProvider, shippingFee, shippingData }
+ */
+let updateShippingInfo = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.orderId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing orderId parameter!'
+                })
+                return;
+            }
+
+            let order = await db.OrderProduct.findOne({
+                where: { id: data.orderId },
+                raw: false
+            })
+
+            if (!order) {
+                resolve({
+                    errCode: 2,
+                    errMessage: 'Order not found!'
+                })
+                return;
+            }
+
+            const existingShippingData = order.shippingData
+                ? (typeof order.shippingData === 'string'
+                    ? JSON.parse(order.shippingData)
+                    : order.shippingData)
+                : {};
+
+            const normalizedShippingData = data.shippingData && typeof data.shippingData === 'string'
+                ? JSON.parse(data.shippingData)
+                : (data.shippingData || {});
+
+            const resolvedProvider = data.shippingProvider
+                ?? normalizedShippingData.provider
+                ?? existingShippingData.provider
+                ?? null;
+
+            const resolvedShipCode = data.shipCode
+                ?? normalizedShippingData.shipCode
+                ?? existingShippingData.shipCode
+                ?? null;
+
+            const resolvedShippingFee = data.shippingFee
+                ?? normalizedShippingData.shippingFee
+                ?? existingShippingData.shippingFee
+                ?? 0;
+
+            const shippingDataObj = {
+                ...existingShippingData,
+                ...normalizedShippingData,
+                provider: resolvedProvider,
+                shipCode: resolvedShipCode,
+                shippingFee: resolvedShippingFee,
+                updatedAt: new Date().toISOString()
+            };
+
+            order.shippingData = shippingDataObj ? JSON.stringify(shippingDataObj) : null;
+
+            await order.save();
+
+            resolve({
+                errCode: 0,
+                errMessage: 'Shipping info updated successfully!',
+                shippingData: shippingDataObj
+            })
+        } catch (error) {
+            console.error('updateShippingInfo error:', error);
+            reject(error)
+        }
+    })
+}
+
+let handleGHNWebhook = (payload) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { orderCode, rawStatus } = extractGhnWebhookPayload(payload);
+
+            if (!orderCode) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'orderCode is required'
+                });
+                return;
+            }
+
+            if (!rawStatus) {
+                resolve({
+                    errCode: 2,
+                    errMessage: 'status is required'
+                });
+                return;
+            }
+
+            const normalizedStatus = normalizeVietnamese(rawStatus);
+            const mapping = GHN_STATUS_TO_INTERNAL[normalizedStatus] || null;
+
+            const whereClause = db.sequelize.where(
+                db.sequelize.fn(
+                    'JSON_UNQUOTE',
+                    db.sequelize.fn('JSON_EXTRACT', db.sequelize.col('shippingData'), '$.shipCode')
+                ),
+                orderCode
+            );
+
+            const order = await db.OrderProduct.findOne({ where: whereClause, raw: false });
+
+            if (!order) {
+                resolve({
+                    errCode: 3,
+                    errMessage: `Không tìm thấy đơn hàng với mã vận đơn ${orderCode}`
+                });
+                return;
+            }
+
+            const previousStatusId = order.statusId;
+            const now = new Date().toISOString();
+            const shippingDataObj = order.shippingData && typeof order.shippingData === 'string'
+                ? JSON.parse(order.shippingData)
+                : (order.shippingData || {});
+
+            shippingDataObj.provider = shippingDataObj.provider || 'GHN';
+            shippingDataObj.shipCode = shippingDataObj.shipCode || orderCode;
+            shippingDataObj.lastWebhookStatus = rawStatus;
+            shippingDataObj.lastWebhookStatusNormalized = normalizedStatus;
+            shippingDataObj.lastWebhookAt = now;
+
+            const history = Array.isArray(shippingDataObj.webhookHistory) ? shippingDataObj.webhookHistory : [];
+            history.push({
+                provider: 'GHN',
+                providerStatus: rawStatus,
+                normalizedStatus,
+                mappedStatusId: mapping ? mapping.statusId : null,
+                receivedAt: now
+            });
+            shippingDataObj.webhookHistory = history.slice(-20);
+
+            if (mapping && mapping.statusId && mapping.statusId !== previousStatusId) {
+                order.statusId = mapping.statusId;
+            }
+
+            order.shippingData = shippingDataObj ? JSON.stringify(shippingDataObj) : null;
+            await order.save();
+
+            resolve({
+                errCode: 0,
+                errMessage: mapping ? 'Đã cập nhật trạng thái đơn hàng theo GHN' : 'Đã ghi nhận trạng thái GHN (chưa có mapping)',
+                data: {
+                    orderId: order.id,
+                    orderCode,
+                    previousStatusId,
+                    currentStatusId: order.statusId,
+                    rawStatus,
+                    normalizedStatus,
+                    mapping
+                }
+            });
+        } catch (error) {
+            console.error('handleGHNWebhook error:', error);
+            reject(error);
+        }
+    });
+}
+
 module.exports = {
     createNewOrder: createNewOrder,
     getAllOrders: getAllOrders,
@@ -787,5 +1294,8 @@ module.exports = {
     paymentOrderVnpay: paymentOrderVnpay,
     confirmOrderVnpay: confirmOrderVnpay,
     paymentOrderVnpaySuccess: paymentOrderVnpaySuccess,
-    updateImageOrder: updateImageOrder
+    updateImageOrder: updateImageOrder,
+    updateShippingInfo: updateShippingInfo,
+    handleGHNWebhook: handleGHNWebhook,
+    updateRefundStatus: updateRefundStatus
 }

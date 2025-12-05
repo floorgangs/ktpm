@@ -37,6 +37,22 @@ function VnpayPaymentSuccess(props) {
 
                
                 if(orderData){
+                    orderData.paymentMeta = {
+                        gateway: 'VNPAY',
+                        bankCode: query.get('vnp_BankCode'),
+                        bankTranNo: query.get('vnp_BankTranNo'),
+                        transactionNo: query.get('vnp_TransactionNo'),
+                        cardType: query.get('vnp_CardType'),
+                        payDate: query.get('vnp_PayDate'),
+                        amount: query.get('vnp_Amount'),
+                        responseCode: query.get('vnp_ResponseCode'),
+                        currency: 'VND',
+                        txnRef: query.get('vnp_TxnRef'),
+                        orderInfo: query.get('vnp_OrderInfo'),
+                        tmnCode: query.get('vnp_TmnCode'),
+                        transactionStatus: query.get('vnp_TransactionStatus'),
+                        secureHash: query.get('vnp_SecureHash')
+                    };
                     let res = await confirmOrderVnpay(objectParam)
                     if(res && res.errCode === 0){
 

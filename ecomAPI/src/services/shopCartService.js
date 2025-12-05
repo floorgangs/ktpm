@@ -22,7 +22,7 @@ let addShopCart = (data) => {
                         }
                         for (let k = 0; k < orderDetail.length; k++) {
                             let order = await db.OrderProduct.findOne({ where: { id: orderDetail[k].orderId } })
-                            if (order.statusId != 'S7') {
+                            if (order && order.statusId != 'S7') {
 
                                 quantity = quantity - orderDetail[k].quantity
                             }
@@ -70,7 +70,7 @@ let addShopCart = (data) => {
                         }
                         for (let k = 0; k < orderDetail.length; k++) {
                             let order = await db.OrderProduct.findOne({ where: { id: orderDetail[k].orderId } })
-                            if (order.statusId != 'S7') {
+                            if (order && order.statusId != 'S7') {
 
                                 quantity = quantity - orderDetail[k].quantity
                             }
@@ -78,7 +78,7 @@ let addShopCart = (data) => {
                         res.stock = quantity
                     }
 
-                    if (data.quantity > res.stock) {
+                    if (+data.quantity > res.stock) {
                         resolve({
                             errCode: 2,
                             errMessage: `Chỉ còn ${res.stock} sản phẩm`,

@@ -39,6 +39,7 @@ function OrderHomePage(props) {
     const [discountAmount, setDiscountAmount] = useState(0)
     
     // GHN States - Only shipping method
+    // eslint-disable-next-line no-unused-vars
     const [ghnAddress, setGhnAddress] = useState(null)
     const [ghnShippingFee, setGhnShippingFee] = useState(0)
     const [ghnInitialAddress, setGhnInitialAddress] = useState(null)
@@ -304,16 +305,15 @@ function OrderHomePage(props) {
             result.push(object)
         })
         
-        // Generate GHN ship code (mock)
-        const shipCode = `GHN_${Date.now()}_${Math.random().toString(36).substr(2, 6).toUpperCase()}`
-        
-        // Map Vietnamese address names to GHN IDs for order tracking
+        // Map Vietnamese address names to GHN IDs for shipping fee calculation
+        // Note: shipCode will be generated later when admin pushes order to GHN
         const ghnMapped = await mapAddressToGHN(
             currentAddress.provinceName,
             currentAddress.districtName,
             currentAddress.wardName
         )
         
+        // eslint-disable-next-line no-unused-vars
         const ghnAddressInfo = ghnMapped ? {
             districtId: ghnMapped.districtId,
             wardCode: ghnMapped.wardCode,
@@ -334,10 +334,7 @@ function OrderHomePage(props) {
                 note: note,
                 userId: userId,
                 arrDataShopCart: result,
-                // GHN fields - Always use GHN
-                shipCode: shipCode,
-                shippingProvider: 'GHN',
-                ghnAddress: ghnAddressInfo,
+                // Only save shipping fee - shipCode will be generated when admin pushes to GHN
                 shippingFee: ghnShippingFee
             })
                 if (res && res.errCode === 0) {
@@ -370,10 +367,7 @@ function OrderHomePage(props) {
                             userId: userId,
                             arrDataShopCart: result,
                             total: total,
-                            // GHN fields - Always use GHN
-                            shipCode: shipCode,
-                            shippingProvider: 'GHN',
-                            ghnAddress: ghnAddressInfo,
+                            // Only save shipping fee - shipCode will be generated when admin pushes to GHN
                             shippingFee: ghnShippingFee
                         }))
                         window.location.href = res.link
@@ -393,10 +387,7 @@ function OrderHomePage(props) {
                             userId: userId,
                             arrDataShopCart: result,
                             total: price + (+priceShip) - discountAmount,
-                            // GHN fields - Always use GHN
-                            shipCode: shipCode,
-                            shippingProvider: 'GHN',
-                            ghnAddress: ghnAddressInfo,
+                            // Only save shipping fee - shipCode will be generated when admin pushes to GHN
                             shippingFee: ghnShippingFee
                         }
 

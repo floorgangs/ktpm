@@ -457,6 +457,193 @@
                 margin: 10px 0 0 230px;
             }
         }
+        .payment-meta-card{
+            margin: 0 20px 20px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            background: #fbfcff;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+
+            .meta-header{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .header-left{
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    i{
+                        font-size: 24px;
+                        color: #2563eb;
+                    }
+                    .title{
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #1f2937;
+                    }
+                    .subtitle{
+                        font-size: 13px;
+                        color: #4b5563;
+                        margin-top: 2px;
+                    }
+                }
+                .refund-badge{
+                    text-transform: uppercase;
+                    font-size: 11px;
+                    font-weight: 700;
+                    border-radius: 999px;
+                    padding: 6px 12px;
+                    color: #b45309;
+                    background: #fef3c7;
+                    &.neutral{
+                        color: #4b5563;
+                        background: #e5e7eb;
+                    }
+                    &.success{
+                        color: #047857;
+                        background: #d1fae5;
+                    }
+                    &.failed{
+                        color: #b91c1c;
+                        background: #fee2e2;
+                    }
+                    &.pending{
+                        color: #b45309;
+                        background: #fef3c7;
+                    }
+                }
+            }
+            .meta-grid{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 12px 20px;
+
+                .meta-item{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                    padding: 8px 0;
+                    border-bottom: 1px dashed #e5e7eb;
+
+                    &.full{
+                        grid-column: 1 / -1;
+                    }
+
+                    .label{
+                        font-size: 12px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.02em;
+                        color: #6b7280;
+                    }
+                    .value{
+                        font-size: 15px;
+                        font-weight: 500;
+                        color: #111827;
+                        word-break: break-all;
+                        &.highlight{
+                            color: #2563eb;
+                        }
+                    }
+                }
+            }
+            .meta-status{
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                .label{
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.02em;
+                    color: #6b7280;
+                }
+                .status-value{
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+
+                    .status-pill{
+                        padding: 6px 16px;
+                        border-radius: 999px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        &.success{
+                            background: #d1fae5;
+                            color: #047857;
+                        }
+                        &.failed{
+                            background: #fee2e2;
+                            color: #b91c1c;
+                        }
+                        &.pending{
+                            background: #fef3c7;
+                            color: #b45309;
+                        }
+                        &.neutral{
+                            background: #e5e7eb;
+                            color: #4b5563;
+                        }
+                    }
+                    .status-note{
+                        font-size: 13px;
+                        color: #4b5563;
+                    }
+                }
+            }
+            .meta-actions{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                .btn-refund{
+                    border: none;
+                    padding: 8px 14px;
+                    border-radius: 6px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    &.success{
+                        background: #047857;
+                        color: #fff;
+                    }
+                    &.secondary{
+                        background: #e5e7eb;
+                        color: #1f2937;
+                    }
+                    &.danger{
+                        background: #b91c1c;
+                        color: #fff;
+                    }
+                    &:disabled{
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+                    &:not(:disabled):hover{
+                        transform: translateY(-1px);
+                    }
+                }
+            }
+            .meta-footer{
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                font-size: 13px;
+                color: #92400e;
+                background: #fff7ed;
+                padding: 10px 12px;
+                border-radius: 6px;
+                i{
+                    margin-top: 2px;
+                }
+            }
+        }
         .content-bottom{
             background-color: #fffefb;
             display: flex;
