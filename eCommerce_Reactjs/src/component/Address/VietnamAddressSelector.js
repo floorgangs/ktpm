@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { getVietnamProvinces, getVietnamDistricts, getVietnamWards } from '../../services/shippingService';
 import './VietnamAddressSelector.scss';
 
@@ -8,10 +8,18 @@ import './VietnamAddressSelector.scss';
  * Props:
  * - onAddressChange: Callback khi địa chỉ thay đổi
  *   Returns: { provinceName, districtName, wardName, fullAddress }
- * - initialAddress: Địa chỉ ban đầu { provinceName, districtName, wardName }
+ * - initialProvinceName: Tên tỉnh/thành phố ban đầu (string)
+ * - initialDistrictName: Tên quận/huyện ban đầu (string)
+ * - initialWardName: Tên phường/xã ban đầu (string)
  * - compact: Chế độ gọn nhẹ cho modal
  */
-function VietnamAddressSelector({ onAddressChange, initialAddress = null, compact = true }) {
+function VietnamAddressSelector({ 
+    onAddressChange, 
+    initialProvinceName = '',
+    initialDistrictName = '',
+    initialWardName = '',
+    compact = true 
+}) {
     // Data lists
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -28,41 +36,67 @@ function VietnamAddressSelector({ onAddressChange, initialAddress = null, compac
     const [loadingWards, setLoadingWards] = useState(false);
     
     const [error, setError] = useState('');
-
-    // Load provinces on mount
+    
+    // Refs to prevent infinite loops
+    const onAddressChangeRef = useRef(onAddressChange);
+    const isLoadingInitial = useRef(true);
+    const lastNotifiedAddress = useRef('');
+    
+    // Update ref when callback changes
     useEffect(() => {
+        onAddressChangeRef.current = onAddressChange;
+    }, [onAddressChange]);
+
+    // Load provinces on mount only
+    useEffect(() => {
+        let isMounted = true;
+        
         const fetchProvinces = async () => {
             setLoadingProvinces(true);
             setError('');
             try {
                 const res = await getVietnamProvinces();
+                if (!isMounted) return;
+                
                 if (res.errCode === 0) {
-                    setProvinces(res.data || []);
+                    const data = res.data || [];
+                    setProvinces(data);
                     
-                    // If initial address provided, try to match by name
-                    if (initialAddress?.provinceName && res.data) {
-                        const match = res.data.find(p => 
-                            p.name.toLowerCase().includes(initialAddress.provinceName.toLowerCase()) ||
-                            initialAddress.provinceName.toLowerCase().includes(p.name.toLowerCase())
+                    // Match initial province by name if provided
+                    if (initialProvinceName && data.length > 0) {
+                        const match = data.find(p => 
+                            p.name.toLowerCase().includes(initialProvinceName.toLowerCase()) ||
+                            initialProvinceName.toLowerCase().includes(p.name.toLowerCase())
                         );
                         if (match) {
                             setSelectedProvince(match);
                         }
                     }
                 } else {
-                    setError(res.errMessage);
+                    setError(res.errMessage || 'Lỗi tải dữ liệu');
                 }
             } catch (err) {
-                setError('Không thể tải danh sách tỉnh/thành phố');
+                if (isMounted) {
+                    setError('Không thể tải danh sách tỉnh/thành phố');
+                }
             }
-            setLoadingProvinces(false);
+            if (isMounted) {
+                setLoadingProvinces(false);
+            }
         };
+        
         fetchProvinces();
-    }, [initialAddress.provinceName]);
+        
+        return () => {
+            isMounted = false;
+        };
+    // Only run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Load districts when province changes
     useEffect(() => {
-        if (!selectedProvince) {
+        if (!selectedProvince?.id) {
             setDistricts([]);
             setSelectedDistrict(null);
             setWards([]);
@@ -70,135 +104,194 @@ function VietnamAddressSelector({ onAddressChange, initialAddress = null, compac
             return;
         }
         
+        let isMounted = true;
+        
         const fetchDistricts = async () => {
             setLoadingDistricts(true);
             setError('');
-            setDistricts([]);
-            setWards([]);
-            setSelectedDistrict(null);
-            setSelectedWard(null);
             
             try {
                 const res = await getVietnamDistricts(selectedProvince.id);
+                if (!isMounted) return;
+                
                 if (res.errCode === 0) {
-                    setDistricts(res.data || []);
+                    const data = res.data || [];
+                    setDistricts(data);
+                    setSelectedDistrict(null);
+                    setWards([]);
+                    setSelectedWard(null);
                     
-                    // Match initial district by name
-                    if (initialAddress?.districtName && res.data) {
-                        const match = res.data.find(d => 
-                            d.name.toLowerCase().includes(initialAddress.districtName.toLowerCase()) ||
-                            initialAddress.districtName.toLowerCase().includes(d.name.toLowerCase())
+                    // Match initial district by name if loading initial data
+                    if (isLoadingInitial.current && initialDistrictName && data.length > 0) {
+                        const match = data.find(d => 
+                            d.name.toLowerCase().includes(initialDistrictName.toLowerCase()) ||
+                            initialDistrictName.toLowerCase().includes(d.name.toLowerCase())
                         );
                         if (match) {
                             setSelectedDistrict(match);
                         }
                     }
                 } else {
-                    setError(res.errMessage);
+                    setError(res.errMessage || 'Lỗi tải dữ liệu');
                 }
             } catch (err) {
-                setError('Không thể tải danh sách quận/huyện');
+                if (isMounted) {
+                    setError('Không thể tải danh sách quận/huyện');
+                }
             }
-            setLoadingDistricts(false);
+            if (isMounted) {
+                setLoadingDistricts(false);
+            }
         };
+        
         fetchDistricts();
-    }, [selectedProvince, initialAddress?.districtName]);
+        
+        return () => {
+            isMounted = false;
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedProvince?.id]);
 
     // Load wards when district changes
     useEffect(() => {
-        if (!selectedDistrict) {
+        if (!selectedDistrict?.id) {
             setWards([]);
             setSelectedWard(null);
             return;
         }
         
+        let isMounted = true;
+        
         const fetchWards = async () => {
             setLoadingWards(true);
             setError('');
-            setWards([]);
-            setSelectedWard(null);
             
             try {
                 const res = await getVietnamWards(selectedDistrict.id);
+                if (!isMounted) return;
+                
                 if (res.errCode === 0) {
-                    setWards(res.data || []);
+                    const data = res.data || [];
+                    setWards(data);
+                    setSelectedWard(null);
                     
-                    // Match initial ward by name
-                    if (initialAddress?.wardName && res.data) {
-                        const match = res.data.find(w => 
-                            w.name.toLowerCase().includes(initialAddress.wardName.toLowerCase()) ||
-                            initialAddress.wardName.toLowerCase().includes(w.name.toLowerCase())
+                    // Match initial ward by name if loading initial data
+                    if (isLoadingInitial.current && initialWardName && data.length > 0) {
+                        const match = data.find(w => 
+                            w.name.toLowerCase().includes(initialWardName.toLowerCase()) ||
+                            initialWardName.toLowerCase().includes(w.name.toLowerCase())
                         );
                         if (match) {
                             setSelectedWard(match);
+                            isLoadingInitial.current = false; // Done loading initial
                         }
                     }
                 } else {
-                    setError(res.errMessage);
+                    setError(res.errMessage || 'Lỗi tải dữ liệu');
                 }
             } catch (err) {
-                setError('Không thể tải danh sách phường/xã');
+                if (isMounted) {
+                    setError('Không thể tải danh sách phường/xã');
+                }
             }
-            setLoadingWards(false);
+            if (isMounted) {
+                setLoadingWards(false);
+            }
         };
+        
         fetchWards();
-    }, [selectedDistrict, initialAddress?.wardName]);
+        
+        return () => {
+            isMounted = false;
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedDistrict?.id]);
 
-    // Notify parent when address changes
-    const notifyAddressChange = useCallback(() => {
-        if (onAddressChange) {
+    // Notify parent - only call when address actually changes
+    const notifyParent = (province, district, ward) => {
+        const addressKey = `${province?.id || ''}-${district?.id || ''}-${ward?.id || ''}`;
+        
+        // Prevent duplicate notifications
+        if (addressKey === lastNotifiedAddress.current) {
+            return;
+        }
+        lastNotifiedAddress.current = addressKey;
+        
+        if (onAddressChangeRef.current) {
             const fullAddress = [
-                selectedWard?.name,
-                selectedDistrict?.name,
-                selectedProvince?.name
+                ward?.name,
+                district?.name,
+                province?.name
             ].filter(Boolean).join(', ');
             
-            onAddressChange({
-                provinceName: selectedProvince?.name || '',
-                districtName: selectedDistrict?.name || '',
-                wardName: selectedWard?.name || '',
+            onAddressChangeRef.current({
+                provinceName: province?.name || '',
+                districtName: district?.name || '',
+                wardName: ward?.name || '',
                 fullAddress,
-                // Also provide IDs for internal use (these are from GHN but standardized)
-                provinceId: selectedProvince?.id,
-                districtId: selectedDistrict?.id,
-                wardId: selectedWard?.id
+                provinceId: province?.id,
+                districtId: district?.id,
+                wardId: ward?.id
             });
         }
-    }, [selectedProvince, selectedDistrict, selectedWard, onAddressChange]);
-
-    useEffect(() => {
-        notifyAddressChange();
-    }, [notifyAddressChange]);
+    };
 
     // Handlers
     const handleProvinceChange = (e) => {
+        isLoadingInitial.current = false; // User is interacting
         const id = e.target.value;
+        
         if (!id) {
             setSelectedProvince(null);
+            setSelectedDistrict(null);
+            setSelectedWard(null);
+            setDistricts([]);
+            setWards([]);
+            notifyParent(null, null, null);
             return;
         }
+        
         const province = provinces.find(p => String(p.id) === String(id));
         setSelectedProvince(province);
+        setSelectedDistrict(null);
+        setSelectedWard(null);
+        setDistricts([]);
+        setWards([]);
+        notifyParent(province, null, null);
     };
 
     const handleDistrictChange = (e) => {
+        isLoadingInitial.current = false;
         const id = e.target.value;
+        
         if (!id) {
             setSelectedDistrict(null);
+            setSelectedWard(null);
+            setWards([]);
+            notifyParent(selectedProvince, null, null);
             return;
         }
+        
         const district = districts.find(d => String(d.id) === String(id));
         setSelectedDistrict(district);
+        setSelectedWard(null);
+        setWards([]);
+        notifyParent(selectedProvince, district, null);
     };
 
     const handleWardChange = (e) => {
+        isLoadingInitial.current = false;
         const id = e.target.value;
+        
         if (!id) {
             setSelectedWard(null);
+            notifyParent(selectedProvince, selectedDistrict, null);
             return;
         }
+        
         const ward = wards.find(w => String(w.id) === String(id));
         setSelectedWard(ward);
+        notifyParent(selectedProvince, selectedDistrict, ward);
     };
 
     return (
@@ -275,4 +368,4 @@ function VietnamAddressSelector({ onAddressChange, initialAddress = null, compac
     );
 }
 
-export default VietnamAddressSelector;
+export default memo(VietnamAddressSelector);

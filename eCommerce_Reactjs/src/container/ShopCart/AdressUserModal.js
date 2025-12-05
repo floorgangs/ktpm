@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getDetailAddressUserByIdService } from '../../services/userService';
 import VietnamAddressSelector from '../../component/Address/VietnamAddressSelector';
 import { Modal } from 'reactstrap';
@@ -82,8 +82,8 @@ const AddressUsersModal = (props) => {
         setInputValues({ ...inputValues, [name]: value });
     };
 
-    // Handle address change from VietnamAddressSelector
-    const handleAddressChange = (addressData) => {
+    // Handle address change from VietnamAddressSelector - wrapped in useCallback
+    const handleAddressChange = useCallback((addressData) => {
         if (addressData) {
             const locationString = [
                 addressData.wardName,
@@ -91,15 +91,18 @@ const AddressUsersModal = (props) => {
                 addressData.provinceName
             ].filter(Boolean).join(', ');
             
-            setInputValues(prev => ({
-                ...prev,
-                provinceName: addressData.provinceName || '',
-                districtName: addressData.districtName || '',
-                wardName: addressData.wardName || '',
-                address: composeFullAddress(prev.addressDetail, locationString)
-            }));
+            setInputValues(prev => {
+                const newAddress = composeFullAddress(prev.addressDetail, locationString);
+                return {
+                    ...prev,
+                    provinceName: addressData.provinceName || '',
+                    districtName: addressData.districtName || '',
+                    wardName: addressData.wardName || '',
+                    address: newAddress
+                };
+            });
         }
-    };
+    }, []);
 
     const handleDetailChange = (event) => {
         const detail = event.target.value;
@@ -219,11 +222,9 @@ const AddressUsersModal = (props) => {
                             <VietnamAddressSelector
                                 onAddressChange={handleAddressChange}
                                 compact={true}
-                                initialAddress={{
-                                    provinceName: inputValues.provinceName,
-                                    districtName: inputValues.districtName,
-                                    wardName: inputValues.wardName
-                                }}
+                                initialProvinceName={inputValues.provinceName}
+                                initialDistrictName={inputValues.districtName}
+                                initialWardName={inputValues.wardName}
                             />
                         </div>
 
