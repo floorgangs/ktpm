@@ -24,7 +24,7 @@
   },
   "production": {
     "username": "root",
-    "password": "",
+    "password": "ecompassword",
     "database": "ecom",
     "host": "mysql",
     "port": 3306,

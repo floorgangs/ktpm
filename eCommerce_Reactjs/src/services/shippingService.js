@@ -321,7 +321,7 @@ export const getVietnamWards = async (districtId) => {
     return result;
 };
 
-export default {
+const shippingService = {
     SHIPPING_PROVIDERS,
     mapAddressToGHN,
     mapAddressToGHTK,
@@ -332,3 +332,5 @@ export default {
     getVietnamWards,
     normalizeVietnamese
 };
+
+export default shippingService;

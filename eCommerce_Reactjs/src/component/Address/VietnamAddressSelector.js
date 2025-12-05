@@ -58,7 +58,7 @@ function VietnamAddressSelector({ onAddressChange, initialAddress = null, compac
             setLoadingProvinces(false);
         };
         fetchProvinces();
-    }, []);
+    }, [initialAddress.provinceName]);
 
     // Load districts when province changes
     useEffect(() => {

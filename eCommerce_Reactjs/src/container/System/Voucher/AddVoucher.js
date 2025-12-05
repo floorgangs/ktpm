@@ -36,7 +36,7 @@ const AddVoucher = (props) => {
                 setInputValues(prev => ({ ...prev, typeVoucherId: arrData.data[0].id }))
             }
         }
-    }, [])
+    }, [inputValues.typeVoucherId])
 
     const fetchProducts = useCallback(async () => {
         let res = await getAllProductService({})

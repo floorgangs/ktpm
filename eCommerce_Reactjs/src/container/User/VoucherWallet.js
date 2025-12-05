@@ -124,11 +124,6 @@ function VoucherWallet(props) {
         return text;
     };
 
-    // Check if user already saved this voucher
-    const isVoucherSaved = (voucherId) => {
-        return myVoucherIds.has(voucherId);
-    };
-
     return (
         <div className="voucher-page">
             <div className="voucher-header">

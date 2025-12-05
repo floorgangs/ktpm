@@ -12,7 +12,6 @@ const ManageVoucher = () => {
     const [dataVoucher, setdataVoucher] = useState([])
     const [dataTypeVoucher, setdataTypeVoucher] = useState([])
     const [count, setCount] = useState('')
-    const [numberPage, setnumberPage] = useState('')
     const [keyword, setkeyword] = useState('')
     const [statusFilter, setStatusFilter] = useState('ALL')
     const [typeFilter, setTypeFilter] = useState('ALL')
@@ -61,7 +60,6 @@ const ManageVoucher = () => {
     }
 
     let handleChangePage = async (number) => {
-        setnumberPage(number.selected)
         let arrData = await getAllVoucherService({
             limit: PAGINATION.pagerow,
             offset: number.selected * PAGINATION.pagerow,

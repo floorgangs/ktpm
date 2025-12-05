@@ -23,6 +23,19 @@ const AddBlog = (props) => {
 
         setInputValues({ ...inputValues, subjectId: dataSubject[0].code })
     }
+    const setStateBlog = (data) => {
+        setInputValues(prev => ({
+            ...prev,
+            title: data.title,
+            shortdescription: data.shortdescription,
+            image: data.image,
+            imageReview: data.image,
+            isActionADD: false,
+            contentMarkdown: data.contentMarkdown,
+            contentHTML: data.contentHTML,
+            subjectId: data.subjectId,
+        }))
+    }
     useEffect(() => {
         if (id) {
             let fetchBlog = async () => {
@@ -33,22 +46,9 @@ const AddBlog = (props) => {
             }
             fetchBlog();
         }
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id])
-    let setStateBlog = (data) => {
-        setInputValues({
-            ...inputValues,
-            title: data.title,
-            shortdescription: data.shortdescription,
-            image: data.image,
-            imageReview: data.image,
-            isActionADD: false,
-            contentMarkdown: data.contentMarkdown,
-            contentHTML: data.contentHTML,
-            subjectId: data.subjectId,
-        })
-
-    }
+    
     const handleOnChange = event => {
         const { name, value } = event.target;
         setInputValues({ ...inputValues, [name]: value });
