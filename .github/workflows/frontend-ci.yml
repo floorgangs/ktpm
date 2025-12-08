@@ -41,10 +41,11 @@ jobs:
         run: npm run build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: eCommerce_Reactjs/build/
+          retention-days: 30
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -52,6 +53,7 @@ jobs:
           directory: ./eCommerce_Reactjs/coverage
           flags: frontend
           name: frontend-coverage
+        continue-on-error: true
 
   e2e-test:
     name: E2E Tests (Cypress)
@@ -95,18 +97,20 @@ jobs:
           CYPRESS_baseUrl: http://localhost:3000
 
       - name: Upload Cypress screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
           path: eCommerce_Reactjs/cypress/screenshots
+          retention-days: 30
 
       - name: Upload Cypress videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cypress-videos
           path: eCommerce_Reactjs/cypress/videos
+          retention-days: 30
 
   deploy:
     name: Deploy to Netlify
@@ -153,13 +157,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: failure()
+    permissions:
+      issues: write
+      contents: read
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Create GitHub Issue
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
