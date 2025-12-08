@@ -3,28 +3,7 @@
  * Test: Password Hashing, Email Validation, Password Validation
  */
 
-const bcrypt = require("bcryptjs");
-
-// Mock Auth Service
-const authService = {
-  hashPassword: async (password) => {
-    const salt = await bcrypt.genSalt(10);
-    return bcrypt.hash(password, salt);
-  },
-
-  comparePassword: async (inputPassword, hashedPassword) => {
-    return bcrypt.compare(inputPassword, hashedPassword);
-  },
-
-  validateEmail: (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  },
-
-  validatePassword: (password) => {
-    return password && password.length >= 6 ? true : false;
-  },
-};
+const authService = require("../../src/utils/authUtils");
 
 // ==================== TESTS ====================
 
