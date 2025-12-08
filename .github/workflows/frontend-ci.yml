@@ -1,0 +1,173 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: eCommerce_Reactjs/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./eCommerce_Reactjs
+        run: npm ci
+
+      - name: Run linter
+        working-directory: ./eCommerce_Reactjs
+        run: npm run lint || echo "No linter configured"
+
+      - name: Run unit tests
+        working-directory: ./eCommerce_Reactjs
+        run: npm test -- --coverage --watchAll=false
+        env:
+          CI: true
+
+      - name: Build production
+        working-directory: ./eCommerce_Reactjs
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: eCommerce_Reactjs/build/
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./eCommerce_Reactjs/coverage
+          flags: frontend
+          name: frontend-coverage
+
+  e2e-test:
+    name: E2E Tests (Cypress)
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        working-directory: ./eCommerce_Reactjs
+        run: npm ci
+
+      - name: Install Cypress
+        working-directory: ./eCommerce_Reactjs
+        run: npx cypress install
+
+      - name: Start backend
+        working-directory: ./ecomAPI
+        run: |
+          npm install
+          npm start &
+          sleep 15
+
+      - name: Start frontend
+        working-directory: ./eCommerce_Reactjs
+        run: |
+          npm start &
+          sleep 15
+
+      - name: Run Cypress E2E tests
+        working-directory: ./eCommerce_Reactjs
+        run: npx cypress run --record false
+        env:
+          CYPRESS_baseUrl: http://localhost:3000
+
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: eCommerce_Reactjs/cypress/screenshots
+
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: cypress-videos
+          path: eCommerce_Reactjs/cypress/videos
+
+  deploy:
+    name: Deploy to Netlify
+    needs: [test, e2e-test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies and build
+        working-directory: ./eCommerce_Reactjs
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: "./eCommerce_Reactjs/build"
+          production-deploy: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Comment deployment URL
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Deployed to: https://your-site.netlify.app'
+            })
+
+  create-issue-on-failure:
+    name: Create Issue if Tests Failed
+    runs-on: ubuntu-latest
+    needs: test
+    if: failure()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create GitHub Issue
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `❌ Frontend Tests/Build Failed - ${new Date().toLocaleString()}`,
+              body: `## 🔴 Frontend Test/Build Failure Report\n\n**Commit:** ${context.payload.head_commit ? context.payload.head_commit.message : 'N/A'}\n**Branch:** ${context.ref}\n**Author:** ${context.actor}\n\n### ⚠️ Build or Tests Failed\n\nPlease check the test/build results and fix the issues:\n\n**Action Required:**\n- [ ] Review error logs\n- [ ] Fix code issues\n- [ ] Run tests locally: \`npm test\`\n- [ ] Build locally: \`npm run build\`\n- [ ] Commit and push fixes\n\n**Build Details:** [View Workflow](${context.server_url}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n---\n*Auto-generated by GitHub Actions*`,
+              labels: ['bug', 'ci-failure', 'frontend', 'test-failure']
+            });
+            console.log(`✅ Created issue #${issue.data.number}`);
