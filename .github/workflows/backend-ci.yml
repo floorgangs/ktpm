@@ -46,14 +46,14 @@ jobs:
 
       - name: Run unit tests
         working-directory: ./ecomAPI
-        run: npm run test:unit 2>&1 || echo "Tests may have failed"
+        run: npm run test:unit
         env:
           NODE_ENV: test
           JWT_SECRET: test_secret_key
 
-      - name: Run integration tests
+      - name: Run integration tests (no coverage)
         working-directory: ./ecomAPI
-        run: npm run test:integration
+        run: npm run test:integration -- --no-coverage
         env:
           NODE_ENV: test
           DB_HOST: 127.0.0.1
