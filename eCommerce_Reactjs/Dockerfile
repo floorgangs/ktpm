@@ -18,8 +18,8 @@ RUN npm run build
 # Install serve to run static files
 RUN npm install -g serve
 
-# Expose port (Railway will override with $PORT)
+# Expose port
 EXPOSE 3000
 
-# Start static server - use -p for port
-CMD serve -s build -p $PORT
+# Start static server
+CMD ["sh", "-c", "serve -s build -p ${PORT:-3000}"]
