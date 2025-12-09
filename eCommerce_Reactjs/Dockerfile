@@ -12,8 +12,14 @@ RUN npm install --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Expose port
+# Build for production
+RUN npm run build
+
+# Install serve to run static files
+RUN npm install -g serve
+
+# Expose port (Railway will override with $PORT)
 EXPOSE 3000
 
-# Start application
-CMD ["npm", "start"]
+# Start static server - use -p for port
+CMD serve -s build -p $PORT
