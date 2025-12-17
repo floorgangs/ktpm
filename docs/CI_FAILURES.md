@@ -9,3 +9,13 @@ File này dùng làm **fallback** khi GitHub Actions **không thể tạo GitHub
 ## Entries
 
 (Chưa có entry)
+## 2025-12-17T18:29:25.828Z — [CI FAIL] Frontend CI/CD - test - frontend tests failed
+- Run URL: https://github.com/floorgangs/ktpm/actions/runs/20313227455
+- Commit: 82fb94b300f2087bc71feefd16809867a991d909
+- Job: test
+- Reason: failed to create issue via API: HttpError: Issues has been disabled in this repository.
+
+```
+==== FRONTEND TEST OUTPUT (tail 100 lines) ====
+
+```
