@@ -205,3 +205,13 @@ Ran all test suites.
 Test results written to: ci-jest-db.json
 
 ```
+## 2025-12-18T15:52:39.699Z — [CI FAIL] Frontend CI/CD - test - frontend tests failed
+- Run URL: https://github.com/floorgangs/ktpm/actions/runs/20342809577
+- Commit: 23cfacff25f2d76e8303ed329f4e569747c1f804
+- Job: test
+- Reason: failed to create issue via API: HttpError: Issues has been disabled in this repository.
+
+```
+==== FRONTEND TEST OUTPUT (tail 100 lines) ====
+
+```
