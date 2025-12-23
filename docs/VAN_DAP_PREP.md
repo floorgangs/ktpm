@@ -2,6 +2,14 @@
 
 Mục tiêu: **không để thầy hỏi dồn**. Em chủ động dẫn: **Kiến trúc → Test plan → Test cases → Test code (white/black/integration) → Evidence chạy thật**.
 
+Gợi ý dẫn dắt theo đúng slide (để thầy nghe “khớp bài”):
+
+1. Giới thiệu đề tài (Agile & CI/CD, thách thức kiểm thử)
+2. Kế hoạch kiểm thử (V-Model: yêu cầu → acceptance, thiết kế → integration/unit)
+3. Phương luận (white-box/black-box/integration/E2E/non-functional, automation)
+4. Kết quả (test report, defect/report, evidence chạy thật)
+5. Kết luận & hướng phát triển
+
 ---
 
 ## 1) Kịch bản “phủ đầu” 5–7 phút (đọc như thuyết trình)
@@ -13,8 +21,8 @@ Mục tiêu: **không để thầy hỏi dồn**. Em chủ động dẫn: **Ki�
 
 Gợi ý mở nhanh sơ đồ use-case:
 
-- docs/tests/Images/Use case summary.png
-- docs/tests/Images/usecase_he_thong-uc1_KiemSoatVaTruyCap.png
+- docs/Images/Use case summary.png
+- docs/Images/usecase_he_thong-uc1_KiemSoatVaTruyCap.png
 
 ### 1.2 Test strategy (1–2 phút)
 
@@ -25,15 +33,20 @@ Gợi ý mở nhanh sơ đồ use-case:
   - **E2E UI**: Cypress một số luồng UI.
   - **Non-functional**: k6 load/stress.
 
+Liên hệ V-Model (nói 1 câu):
+
+- “Em áp dụng V-Model: từ yêu cầu/use-case → thiết kế test acceptance/E2E; từ thiết kế thành phần → integration; từ code/hàm → unit.”
+
 ### 1.3 Test plan → Test case (1–2 phút)
 
-- Em có baseline **90 test case** (Test Design), dùng để coverage requirement.
+- Em có baseline test cases/scenarios (Excel) để coverage requirement.
 - Repo có thêm **automation**: Jest chạy unit + API-contract + DB-real.
 - Số “116 tests” là **số test tự động Jest** (cách đếm khác với baseline 90).
 
-Tài liệu test case baseline:
+Tài liệu baseline (Excel) để mở nhanh khi thầy hỏi coverage requirement:
 
-- docs/PHU_LUC_A_TEST_CASES.md
+- docs/Test-Scenario.xlsx
+- docs/testcase/ (các file TestCase\_\*.xlsx)
 
 ### 1.4 Chỉ thầy xem “tổ chức thư mục” (30–60s)
 
@@ -44,9 +57,9 @@ Tài liệu test case baseline:
 - E2E UI:
   - eCommerce_Reactjs/cypress/e2e/
 - Checklists (Excel):
-  - docs/tests/TestReviewChecklist/test case review checklist.xlsx
+  - docs/TestReviewChecklist/test case review checklist.xlsx
 - Test plan (docx):
-  - docs/tests/docs/test-plan.docx
+  - docs/docs/test-plan.docx
 
 ### 1.5 Show “đoạn code test” theo đúng câu thầy hay hỏi (2 phút)
 
@@ -143,6 +156,12 @@ Thông số DB theo docker-compose (để nhập Adminer/DB tool):
   - Jest report `ecomAPI/jest-results.json` + `ecomAPI/coverage/lcov-report/index.html`
   - Cypress screenshots/videos (nếu có) trong `eCommerce_Reactjs/cypress/`
   - k6 scripts trong `performance/k6/`
+
+Nếu thầy hỏi “thiết kế hệ thống → kiểm thử gì?” (đúng slide phần 2):
+
+- Workflow (wireflow/use-case): dùng để derive E2E scenarios + API scenarios.
+- Data model/ERD: derive integration test để verify dữ liệu nhất quán.
+- UI/UX: derive smoke E2E (happy paths) + negative cases.
 
 ### 3.1 Backend (Jest)
 
@@ -426,6 +445,14 @@ Trong PR:
 
 ---
 
+## 9) (Tuỳ chọn) Ứng dụng GenAI trong kiểm thử (nói 20–30s)
+
+Nếu thầy hỏi “có dùng GenAI không?” thì trả lời ngắn gọn và an toàn:
+
+- “Dạ có thể dùng GenAI để hỗ trợ tạo draft test cases/scenarios/checklists, nhưng em luôn review lại theo requirement và chạy verification bằng automation/CI. GenAI chỉ hỗ trợ tăng tốc, không thay thế kiểm thử.”
+
+---
+
 ## 8) So sánh Verification vs Validation (và chỉ rõ trong đồ án)
 
 ### 8.1 Khác nhau nhanh (trả lời 15–20s)
@@ -481,7 +508,9 @@ Gói gọn 1 câu hay dùng:
 
 2. **Baseline test cases (90) = Validation theo requirement/use-case**
 
-- Baseline `docs/PHU_LUC_A_TEST_CASES.md`: mapping requirement → testcase → expected result.
+- Baseline (Excel) trong `docs/` dùng để mapping requirement → testcase → expected result:
+  - `docs/Test-Scenario.xlsx`
+  - `docs/testcase/` (các file TestCase\_\*.xlsx)
 - Khi thầy hỏi “có đúng nghiệp vụ không?”: mở baseline test case và chỉ expected/acceptance.
 
 3. **k6 = Validation một phần cho NFR (hiệu năng)**
