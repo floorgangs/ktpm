@@ -367,6 +367,63 @@ Thành công là gì (nói đúng theo CI):
 - Frontend CI sẽ chạy: unit + Cypress smoke + build.
 - Khi fail: CI upload artifacts (logs, Cypress screenshots/videos) để verification.
 
+### 7.1 Giải thích CI/CD + “workflow” là gì (nói 20–30s)
+
+- **CI (Continuous Integration)**: mỗi lần push/PR thì hệ thống **tự chạy build/test** để phát hiện lỗi sớm.
+- **CD (Continuous Delivery/Deployment)**: sau khi CI xanh (thường trên nhánh main) thì **tự build image/triển khai** (tuỳ cấu hình).
+- **Workflow (GitHub Actions)**: là file YAML trong `.github/workflows/` mô tả **khi nào chạy (trigger)** và **chạy những job/step nào**.
+
+### 7.2 Repo này đang có workflow nào? (đọc đúng tên)
+
+1. `.github/workflows/backend-ci.yml` → **Backend CI/CD**
+
+- Trigger: push/PR.
+- Job quan trọng cho PR:
+  - **Security Audit**: chạy `npm audit` backend.
+  - **Test Backend**: chạy unit + integration + DB-real (MySQL service + import `ecom.sql`).
+- Job chỉ chạy khi vào nhánh `main`:
+  - **Build Docker Image** (có điều kiện `if: github.ref == 'refs/heads/main'`).
+  - **Deploy to Staging** (cũng chỉ `main`).
+
+2. `.github/workflows/frontend-ci.yml` → **Frontend CI/CD**
+
+- Trigger: push/PR.
+- Job chính:
+  - **Test Frontend**: chạy unit + Cypress smoke + build.
+
+3. `.github/workflows/e2e-real-backend.yml` → **E2E (Real Backend) - Manual**
+
+- Trigger: **workflow_dispatch** (bấm Run workflow thủ công).
+- Ý nghĩa: dựng `mysql + backend` bằng docker compose → chạy Cypress spec “real backend”.
+
+### 7.3 Vì sao PR thấy “Skipped” mà vẫn đúng?
+
+- Vì một số job được thiết kế **chỉ chạy trên `main`** (build/deploy). Khi PR chạy trên nhánh feature, các job này sẽ hiện **Skipped** (đúng).
+- Một số job “Create Issue if Tests Failed” đang để `if: false` hoặc chỉ chạy khi failure → nên PR sẽ thấy **Skipped**.
+
+Chốt câu trả lời:
+
+- “Dạ steps bị `Skipped` vì workflow set điều kiện (chỉ chạy ở `main` hoặc khi fail). Với PR em chỉ cần các job test/audit PASS.”
+
+### 7.4 Dẫn thầy xem trên GitHub như thế nào (rất cụ thể)
+
+Trong PR:
+
+1. Mở tab **Checks** (hoặc kéo xuống phần checks)
+2. Chỉ vào 3 dòng quan trọng:
+   - `Backend CI/CD / Test Backend` ✅
+   - `Backend CI/CD / Security Audit` ✅
+   - `Frontend CI/CD / Test Frontend` ✅
+3. Nếu thầy hỏi log/report:
+   - Click vào check → xem log step `Run unit tests / integration / db-real`.
+   - Nếu fail: tải artifacts (logs, Cypress screenshots/videos) mà workflow upload.
+
+### 7.5 “Thành công” nghĩa là gì trong CI/CD của repo này?
+
+- PR merge được khi **required checks** đều xanh (thường là các job test/audit).
+- Build/Deploy có thể **Skipped** ở PR nhưng sẽ chạy khi merge vào `main`.
+- Nếu thầy hỏi “CD”: trả lời theo đúng cấu hình hiện có: repo có khung build/deploy cho `main`, còn triển khai thực tế phụ thuộc môi trường (server/railway).
+
 ---
 
 ## 8) So sánh Verification vs Validation (và chỉ rõ trong đồ án)
